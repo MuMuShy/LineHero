@@ -8,6 +8,8 @@
 
 加密貨幣機器人是一個使用python撰寫的Line bot,使用message api還有bybit api進行功能上的串接,目前提供了實時價格,訂閱表,等功能.
 
+新增好友: @765llgvq
+
 
 ## 如何開發
 
