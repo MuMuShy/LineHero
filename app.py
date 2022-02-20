@@ -17,8 +17,17 @@ import bybitApi
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi(os.getenv("LINE_BOT_API"))
-handler = WebhookHandler(os.getenv("LINE_BOT_SECRET"))
+
+environment = os.getenv("ENVIRONMENT")
+print("environment: "+environment)
+if environment =="DEV":
+    print("本地開發 使用本地開發版本機器人")
+    line_bot_api = LineBotApi(os.getenv("LINE_BOT_API_DEV"))
+    handler = WebhookHandler(os.getenv("LINE_BOT_SECRET_DEV"))  
+else:
+    print("線上heroku環境 預設線上版機器人")
+    line_bot_api = LineBotApi(os.getenv("LINE_BOT_API"))
+    handler = WebhookHandler(os.getenv("LINE_BOT_SECRET"))
 
 
 @app.route("/callback", methods=['POST'])
@@ -48,7 +57,7 @@ def handle_message(event):
         price = apiThread.getPrice()
         str=""
         for symbol in price:
-            str+= symbol+" : $"+price[symbol]+"\n"
+            str+= symbol+" : "+price[symbol]+"\n"
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=str))

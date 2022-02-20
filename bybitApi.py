@@ -83,9 +83,9 @@ class BybitApi(Thread):
         for item in self.subscribeSymbolList:
             try:
                 _price = self.session.last_traded_price(symbol=item)['result']['price']
-                self.priceList[item] = _price
+                self.priceList[item] = "$"+_price
             except:
-                self.priceList[item] = "此交易對沒有現貨資料 可使用!unsubscribe "+item+" 來移除訂閱!"
+                self.priceList[item] = "此交易對沒有現貨資料 可使用!unsubscribe "+item.split("USDT")[0]+" 來移除訂閱!"
         print("price:")
         print(self.priceList)
         return self.priceList        
