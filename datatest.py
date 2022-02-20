@@ -5,6 +5,10 @@ from DataBase import DataBase
 
 
 database = DataBase()
+str=""
+list = database.getCommandList()
+for command in list:
+    str+=command+"\n"+list[command][0]+"\n"
 
-print(database.checkUser(""))
+print(str)
 

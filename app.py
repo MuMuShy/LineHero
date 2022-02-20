@@ -2,7 +2,7 @@ import threading
 from time import sleep
 from flask import Flask, request, abort
 from dotenv import load_dotenv
-
+import lineMessagePacker
 from DataBase import DataBase
 load_dotenv()
 from linebot import (
@@ -64,65 +64,9 @@ def handle_message(event):
         user_line_img = profile.picture_url
         if database.checkUser(user_id) is True:
             _userjson = database.getUser(user_id)
-            str = "名稱:"+_userjson["user_line_name"]+"\n圖片:"+_userjson["user_img_link"]+"\n金錢:"+_userjson["user_money"]
             flex_message = FlexSendMessage(
-            alt_text='hello',
-            contents={
-                "type": "bubble",
-                "hero": {
-                    "type": "image",
-                    "url": _userjson["user_img_link"],
-                    "size": "full",
-                    "aspectRatio": "20:13",
-                    "aspectMode": "cover",
-                    "action": {
-                    "type": "uri",
-                    "uri": "http://linecorp.com/"
-                    }
-                },
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": _userjson["user_line_name"],
-                        "weight": "bold",
-                        "size": "xl"
-                    },
-                    {
-                        "type": "box",
-                        "layout": "vertical",
-                        "margin": "lg",
-                        "spacing": "sm",
-                        "contents": [
-                        {
-                            "type": "box",
-                            "layout": "baseline",
-                            "spacing": "sm",
-                            "contents": [
-                            {
-                                "type": "text",
-                                "text": "金錢",
-                                "color": "#aaaaaa",
-                                "size": "sm",
-                                "flex": 1
-                            },
-                            {
-                                "type": "text",
-                                "text": _userjson["user_money"],
-                                "color": "#666666",
-                                "size": "sm",
-                                "flex": 5
-                            }
-                            ]
-                        }
-                        
-                        ]
-                    }
-                    ]
-                }
-            })
+            alt_text='玩家資料來囉~',
+            contents=lineMessagePacker.getInfoFlexJson(_userjson["user_line_name"],_userjson["user_img_link"],_userjson["user_money"],_userjson["locked_money"]))
             line_bot_api.reply_message(event.reply_token, flex_message)
         else:
             database.createUser(user_id,user_line_name,user_line_img)
@@ -159,10 +103,13 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=_reply))
     elif user_send == '!help':
-        _reply="指令\n!price : 獲得訂閱交易對最新價格\n!subscribe 交易對(大寫英文 ex. !subscribe BTC):訂閱交易對\n!unsubscribe交易對(大寫英文 ex. !unsubscribe BTC):取消訂閱交易對\n!list:列出交易對"
+        str=""
+        list = database.getCommandList()
+        for command in list:
+            str+=command+"\n"+list[command][0]+"\n"
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=_reply))
+            TextSendMessage(text=str))
     else:
         None
 
