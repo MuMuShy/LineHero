@@ -6,11 +6,12 @@ from pybit import HTTP, WebSocket
 from dotenv import load_dotenv
 import os
 load_dotenv()
-class MyThread(Thread):
+class BybitApi(Thread):
     def __init__(self, name):
-        super(MyThread, self).__init__()  # 重構run函式必須要寫
+        super(BybitApi, self).__init__()  # 重構run函式必須要寫
         self.subscribeSymbolList=["BTCUSDT","BITUSDT"]
         self.priceList={}
+        self.allSymbolList=[]
         self.name = name
         self.initWebSocket()
     
@@ -28,30 +29,12 @@ class MyThread(Thread):
         )
 
     def run(self):
-        # while True:
-        #     #print("list:")
-        #     #print(self.subscribeSymbolList)
-        #     for subscribeSymbol in self.subscribeSymbolList:
-        #         _str = "instrument_info.100ms."+subscribeSymbol
-        #         #print("find data:"+_str)
-        #         data = self.ws.get_data(_str)
-        #         #print("交易對:"+subscribeSymbol+"結果:")
-        #         print(data)
-        #         if len(data) != 0:
-        #             try:
-        #                 price_data = data['update'][0]
-        #                 #print(price_data['last_price'])
-        #                 price = price_data['last_price']
-        #                 self.priceList[subscribeSymbol] = price
-        #                 print(self.priceList)
-        #             except:
-        #                 None
-        #         else:
-        #             None
-        #             #print("交易對:"+subscribeSymbol+"還未有新價格")
-        #             #print(data)
-        #     time.sleep(1)
-        print("start")
+        #init all symbol
+        print("get all legal symbol ...")
+        _allsymbol = self.session.query_symbol()['result']
+        for _sym in _allsymbol:
+            self.allSymbolList.append(_sym['name'])
+        print(self.allSymbolList)
     
     def subScribe(self,symbol):
         symbol = symbol.replace(" ","")
@@ -59,12 +42,16 @@ class MyThread(Thread):
             print("此交易對已存在訂閱")
             return "此交易對已存在訂閱目錄"
         else:
-            self.subscribeSymbolList.append(symbol)
-            #print("訂閱:"+symbol+"\n"+"目前訂閱目錄:")
-            _str = "訂閱:"+symbol+"成功!\n"+"目前訂閱目錄:\n"
-            for item in self.subscribeSymbolList:
-                _str+=item+"\n"
-            return _str
+            if symbol in self.allSymbolList:
+                self.subscribeSymbolList.append(symbol)
+                #print("訂閱:"+symbol+"\n"+"目前訂閱目錄:")
+                _str = "訂閱:"+symbol+"成功!\n"+"目前訂閱目錄:\n"
+                for item in self.subscribeSymbolList:
+                    _str+=item+"\n"
+                return _str
+            else:
+                _str = "此交易對不存在 請確定輸入內容"
+                return _str
     
     def unSubScribe(self,symbol):
         symbol = symbol.replace(" ","")
@@ -94,7 +81,11 @@ class MyThread(Thread):
     def getPrice(self):
         
         for item in self.subscribeSymbolList:
-            self.priceList[item] = self.session.last_traded_price(symbol=item)['result']['price']
+            try:
+                _price = self.session.last_traded_price(symbol=item)['result']['price']
+                self.priceList[item] = _price
+            except:
+                self.priceList[item] = "此交易對沒有現貨資料 可使用!unsubscribe "+item+" 來移除訂閱!"
         print("price:")
         print(self.priceList)
         return self.priceList        

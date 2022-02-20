@@ -45,7 +45,7 @@ def handle_message(event):
     user_send =event.message.text
     #回傳價格表
     if user_send == "!price":
-        price = t1.getPrice()
+        price = apiThread.getPrice()
         str=""
         for symbol in price:
             str+= symbol+" : $"+price[symbol]+"\n"
@@ -55,20 +55,20 @@ def handle_message(event):
     #訂閱交易對
     elif user_send.startswith('!subscribe'):
         _symbol = user_send.split("!subscribe")[1].upper()
-        _reply = t1.subScribe(_symbol+"USDT")
+        _reply = apiThread.subScribe(_symbol+"USDT")
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=_reply))
     #移除訂閱交易對
     elif user_send.startswith('!unsubscribe'):
         _symbol = user_send.split("!unsubscribe")[1].upper()
-        _reply = t1.unSubScribe(_symbol+"USDT")
+        _reply = apiThread.unSubScribe(_symbol+"USDT")
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=_reply))
     #獲得目前交易對
     elif user_send == '!list':
-        _reply = t1.getSubscribeList()
+        _reply = apiThread.getSubscribeList()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=_reply))
@@ -82,8 +82,8 @@ def handle_message(event):
 
 
 if __name__ == "__main__":
-    t1 = bybitApi.MyThread("test")
-    t1.start()
+    apiThread = bybitApi.BybitApi("apithread")
+    apiThread.start()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
     
