@@ -1,6 +1,7 @@
 import threading
 from time import sleep
 from flask import Flask, request, abort
+from flask import render_template
 from dotenv import load_dotenv
 import lineMessagePacker
 from DataBase import DataBase
@@ -52,6 +53,11 @@ def callback():
         abort(400)
 
     return 'OK'
+
+#訪問網站
+@app.route("/")
+def home():
+    return render_template("home.html")
 
 
 @handler.add(MessageEvent, message=TextMessage)
