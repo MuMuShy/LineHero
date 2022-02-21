@@ -2,6 +2,7 @@
     "cSpell.words": [
         "BNBUSDT",
         "Bybit",
-        "dotenv"
+        "dotenv",
+        "psycopg"
     ]
 }

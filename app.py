@@ -5,6 +5,7 @@ from flask import render_template
 from dotenv import load_dotenv
 import lineMessagePacker
 from DataBase import DataBase
+from Games import diceGame
 load_dotenv()
 from linebot import (
     LineBotApi, WebhookHandler
@@ -63,6 +64,50 @@ def home():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_send =event.message.text
+    if user_send =="!create":
+        user_id = event.source.user_id
+        _reply = diceGame.createGame(user_id)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=_reply))
+    if user_send.startswith('!join'):
+        user_id = event.source.user_id
+        content =  user_send.split(" ")
+        try:
+            room_id = content[1]
+            bet_info = content[2]
+            if diceGame.checkGameIsExist(room_id) is False:
+                line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="請房間不存在! 請確定房號"))
+                return
+            profile = line_bot_api.get_profile(user_id)
+            user_line_name = profile.display_name
+            _reply = diceGame.joinGame(user_id,bet_info,room_id)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="玩家:"+user_line_name+_reply))
+        except:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="請使用格式 !join 房號 數字:金額 使用&區隔多個數字 ex 5:100&6:200"))
+    if user_send.startswith('!room'):
+        try:
+            _roomid = user_send.split(" ")[1]
+            reply = diceGame.getGameInfoStr(_roomid)
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply))
+        except:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="好像沒有此資料喔"))
+    if user_send =="!dice":
+        user_id = event.source.user_id
+        _reply = diceGame.StartGame(user_id)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=_reply))
     if user_send =="!info":
         user_id = event.source.user_id
         profile = line_bot_api.get_profile(user_id)
@@ -79,6 +124,7 @@ def handle_message(event):
             line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="已成功創建資料 可用 !info 查詢"))
+       
     #回傳價格表
     elif user_send == "!price":
         price = apiThread.getPrice()

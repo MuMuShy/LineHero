@@ -1,7 +1,4 @@
-import urllib.request
+import time # 引入time
 
-
-url = "https://bybitline.herokuapp.com/"
-conn = urllib.request.urlopen(url)
-for key, value in conn.getheaders():
-    print(key, value)
+nowTime = time.time()
+print(str(nowTime).split(".")[1])
