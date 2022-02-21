@@ -20,6 +20,7 @@ from linebot.models import (
 )
 import os
 import bybitApi
+import sys
 
 app = Flask(__name__)
 
@@ -81,9 +82,22 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage(text="請房間不存在! 請確定房號"))
                 return
+            bets = bet_info.split("&")
+            _temp_money =0
+            for bet_pair in bets:
+                money = int(bet_pair.split(":")[1])
+                _temp_money+=money
+            print("玩家總下注金額")
+            print(_temp_money)
+            if _temp_money > diceGame.checkPlayerMoney(user_id):
+                print("下注金額過大 超出餘額 請重新下注")
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="下注金額過大 超出餘額 請重新下注"))
+                return
             profile = line_bot_api.get_profile(user_id)
             user_line_name = profile.display_name
-            _reply = diceGame.joinGame(user_id,bet_info,room_id)
+            _reply = diceGame.joinGame(user_id,bet_info,room_id,_temp_money)
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="玩家:"+user_line_name+_reply))

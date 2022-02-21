@@ -15,6 +15,7 @@ class DataBase():
     
     def checkUser(self,user_line_id):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
         sql ="SELECT user_line_id FROM users where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         row = self.cursor.fetchone()
@@ -28,6 +29,7 @@ class DataBase():
     
     def createUser(self,user_line_id,user_line_name,user_img_link):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
         sql ="""INSERT INTO users (user_line_name, user_line_id,user_img,user_money,locked_money) VALUES (%(user_line_name)s, %(user_line_id)s, %(user_img)s, %(user_money)s,%(locked_money)s)"""
         params = {'user_line_name':user_line_name, 'user_line_id':user_line_id,'user_img':user_img_link,'user_money':10000,'locked_money':0}
         self.cursor.execute(sql,params)
@@ -37,6 +39,7 @@ class DataBase():
 
     def getUser(self,user_line_id):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
         sql = "SELECT * from users WHERE user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -52,6 +55,7 @@ class DataBase():
     
     def getCommandList(self):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
         sql = "SELECT * FROM commands"
         self.cursor.execute(sql)
         self.conn.commit()

@@ -96,7 +96,7 @@ def getGameInfoStr(room_id):
     return _str
 
 
-def joinGame(user_line_id,bet_info,room_id):
+def joinGame(user_line_id,bet_info,room_id,total_bet):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = conn.cursor()
     game_info = getGame(room_id)
@@ -116,9 +116,18 @@ def joinGame(user_line_id,bet_info,room_id):
     cursor.execute(sql,params)
     # 事物提交
     conn.commit()
+    
+
+    _money = checkPlayerMoney(user_line_id)
+    _money-=total_bet
+    sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
+    params = {'money':_money,'line_id':user_line_id}
+    cursor.execute(sql,params)
+    conn.commit()
     conn.close()
     print("加入遊戲成功!")
     return "加入遊戲成功!"
+
 
 def checkUserIsHosting(user_line_id):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -160,7 +169,7 @@ def StartGame(user_line_id):
     cursor.execute(sql)
     conn.commit()
     row = cursor.fetchone()
-    conn.close()
+    
     _room_id = row[0]
     _room_id = str(_room_id)
     _room_info = getGame(_room_id)
@@ -181,6 +190,7 @@ def StartGame(user_line_id):
         user_line_name = profile.display_name
         _reply+="玩家: "+user_line_name+"\n"+"下注結果:\n"
         allbets = _player_info['bet_info'].split("&")
+        _tempmoney = checkPlayerMoney(user_line_id)
         for _bet in allbets:
             num = _bet.split(":")[0]
             price = _bet.split(":")[1]
@@ -188,6 +198,7 @@ def StartGame(user_line_id):
             print("壓住:"+str(price))
             _reply+="數字:"+str(num)+" 壓住:"+str(price)
             if str(num) == str(_dice_result):
+                _tempmoney+=int(price)
                 print("成功! 獲得金錢")
                 _reply+="成功! 獲得金錢"
             else:
@@ -195,6 +206,11 @@ def StartGame(user_line_id):
                 _reply+="猜測失敗"
             _reply+="\n"
         _reply+="\n"
+        sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
+        params = {'money':_tempmoney,'line_id':user_line_id}
+        cursor.execute(sql,params)
+        conn.commit()
+    conn.close()
     clearGame(user_line_id)
     return _reply
 
@@ -211,6 +227,15 @@ def clearGame(user_id):
     print("done clear game with:"+user_id)
 
 
+def checkPlayerMoney(user_id):
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    sql = "SELECT user_money from users WHERE user_line_id = '"+user_id+"'"
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    conn.commit()
+    row = cursor.fetchone()
+    conn.close()
+    return row[0]
 
 if __name__ == "__main__":
     #print(checkUserIsHosting("1"))
@@ -220,5 +245,5 @@ if __name__ == "__main__":
     #joinGame("shane","6:200","-3")
     #StartGame("shane1")
     #joinGame("shane","1:1","0")
-    clearGame("U8d0f4dfe21ccb2f1dccd5c80d5bb20fe")
+    checkPlayerMoney('U8d0f4dfe21ccb2f1dccd5c80d5bb20fe')
 
