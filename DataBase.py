@@ -17,6 +17,7 @@ class DataBase():
         row = self.cursor.fetchone()
         # 事物提交
         self.conn.commit()
+        self.conn.close()
         if row is not None:
             return True
         else:
@@ -27,6 +28,7 @@ class DataBase():
         params = {'user_line_name':user_line_name, 'user_line_id':user_line_id,'user_img':user_img_link,'user_money':10000,'locked_money':0}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
     
 
     def getUser(self,user_line_id):
@@ -35,6 +37,7 @@ class DataBase():
         self.conn.commit()
         row = self.cursor.fetchone()
         json={"user_line_name":"","user_img_link":"","user_money":123}
+        self.conn.close()
         if row is not None:
             json["user_line_name"] = row[0]
             json["user_img_link"] = row[3]
@@ -48,6 +51,7 @@ class DataBase():
         self.conn.commit()
         row = self.cursor.fetchall()
         commandlist = {}
+        self.conn.close()
         if row is not None:
             for item in row:
                 commandlist[item[0]]=[item[1]]
