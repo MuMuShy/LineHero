@@ -5,6 +5,7 @@ import time
 from pybit import HTTP, WebSocket
 from dotenv import load_dotenv
 import os
+import sys
 load_dotenv()
 class BybitApi(Thread):
     def __init__(self, name):
@@ -31,7 +32,10 @@ class BybitApi(Thread):
     def run(self):
         #init all symbol
         print("get all legal symbol ...")
-        _allsymbol = self.session.query_symbol()['result']
+        try:
+            _allsymbol = self.session.query_symbol()['result']
+        except:
+            print("Unexpected error at run():", sys.exc_info()[0])
         for _sym in _allsymbol:
             self.allSymbolList.append(_sym['name'])
         print(self.allSymbolList)
@@ -84,7 +88,8 @@ class BybitApi(Thread):
             try:
                 _price = self.session.last_traded_price(symbol=item)['result']['price']
                 self.priceList[item] = "$"+_price
-            except:
+            except Exception:
+                print("Unexpected error at getprice():", sys.exc_info()[0])
                 self.priceList[item] = "此交易對沒有現貨資料 可使用!unsubscribe "+item.split("USDT")[0]+" 來移除訂閱!"
         print("price:")
         print(self.priceList)
