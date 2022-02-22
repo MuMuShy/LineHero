@@ -187,10 +187,11 @@ def StartGame(user_line_id):
         print("line id:"+_player_info['user_id'])
         print(_player_info['bet_info'])
         profile = line_bot_api.get_profile(_player_info['user_id'])
+        _player_id = _player_info['user_id']
         user_line_name = profile.display_name
         _reply+="玩家: "+user_line_name+"\n"+"下注結果:\n"
         allbets = _player_info['bet_info'].split("&")
-        _tempmoney = checkPlayerMoney(user_line_id)
+        _tempmoney = checkPlayerMoney(_player_id)
         for _bet in allbets:
             num = _bet.split(":")[0]
             price = _bet.split(":")[1]
@@ -207,7 +208,7 @@ def StartGame(user_line_id):
             _reply+="\n"
         _reply+="\n"
         sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
-        params = {'money':_tempmoney,'line_id':user_line_id}
+        params = {'money':_tempmoney,'line_id':_player_id}
         cursor.execute(sql,params)
         conn.commit()
     conn.close()
