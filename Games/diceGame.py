@@ -328,6 +328,24 @@ def StartGame(user_line_id):
                     else:
                         print("猜測失敗")
                         _reply+="猜測失敗"
+                elif choice =="奇":
+                    if int(_dice_result)%2 !=0:
+                        _payoff = math.ceil(int(price)*1.9)
+                        _tempmoney+=_payoff
+                        print("成功! 獲得金錢")
+                        _reply+="成功! 獲得金錢 : "+str(_payoff)
+                    else:
+                        print("猜測失敗")
+                        _reply+="猜測失敗"
+                elif choice =="偶":
+                    if int(_dice_result)%2 ==0:
+                        _payoff = math.ceil(int(price)*1.9)
+                        _tempmoney+=_payoff
+                        print("成功! 獲得金錢")
+                        _reply+="成功! 獲得金錢 : "+str(_payoff)
+                    else:
+                        print("猜測失敗")
+                        _reply+="猜測失敗"
             _reply+="\n"
         _reply+="\n"
         sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
