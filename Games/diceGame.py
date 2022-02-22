@@ -50,7 +50,7 @@ def createGame(user_line_id):
         conn.commit()
         conn.close()
         print("創建遊戲成功!")
-        return "創建遊戲成功! 房號為:"+roomid
+        return "創建遊戲成功! 房號為:"+roomid+"\n此遊戲為單顆骰 賠率為 1:2 "
 
 
 def getGame(room_id):
@@ -180,7 +180,10 @@ def StartGame(user_line_id):
     _dice_result = str(_dice_result)
     print("此輪結果為:"+str(_dice_result))
     _reply = "房間:"+_room_id+"\n此輪結果為:"+_dice_result+"\n"
-    _players = _bets_info.split("#")
+    try:
+        _players = _bets_info.split("#")
+    except:
+        return "此局的下注資料好像有問題(有可能是沒有玩家) 請利用join加入此遊戲 房號: "+_room_id
     for _player in _players:
         print(_player)
         _player_info = json.loads(_player)
@@ -199,9 +202,10 @@ def StartGame(user_line_id):
             print("壓住:"+str(price))
             _reply+="數字:"+str(num)+" 壓住:"+str(price)
             if str(num) == str(_dice_result):
-                _tempmoney+=int(price)
+                _payoff = int(price)*2
+                _tempmoney+=_payoff
                 print("成功! 獲得金錢")
-                _reply+="成功! 獲得金錢"
+                _reply+="成功! 獲得金錢 : "+str(_payoff)
             else:
                 print("猜測失敗")
                 _reply+="猜測失敗"
@@ -213,6 +217,7 @@ def StartGame(user_line_id):
         conn.commit()
     conn.close()
     clearGame(user_line_id)
+    _reply=str(_dice_result)+"|"+_reply
     return _reply
 
     

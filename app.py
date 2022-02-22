@@ -65,13 +65,18 @@ def home():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_send =event.message.text
-    if user_send =="!create":
+    if user_send.strip().startswith("!"):
+        _command_check = "!"+user_send.strip().split("!")[1].strip()
+    else:
+        _command_check = user_send
+    if _command_check =="!create" or _command_check =="!c":
         user_id = event.source.user_id
         _reply = diceGame.createGame(user_id)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=_reply))
-    if user_send.startswith('!join'):
+
+    if _command_check.startswith('!join') or _command_check.startswith('!j'):
         user_id = event.source.user_id
         content =  user_send.split(" ")
         try:
@@ -105,7 +110,7 @@ def handle_message(event):
             line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="請使用格式 !join 房號 數字:金額 使用&區隔多個數字 ex 5:100&6:200"))
-    if user_send.startswith('!room'):
+    if _command_check.startswith('!room') or _command_check.startswith('!r'):
         try:
             _roomid = user_send.split(" ")[1]
             reply = diceGame.getGameInfoStr(_roomid)
@@ -116,13 +121,17 @@ def handle_message(event):
             line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="好像沒有此資料喔"))
-    if user_send =="!dice":
+    if _command_check =="!dice" or _command_check.startswith('!d'):
         user_id = event.source.user_id
         _reply = diceGame.StartGame(user_id)
+        _dice = _reply.split("|")[0]
+        _text = _reply.split("|")[1]
         line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=_reply))
-    if user_send =="!info":
+            event.reply_token,[
+            FlexSendMessage("開獎囉!",contents=lineMessagePacker.getDiceResult(_dice)),
+            TextSendMessage(text=_text)
+            ])
+    if _command_check =="!info":
         user_id = event.source.user_id
         profile = line_bot_api.get_profile(user_id)
         user_line_name = profile.display_name
