@@ -66,8 +66,24 @@ def home():
 def handle_message(event):
     user_send =event.message.text
     print(user_send)
-    if user_send =="!develope":
-        print("")
+    if user_send.startswith("!set"):
+        if event.source.user_id != os.getenv("GM_LINE_ID"):
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="無權限執行此指令"))
+            return
+        try:
+            _user_id = user_send.split(" ")[1]
+            _money = user_send.split(" ")[2]
+            database.AddUserMoneyByIndex(_user_id,_money)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="成功到賬!"))
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="錯誤 請確認id等資料"))
+            return
     if user_send.strip().startswith("!"):
         _command_check = "!"+user_send.strip().split("!")[1].strip().lower()
     else:
@@ -148,7 +164,7 @@ def handle_message(event):
             _userjson = database.getUser(user_id)
             flex_message = FlexSendMessage(
             alt_text='玩家資料來囉~',
-            contents=lineMessagePacker.getInfoFlexJson(_userjson["user_line_name"],_userjson["user_img_link"],_userjson["user_money"],_userjson["locked_money"]))
+            contents=lineMessagePacker.getInfoFlexJson(_userjson["user_line_name"],_userjson["user_img_link"],_userjson["user_money"],_userjson["locked_money"],_userjson["user_info_id"]))
             line_bot_api.reply_message(event.reply_token, flex_message)
         else:
             database.createUser(user_id,user_line_name,user_line_img)

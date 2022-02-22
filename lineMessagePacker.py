@@ -4,7 +4,7 @@
 import json
 
 
-def getInfoFlexJson(user_name,user_img_link,user_money,locked_money):
+def getInfoFlexJson(user_name,user_img_link,user_money,locked_money,user_id):
     json = {
                 "type": "bubble",
                 "hero": {
@@ -71,6 +71,27 @@ def getInfoFlexJson(user_name,user_img_link,user_money,locked_money):
                                 "type": "text",
                                 "text": "$"+str(locked_money),
                                 "color": "#ff1a1a",
+                                "size": "sm",
+                                "flex": 5
+                            }
+                            ]
+                        },
+                        {
+                            "type": "box",
+                            "layout": "baseline",
+                            "spacing": "sm",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": "ID:",
+                                "color": "#aaaaaa",
+                                "size": "sm",
+                                "flex": 1
+                            },
+                            {
+                                "type": "text",
+                                "text": str(user_id),
+                                "color": "#944dff",
                                 "size": "sm",
                                 "flex": 5
                             }

@@ -48,6 +48,7 @@ class DataBase():
         self.conn.close()
         if row is not None:
             json["user_line_name"] = row[0]
+            json["user_info_id"] = row[2]
             json["user_img_link"] = row[3]
             json["user_money"] = str(row[4])
             json["locked_money"] = str(row[5])
@@ -61,7 +62,7 @@ class DataBase():
         self.conn.commit()
         row = self.cursor.fetchone()
         return row[0]
-        
+
     def getCommandList(self):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
@@ -75,4 +76,15 @@ class DataBase():
             for item in row:
                 commandlist[item[0]]=[item[1]]
         return commandlist
+    
+
+    def AddUserMoneyByIndex(self,user_index_id,money):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""UPDATE users SET user_money = """+str(money)+"""WHERE user_id ="""+str(user_index_id)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+
+
                
