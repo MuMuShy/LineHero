@@ -190,6 +190,14 @@ def getHelpFlex():
                 "label": "創建房間",
                 "text": "!create"
                 }
+            },
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "確認資料",
+                "text": "!info"
+                }
             }
             ]
         }
