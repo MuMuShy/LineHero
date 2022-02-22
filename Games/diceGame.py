@@ -33,7 +33,7 @@ else:
     line_bot_api = LineBotApi(os.getenv("LINE_BOT_API"))
     handler = WebhookHandler(os.getenv("LINE_BOT_SECRET"))
 
-def createGame(user_line_id):
+def createGame(user_line_id,group_id):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = conn.cursor()
     if checkUserIsHosting(user_line_id) is True:
@@ -43,9 +43,12 @@ def createGame(user_line_id):
     else:
         nowTime = time.time()
         roomid = str(nowTime).split(".")[1]
-        data = json.dumps([{"user_id":"以軒"}])
-        sql ="""INSERT INTO dicegames (hoster, room_id,status) VALUES (%(hoster)s, %(room_id)s, %(status)s)"""
-        params = {'hoster':user_line_id, 'room_id':roomid,'status':'OPEN',}
+        if group_id == "":
+            sql ="""INSERT INTO dicegames (hoster, room_id,status,group_id) VALUES (%(hoster)s, %(room_id)s, %(status)s)"""
+            params = {'hoster':user_line_id, 'room_id':roomid,'status':'OPEN'}
+        else:
+            sql ="""INSERT INTO dicegames (hoster, room_id,status,group_id) VALUES (%(hoster)s, %(room_id)s, %(status)s,%(groupid)s)"""
+            params = {'hoster':user_line_id, 'room_id':roomid,'status':'OPEN','groupid':group_id}
         cursor.execute(sql,params)
         # 事物提交
         conn.commit()
@@ -78,6 +81,8 @@ def getRoomList():
     cursor = conn.cursor()
     cursor.execute(sql)
     result = cursor.fetchall()
+    conn.commit()
+    conn.close()
     for room in result:
         print("房主:")
         user_id = str(room[0])
@@ -89,6 +94,42 @@ def getRoomList():
     return _str
 
 
+def checkGroupHasGame(group_id):
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    sql = "SELECT * from dicegames where group_id  = '"+group_id+"'"
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    print(len(result))
+    conn.commit()
+    conn.close()
+    if len(result) == 0:
+        print("沒有進行中遊戲")
+        return False
+    else:
+        print("有進行中遊戲")
+        print(result)
+        print(len(result))
+        print(type(result))
+        print(dataBase.getUserName(result[0][0]))
+        print(result[0][1])
+        return True
+
+def getGroupPlayingGame(group_id):
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    sql = "SELECT * from dicegames where group_id  = '"+group_id+"'"
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    print(len(result))
+    _hoster = dataBase.getUserName(result[0][0])
+    _room_id = result[0][1]
+    room_json={"room_hoster":_hoster,"room_id":_room_id}
+    conn.commit()
+    conn.close()
+    return room_json
+      
+    
 
 def getGameInfoStr(room_id):
     _room_info = getGame(str(room_id))
@@ -102,14 +143,14 @@ def getGameInfoStr(room_id):
         _player_info = json.loads(_player)
         profile = line_bot_api.get_profile(_player_info['user_id'])
         user_line_name = profile.display_name
-        _str+="user:"+user_line_name+"\n"+"betinfo:\n"
+        _str+="玩家:"+user_line_name+"\n"+"下注資料\n"
         print("line id:"+_player_info['user_id'])
         print(_player_info['bet_info'])
         allbets = _player_info['bet_info'].split("&")
         for _bet in allbets:
             num = _bet.split(":")[0]
             price = _bet.split(":")[1]
-            _str+="數字:"+str(num)+"壓住:"+str(price)+"\n"
+            _str+="數字:"+str(num)+"壓注:$"+str(price)+"\n"
             print("數字:"+str(num))
             print("壓住:"+str(price))
     return _str
@@ -266,6 +307,8 @@ def checkPlayerMoney(user_id):
     row = cursor.fetchone()
     conn.close()
     return row[0]
+
+
 
 if __name__ == "__main__":
     #print(checkUserIsHosting("1"))

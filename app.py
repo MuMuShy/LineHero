@@ -65,7 +65,14 @@ def home():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_send =event.message.text
+    group_id =""
+    try:
+        group_id =event.source.group_id
+    except:
+        print("no group")
     print(user_send)
+    if user_send =="!dev":
+        diceGame.checkGroupHasGame(group_id)
     if user_send.startswith("!set"):
         if event.source.user_id != os.getenv("GM_LINE_ID"):
             line_bot_api.reply_message(
@@ -89,8 +96,20 @@ def handle_message(event):
     else:
         _command_check = user_send
     if _command_check =="!create" or _command_check =="!c":
+        if diceGame.checkGroupHasGame(group_id) is True:
+            _inGamingRoom = diceGame.getGroupPlayingGame(group_id)
+            _reply ="此群組已有房間 請先加入\n主持:"+_inGamingRoom["room_hoster"]
+            try:
+                _info = diceGame.getGameInfoStr(str(_inGamingRoom["room_id"]))
+                _reply+=_info
+            except:
+                _reply+="\n房號:"+str(_inGamingRoom["room_id"])+"\n"
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=_reply))
+            return
         user_id = event.source.user_id
-        _reply = diceGame.createGame(user_id)
+        _reply = diceGame.createGame(user_id,group_id=group_id)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=_reply))
@@ -179,12 +198,12 @@ def handle_message(event):
     #回傳價格表
     elif user_send == "!price":
         price = apiThread.getPrice()
-        str=""
+        _reply=""
         for symbol in price:
-            str+= symbol+" : "+price[symbol]+"\n"
+            _reply+= symbol+" : "+price[symbol]+"\n"
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=str))
+            TextSendMessage(text=_reply))
     #訂閱交易對
     elif user_send.startswith('!subscribe'):
         _symbol = user_send.split("!subscribe")[1].upper()
