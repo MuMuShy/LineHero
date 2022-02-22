@@ -5,6 +5,7 @@ import json
 import random
 import os
 import time
+import math
 # adding Folder_2 to the system path
 sys.path.insert(0, '../')
 from linebot import (
@@ -43,8 +44,9 @@ def createGame(user_line_id,group_id):
     else:
         nowTime = time.time()
         roomid = str(nowTime).split(".")[1]
-        if group_id == "":
-            sql ="""INSERT INTO dicegames (hoster, room_id,status,group_id) VALUES (%(hoster)s, %(room_id)s, %(status)s)"""
+        if group_id == " ":
+            print("斯療 沒有group")
+            sql ="""INSERT INTO dicegames (hoster, room_id,status) VALUES (%(hoster)s, %(room_id)s, %(status)s)"""
             params = {'hoster':user_line_id, 'room_id':roomid,'status':'OPEN'}
         else:
             sql ="""INSERT INTO dicegames (hoster, room_id,status,group_id) VALUES (%(hoster)s, %(room_id)s, %(status)s,%(groupid)s)"""
@@ -54,7 +56,7 @@ def createGame(user_line_id,group_id):
         conn.commit()
         conn.close()
         print("創建遊戲成功!")
-        return "創建遊戲成功! 房號為:"+roomid+"\n此遊戲為單顆骰 賠率為 1:2\n請使用 !join 房號 壓注 進行下注\n壓注請用 : 把骰子號碼跟金額分開 使用 & 區隔多筆下注\n Ex(!join xxx 1:200&3:300)"
+        return "創建遊戲成功! 房號為:"+roomid+"\n此遊戲為單顆骰 賠率為:\n大中小:*2.6\n指定數字:*5.2\n單雙:*1.9\n請使用 !join 房號 壓注 進行下注\n!!如果在群組中!!\n可以直接使用 !j 下注資料 不用輸入房號\n壓注請用' : '把骰子號碼跟金額分開 使用' & '區隔多筆下注\n Ex(!join xxx 1:200&3:300&單:900&大:500)"
 
 
 def getGame(room_id):
@@ -176,8 +178,6 @@ def joinGame(user_line_id,bet_info,room_id,total_bet):
     cursor.execute(sql,params)
     # 事物提交
     conn.commit()
-    
-
     _money = checkPlayerMoney(user_line_id)
     _money-=total_bet
     sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
@@ -265,15 +265,65 @@ def StartGame(user_line_id):
             price = _bet.split(":")[1]
             print("數字:"+str(num))
             print("壓住:"+str(price))
-            _reply+="數字:"+str(num)+" 壓住:"+str(price)
-            if str(num) == str(_dice_result):
-                _payoff = int(price)*2
-                _tempmoney+=_payoff
-                print("成功! 獲得金錢")
-                _reply+="成功! 獲得金錢 : "+str(_payoff)
+            _reply+="數字:"+str(num)+" 壓 :"+str(price)
+            #純數字
+            if str(num).isdigit():
+                if str(num) == str(_dice_result):
+                    _payoff = math.ceil(int(price)*5.2)
+                    _tempmoney+=_payoff
+                    print("成功! 獲得金錢")
+                    _reply+="成功! 獲得金錢 : "+str(_payoff)
+                else:
+                    print("猜測失敗")
+                    _reply+="猜測失敗"
+            #大中小 單雙
             else:
-                print("猜測失敗")
-                _reply+="猜測失敗"
+                choice = str(num)
+                if choice =="大":
+                    if int(_dice_result) ==5 or int(_dice_result) ==6:
+                        _payoff = math.ceil(int(price)*2.6)
+                        _tempmoney+=_payoff
+                        print("成功! 獲得金錢")
+                        _reply+="成功! 獲得金錢 : "+str(_payoff)
+                    else:
+                        print("猜測失敗")
+                        _reply+="猜測失敗"
+                elif choice =="中":
+                    if int(_dice_result) ==3 or int(_dice_result) ==4:
+                        _payoff = math.ceil(int(price)*2.6)
+                        _tempmoney+=_payoff
+                        print("成功! 獲得金錢")
+                        _reply+="成功! 獲得金錢 : "+str(_payoff)
+                    else:
+                        print("猜測失敗")
+                        _reply+="猜測失敗"
+                elif choice =="小":
+                    if int(_dice_result) ==1 or int(_dice_result) ==2:
+                        _payoff = math.ceil(int(price)*2.6)
+                        _tempmoney+=_payoff
+                        print("成功! 獲得金錢")
+                        _reply+="成功! 獲得金錢 : "+str(_payoff)
+                    else:
+                        print("猜測失敗")
+                        _reply+="猜測失敗"
+                elif choice =="單":
+                    if int(_dice_result)%2 !=0:
+                        _payoff = math.ceil(int(price)*1.9)
+                        _tempmoney+=_payoff
+                        print("成功! 獲得金錢")
+                        _reply+="成功! 獲得金錢 : "+str(_payoff)
+                    else:
+                        print("猜測失敗")
+                        _reply+="猜測失敗"
+                elif choice =="雙":
+                    if int(_dice_result)%2 ==0:
+                        _payoff = math.ceil(int(price)*1.9)
+                        _tempmoney+=_payoff
+                        print("成功! 獲得金錢")
+                        _reply+="成功! 獲得金錢 : "+str(_payoff)
+                    else:
+                        print("猜測失敗")
+                        _reply+="猜測失敗"
             _reply+="\n"
         _reply+="\n"
         sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
@@ -282,6 +332,7 @@ def StartGame(user_line_id):
         conn.commit()
     conn.close()
     clearGame(user_line_id)
+    print(_reply)
     _reply=str(_dice_result)+"|"+_reply
     return _reply
 

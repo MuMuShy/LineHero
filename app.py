@@ -65,10 +65,11 @@ def home():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_send =event.message.text
-    group_id =""
+    group_id =" "
     try:
         group_id =event.source.group_id
     except:
+        group_id =" "
         print("no group")
     print(user_send)
     if user_send =="!dev":
@@ -109,7 +110,7 @@ def handle_message(event):
                 TextSendMessage(text=_reply))
             return
         user_id = event.source.user_id
-        _reply = diceGame.createGame(user_id,group_id=group_id)
+        _reply = diceGame.createGame(user_id,group_id)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=_reply))
@@ -118,13 +119,29 @@ def handle_message(event):
         user_id = event.source.user_id
         content =  user_send.split(" ")
         try:
-            room_id = content[1]
-            bet_info = content[2]
-            if diceGame.checkGameIsExist(room_id) is False:
-                line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="請房間不存在! 請確定房號"))
-                return
+            bet_info = content[1]
+            # if diceGame.checkGameIsExist(room_id) is False:
+            #     line_bot_api.reply_message(
+            #     event.reply_token,
+            #     TextSendMessage(text="請房間不存在! 請確定房號"))
+            #     return
+            if group_id != " ":
+                if diceGame.checkGroupHasGame(group_id) is False:
+                    line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="此群組還沒開始遊戲喔! 請使用 !c or !create 開始遊戲"))
+                    return
+                else:
+                    _room_id = diceGame.getGroupPlayingGame(group_id)["room_id"]
+            else:
+                try:
+                    _room_id = content[1]
+                    bet_info = content[2]
+                except:
+                    line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="單人遊玩請輸入房號 謝謝"))
+                    return
             bets = bet_info.split("&")
             _temp_money =0
             for bet_pair in bets:
@@ -140,7 +157,7 @@ def handle_message(event):
                 return
             profile = line_bot_api.get_profile(user_id)
             user_line_name = profile.display_name
-            _reply = diceGame.joinGame(user_id,bet_info,room_id,_temp_money)
+            _reply = diceGame.joinGame(user_id,bet_info,str(_room_id),_temp_money)
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="玩家:"+user_line_name+_reply))
