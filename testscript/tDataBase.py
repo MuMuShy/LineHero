@@ -61,7 +61,7 @@ class DataBase():
         self.conn.commit()
         row = self.cursor.fetchone()
         return row[0]
-        
+    
     def getCommandList(self):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()

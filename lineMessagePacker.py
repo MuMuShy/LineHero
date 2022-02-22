@@ -141,3 +141,75 @@ def getDiceResult(num):
         }
         }
     return json
+
+
+def getHelpFlex():
+    json = {
+    "type": "bubble",
+    "hero": {
+        "type": "image",
+        "url": "https://bukku.com.tw/wp-content/uploads/sites/6/2021/04/%E6%88%AA%E5%9C%96-2021-04-02-%E4%B8%8A%E5%8D%8812.56.22-300x298.png",
+        "size": "full",
+        "aspectRatio": "20:13",
+        "aspectMode": "cover",
+        "action": {
+        "type": "uri",
+        "uri": "http://linecorp.com/"
+        }
+    },
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "text",
+            "text": "通殺骰手",
+            "weight": "bold",
+            "size": "xl",
+            "color": "#ff0000",
+            "align": "center"
+        },
+        {
+            "type": "box",
+            "layout": "vertical",
+            "margin": "lg",
+            "spacing": "sm",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "房間列表",
+                "text": "!gamelist"
+                }
+            },
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "創建房間",
+                "text": "!create"
+                }
+            }
+            ]
+        }
+        ]
+    },
+    "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+        {
+            "type": "text",
+            "text": "請勿沉迷賭博",
+            "style": "italic",
+            "weight": "bold",
+            "decoration": "line-through",
+            "align": "center"
+        }
+        ],
+        "flex": 0
+    }
+    }
+    return json

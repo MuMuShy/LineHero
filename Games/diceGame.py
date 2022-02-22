@@ -19,6 +19,7 @@ from linebot.models import (
     MessageTemplateAction,FlexSendMessage
 )
 from DataBase import DataBase
+dataBase = DataBase()
 DATABASE_URL = os.environ['DATABASE_URL']
 
 environment = os.getenv("ENVIRONMENT")
@@ -50,7 +51,7 @@ def createGame(user_line_id):
         conn.commit()
         conn.close()
         print("創建遊戲成功!")
-        return "創建遊戲成功! 房號為:"+roomid+"\n此遊戲為單顆骰 賠率為 1:2 "
+        return "創建遊戲成功! 房號為:"+roomid+"\n此遊戲為單顆骰 賠率為 1:2\n請使用 !join 房號 壓注 進行下注\n壓注請用 : 把骰子號碼跟金額分開 使用 & 區隔多筆下注\n Ex(!join xxx 1:200&3:300)"
 
 
 def getGame(room_id):
@@ -69,6 +70,24 @@ def getGame(room_id):
         for player_bet_info in _json:
             print(player_bet_info)
             print(player_bet_info['user_id'])
+
+def getRoomList():
+    _str=""
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    sql = "SELECT * from dicegames"
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    for room in result:
+        print("房主:")
+        user_id = str(room[0])
+        _str+="房主: "+dataBase.getUserName(user_id)+"房間編號"+str(room[1])+"\n"
+        print(dataBase.getUserName(str(room[0])))
+        print("房間編號:")
+        print(str(room[1]))
+    _str+="使用 !join 房間編號 骰子號碼:金額&骰子號碼2:金額\nEx: !join 666 1:100&2:300&3:300\n\n"
+    return _str
+
 
 
 def getGameInfoStr(room_id):
@@ -177,6 +196,11 @@ def StartGame(user_line_id):
     print(_room_info)
     _bets_info = _room_info[3]
     _dice_result = random.randint(1, 6)
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    sql = "SELECT room_id from dicegames WHERE hoster = '"+user_line_id+"'"
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    conn.commit()
     _dice_result = str(_dice_result)
     print("此輪結果為:"+str(_dice_result))
     _reply = "房間:"+_room_id+"\n此輪結果為:"+_dice_result+"\n"

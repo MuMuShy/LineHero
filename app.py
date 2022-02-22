@@ -65,8 +65,11 @@ def home():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_send =event.message.text
+    print(user_send)
+    if user_send =="!develope":
+        print("")
     if user_send.strip().startswith("!"):
-        _command_check = "!"+user_send.strip().split("!")[1].strip()
+        _command_check = "!"+user_send.strip().split("!")[1].strip().lower()
     else:
         _command_check = user_send
     if _command_check =="!create" or _command_check =="!c":
@@ -133,7 +136,12 @@ def handle_message(event):
             ])
     if _command_check =="!info":
         user_id = event.source.user_id
-        profile = line_bot_api.get_profile(user_id)
+        try:
+            profile = line_bot_api.get_profile(user_id)
+        except:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="看來你沒有加我好友! 請先加我好友喔"))
         user_line_name = profile.display_name
         user_line_img = profile.picture_url
         if database.checkUser(user_id) is True:
@@ -147,7 +155,11 @@ def handle_message(event):
             line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="已成功創建資料 可用 !info 查詢"))
-       
+    if _command_check =="!gamelist":
+        reply = diceGame.getRoomList()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply))
     #回傳價格表
     elif user_send == "!price":
         price = apiThread.getPrice()
@@ -178,13 +190,11 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=_reply))
     elif user_send == '!help':
-        str=""
-        list = database.getCommandList()
-        for command in list:
-            str+=command+"\n"+list[command][0]+"\n"
+        print("send")
         line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=str))
+        event.reply_token,[
+        FlexSendMessage("幫助",contents=lineMessagePacker.getHelpFlex()),
+        ])
     else:
         None
 
