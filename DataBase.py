@@ -85,6 +85,22 @@ class DataBase():
         self.cursor.execute(sql)
         self.conn.commit()
         self.conn.close()
+    
+
+    def getTop5Ranking(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="Select user_line_name, user_money from users ORDER BY user_id,user_money desc"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchall()
+        result=[]
+        for col in row:
+            _reply =str(col[0])+" : $"+str(col[1])
+            print(col[0])
+            print(col[1])
+            result.append(_reply)
+        return result
 
 
                

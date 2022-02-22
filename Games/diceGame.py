@@ -6,6 +6,7 @@ import random
 import os
 import time
 import math
+from datetime import datetime, timedelta
 # adding Folder_2 to the system path
 sys.path.insert(0, '../')
 from linebot import (
@@ -37,20 +38,23 @@ else:
 def createGame(user_line_id,group_id):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     cursor = conn.cursor()
+    current =  datetime.now()
     if checkUserIsHosting(user_line_id) is True:
         print("此玩家已有正在主持的遊戲!")
         conn.close()
         return "此玩家已有正在主持的遊戲!"
     else:
-        nowTime = time.time()
+        nowTime = datetime.now()
+        openTime = nowTime+timedelta(minutes=5)
+        openTime = (openTime.strftime("%m/%d/%Y, %H:%M:%S"))
         roomid = str(nowTime).split(".")[1]
         if group_id == " ":
             print("斯療 沒有group")
-            sql ="""INSERT INTO dicegames (hoster, room_id,status) VALUES (%(hoster)s, %(room_id)s, %(status)s)"""
-            params = {'hoster':user_line_id, 'room_id':roomid,'status':'OPEN'}
+            sql ="""INSERT INTO dicegames (hoster, room_id,status,open_time) VALUES (%(hoster)s, %(room_id)s, %(status)s, %(open_time)s)"""
+            params = {'hoster':user_line_id, 'room_id':roomid,'status':'OPEN','open_time':openTime}
         else:
-            sql ="""INSERT INTO dicegames (hoster, room_id,status,group_id) VALUES (%(hoster)s, %(room_id)s, %(status)s,%(groupid)s)"""
-            params = {'hoster':user_line_id, 'room_id':roomid,'status':'OPEN','groupid':group_id}
+            sql ="""INSERT INTO dicegames (hoster, room_id,status,group_id,open_time) VALUES (%(hoster)s, %(room_id)s, %(status)s,%(groupid)s, %(open_time)s)"""
+            params = {'hoster':user_line_id, 'room_id':roomid,'status':'OPEN','groupid':group_id,'open_time':openTime}
         cursor.execute(sql,params)
         # 事物提交
         conn.commit()

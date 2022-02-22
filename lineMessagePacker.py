@@ -219,6 +219,14 @@ def getHelpFlex():
                 "label": "確認資料",
                 "text": "!info"
                 }
+            },
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "排行榜",
+                "text": "!ranking"
+                }
             }
             ]
         }
@@ -236,6 +244,92 @@ def getHelpFlex():
             "weight": "bold",
             "decoration": "line-through",
             "align": "center"
+        }
+        ],
+        "flex": 0
+    }
+    }
+    return json
+
+
+def getRanking(rank1,rank2,rank3,rank4,rank5):
+    json = {
+    "type": "bubble",
+    "hero": {
+        "type": "image",
+        "url": "https://mumu.tw/images/ranking.jpg",
+        "size": "full",
+        "aspectRatio": "20:13",
+        "aspectMode": "cover",
+        "action": {
+        "type": "uri",
+        "uri": "http://linecorp.com/"
+        }
+    },
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "text",
+            "text": "通殺王",
+            "weight": "bold",
+            "size": "xl",
+            "align": "center"
+        },
+        {
+            "type": "text",
+            "text": "1."+ rank1,
+            "align": "center",
+            "style": "normal",
+            "weight": "bold",
+            "color": "#e60000"
+        },
+        {
+            "type": "text",
+            "text": "2."+rank2,
+            "style": "normal",
+            "weight": "bold",
+            "align": "center"
+        },
+        {
+            "type": "text",
+            "text": "3."+rank3,
+            "style": "normal",
+            "weight": "bold",
+            "align": "center"
+        },
+        {
+            "type": "text",
+            "text": "4."+rank4,
+            "style": "normal",
+            "weight": "bold",
+            "align": "center"
+            
+        },
+        {
+            "type": "text",
+            "text": "5."+rank5,
+            "style": "normal",
+            "weight": "bold",
+            "align": "center"
+        }
+        ]
+    },
+    "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+        {
+            "type": "button",
+            "style": "link",
+            "height": "sm",
+            "action": {
+            "type": "message",
+            "label": "來一把",
+            "text": "!c"
+            }
         }
         ],
         "flex": 0

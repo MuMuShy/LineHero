@@ -72,8 +72,11 @@ def handle_message(event):
         group_id =" "
         print("no group")
     print(user_send)
-    if user_send =="!dev":
-        diceGame.checkGroupHasGame(group_id)
+    if user_send =="!ranking":
+        top5 = database.getTop5Ranking()
+        line_bot_api.reply_message(
+                event.reply_token,
+                FlexSendMessage("123",contents=lineMessagePacker.getRanking(top5[0],top5[1],top5[2],top5[3],top5[4])))
     if user_send.startswith("!set"):
         if event.source.user_id != os.getenv("GM_LINE_ID"):
             line_bot_api.reply_message(
@@ -179,13 +182,17 @@ def handle_message(event):
     if _command_check =="!dice" or _command_check.startswith('!d'):
         user_id = event.source.user_id
         _reply = diceGame.StartGame(user_id)
-        _dice = _reply.split("|")[0]
-        _text = _reply.split("|")[1]
-        line_bot_api.reply_message(
-            event.reply_token,[
-            FlexSendMessage("開獎囉!",contents=lineMessagePacker.getDiceResult(_dice)),
-            TextSendMessage(text=_text)
-            ])
+        try:
+            _dice = _reply.split("|")[0]
+            _text = _reply.split("|")[1]
+            line_bot_api.reply_message(
+                event.reply_token,[
+                FlexSendMessage("開獎囉!",contents=lineMessagePacker.getDiceResult(_dice)),
+                TextSendMessage(text=_text)
+                ])
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,TextSendMessage(text=_reply))
     if _command_check =="!info":
         user_id = event.source.user_id
         try:
