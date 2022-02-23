@@ -27,6 +27,9 @@ app = Flask(__name__)
 
 environment = os.getenv("ENVIRONMENT")
 print("environment: "+environment)
+
+local_storage={}
+
 if environment =="DEV":
     print("本地開發 使用本地開發版本機器人")
     line_bot_api = LineBotApi(os.getenv("LINE_BOT_API_DEV"))
@@ -122,10 +125,12 @@ def handle_message(event):
             return
         user_id = event.source.user_id
         _reply = diceGame.createGame(user_id,group_id)
+
         line_bot_api.reply_message(
             event.reply_token,
             [TextSendMessage(text=_reply),
-            FlexSendMessage("下注囉",contents=lineMessagePacker.getDiceBetChoose())])
+            FlexSendMessage("下注囉",contents=lineMessagePacker.getDiceBetChoose()),
+            FlexSendMessage("下注囉",contents=lineMessagePacker.getRollDiceFlex())])
 
     elif _command_check.startswith('!join') or _command_check.startswith('!j'):
         user_id = event.source.user_id
@@ -178,9 +183,7 @@ def handle_message(event):
             _reply = diceGame.joinGame(user_id,bet_info,str(_room_id),_temp_money)
             line_bot_api.reply_message(
                 event.reply_token,
-                [TextSendMessage(text="玩家:"+user_line_name+_reply),
-                    FlexSendMessage("下注囉",contents=lineMessagePacker.getDiceBetChoose()),
-                    FlexSendMessage("下注!",contents=lineMessagePacker.getRollDiceFlex())])
+                TextSendMessage(text="玩家:"+user_line_name+_reply))
         except:
             line_bot_api.reply_message(
             event.reply_token,
@@ -210,6 +213,12 @@ def handle_message(event):
         except:
             line_bot_api.reply_message(
                 event.reply_token,TextSendMessage(text=_reply))
+    elif _command_check =="!rateinforofdicegame":
+        line_bot_api.reply_message(
+            event.reply_token,[
+            FlexSendMessage("下注表!",contents=lineMessagePacker.getDiceBetChoose()),
+            TextSendMessage(text="以上為下注種類")
+            ])
     elif _command_check =="!info":
         user_id = event.source.user_id
         try:
