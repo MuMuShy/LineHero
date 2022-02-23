@@ -621,7 +621,7 @@ def getDiceBetChoose():
                         "action": {
                         "type": "message",
                         "label": "雙",
-                        "text": "!j 單:1000"
+                        "text": "!j 雙:1000"
                         }
                     }
                     ],
