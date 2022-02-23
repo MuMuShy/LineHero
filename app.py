@@ -65,6 +65,16 @@ def home():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_send =event.message.text
+    if user_send.strip().startswith("!"):
+        _command_check = "!"+user_send.strip().split("!")[1].strip().lower()
+    else:
+        _command_check = user_send
+    if _command_check.startswith("!") and _command_check != "!info" and database.checkUser(event.source.user_id) == False:
+        print("此玩家沒加入好友 傳送提示訊息")
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="看來你還沒有加我好友或是創建個人資料呢!\n 請先加我好友 然後使用 !info 指令"))
+        return
     group_id =" "
     try:
         group_id =event.source.group_id
@@ -95,10 +105,7 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage(text="錯誤 請確認id等資料"))
             return
-    if user_send.strip().startswith("!"):
-        _command_check = "!"+user_send.strip().split("!")[1].strip().lower()
-    else:
-        _command_check = user_send
+
     if _command_check =="!create" or _command_check =="!c":
         if diceGame.checkGroupHasGame(group_id) is True:
             _inGamingRoom = diceGame.getGroupPlayingGame(group_id)
@@ -149,7 +156,13 @@ def handle_message(event):
             _temp_money =0
             for bet_pair in bets:
                 money = int(bet_pair.split(":")[1])
-                _temp_money+=money
+                if money < 0:
+                    line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="請勿輸入小於0的金額!"))
+                    return
+                else:
+                    _temp_money+=money
             print("玩家總下注金額")
             print(_temp_money)
             if _temp_money > diceGame.checkPlayerMoney(user_id):
