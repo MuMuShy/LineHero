@@ -442,7 +442,7 @@ def getDiceBetChoose():
                     "action": {
                     "type": "message",
                     "label": "6",
-                    "text": "!j 61000"
+                    "text": "!j 6:1000"
                     }
                 }
                 ]
