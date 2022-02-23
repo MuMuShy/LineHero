@@ -259,6 +259,7 @@ def StartGame(user_line_id):
     conn.commit()
     _dice_result = str(_dice_result)
     print("此輪結果為:"+str(_dice_result))
+    dataBase.setDiceHistory(_dice_result)
     _reply = "房間:"+_room_id+"\n此輪結果為:"+_dice_result+"\n"
     try:
         _players = _bets_info.split("#")

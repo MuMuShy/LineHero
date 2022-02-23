@@ -122,4 +122,30 @@ class DataBase():
         self.conn.close()
 
 
-               
+    def getDiceHistory(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """SELECT dice_history from gameinfo"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        _historystr = row[0]
+        self.conn.close()
+        _parse = list(_historystr)
+        print(_parse)
+        return _historystr
+
+    def setDiceHistory(self,new):
+        old = self.getDiceHistory()
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        _new =str(str(old)+new)
+        lis = list(_new)
+        if len(lis) > 10:
+            print("太長了 把第一個砍掉")
+            lis.pop(0)
+        _strtodb = ''.join(lis)
+        sql = """UPDATE gameinfo SET dice_history = """+_strtodb
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()

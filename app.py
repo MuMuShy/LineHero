@@ -188,7 +188,7 @@ def handle_message(event):
             line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="請使用格式 !join 房號 數字:金額 使用&區隔多個數字 ex 5:100&6:200"))
-    elif _command_check.startswith('!room') or _command_check.startswith('!r'):
+    elif _command_check.startswith('!room'):
         try:
             _roomid = user_send.split(" ")[1]
             reply = diceGame.getGameInfoStr(_roomid)
@@ -249,6 +249,22 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage("下注表來囉",contents=lineMessagePacker.getDiceBetChoose()))
+    elif _command_check == "!rollhistory":
+        _history = database.getDiceHistory()
+        _parse = list(_history)
+        _strtopackage = ""
+        _index = 0
+        _target = len(_parse)
+        for history in _parse:
+            _strtopackage+=history
+            _index+=1
+            if _index == _target:
+                None
+            else:
+                _strtopackage+="-"
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("擲骰紀錄來囉",contents=lineMessagePacker.getDiceHistoryFlex(_strtopackage)))
     #回傳價格表
     elif user_send == "!price":
         price = apiThread.getPrice()

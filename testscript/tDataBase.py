@@ -1,4 +1,6 @@
+from ast import parse
 import os
+from re import S
 import psycopg2
 from dotenv import load_dotenv
 
@@ -94,11 +96,42 @@ class DataBase():
         data = (new_hobbybet, user_line_id)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        row = self.cursor.fetchone()
+        print(row)
+        self.conn.close()
+    
+    def getDiceHistory(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """SELECT dice_history from gameinfo"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        _historystr = row[0]
+        self.conn.close()
+        _parse = list(_historystr)
+        print(_parse)
+        return _historystr
+
+    def setDiceHistory(self,new):
+        old = self.getDiceHistory()
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        _new =str(str(old)+new)
+        lis = list(_new)
+        if len(lis) > 10:
+            print("太長了 把第一個砍掉")
+            lis.pop(0)
+        _strtodb = ''.join(lis)
+        sql = """UPDATE gameinfo SET dice_history = """+_strtodb
+        self.cursor.execute(sql)
+        self.conn.commit()
         self.conn.close()
 
 
 if __name__ == "__main__":
     data = DataBase()
-    print(data.getHobbyBet("U8d0f4dfe21ccb2f1dccd5c80d5bb20fe"))
-    data.setHobbyBet("U8d0f4dfe21ccb2f1dccd5c80d5bb20fe",5000)
-    print(data.getHobbyBet("U8d0f4dfe21ccb2f1dccd5c80d5bb20fe"))
+    data.getDiceHistory()
+    data.setDiceHistory("3")
+    data.getDiceHistory()
+

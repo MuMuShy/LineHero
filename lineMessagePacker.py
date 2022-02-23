@@ -227,6 +227,14 @@ def getHelpFlex():
                 "label": "排行榜",
                 "text": "!ranking"
                 }
+            },
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "歷史擲骰",
+                "text": "!rollhistory"
+                }
             }
             ]
         }
@@ -675,5 +683,85 @@ def getRollDiceFlex():
         ],
         "flex": 0
     }
+    }
+    return json
+
+
+def getDiceHistoryFlex(history):
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "size": "kilo",
+        "direction": "ltr",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "歷史擲骰結果",
+                "color": "#ffffff",
+                "align": "center",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": history,
+                "weight": "bold",
+                "color": "#ffffff",
+                "align": "center"
+            }
+            ],
+            "backgroundColor": "#27ACB2",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "此紀錄為所有與此機器人進行遊戲的結果.",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                }
+                ],
+                "flex": 1
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "來一把!",
+                "text": "!c"
+                }
+            }
+            ]
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        }
+    ]
     }
     return json
