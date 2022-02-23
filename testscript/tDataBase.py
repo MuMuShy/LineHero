@@ -75,4 +75,30 @@ class DataBase():
             for item in row:
                 commandlist[item[0]]=[item[1]]
         return commandlist
-               
+    
+
+    def getHobbyBet(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM users where user_line_id = '" +user_line_id+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        return int(row[6])
+
+    def setHobbyBet(self,user_line_id,new_hobbybet):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE users SET hobby_bet = %s WHERE user_line_id = %s"""
+        data = (new_hobbybet, user_line_id)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+        self.conn.close()
+
+
+if __name__ == "__main__":
+    data = DataBase()
+    print(data.getHobbyBet("U8d0f4dfe21ccb2f1dccd5c80d5bb20fe"))
+    data.setHobbyBet("U8d0f4dfe21ccb2f1dccd5c80d5bb20fe",5000)
+    print(data.getHobbyBet("U8d0f4dfe21ccb2f1dccd5c80d5bb20fe"))

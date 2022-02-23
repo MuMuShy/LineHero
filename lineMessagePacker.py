@@ -640,3 +640,40 @@ def getDiceBetChoose():
         ]
         }
     return json
+
+
+def getRollDiceFlex():
+    json = {
+    "type": "bubble",
+    "size": "nano",
+    "hero": {
+        "type": "image",
+        "url": "https://mumu.tw/images/dice/roll.jpg",
+        "size": "full",
+        "aspectRatio": "20:13",
+        "aspectMode": "cover",
+        "action": {
+        "type": "uri",
+        "uri": "http://linecorp.com/"
+        }
+    },
+    "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+        {
+            "type": "button",
+            "style": "link",
+            "height": "sm",
+            "action": {
+            "type": "message",
+            "label": "開骰!",
+            "text": "!d"
+            }
+        }
+        ],
+        "flex": 0
+    }
+    }
+    return json

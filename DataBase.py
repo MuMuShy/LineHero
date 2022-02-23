@@ -101,6 +101,25 @@ class DataBase():
             print(col[1])
             result.append(_reply)
         return result
+    
+    def getHobbyBet(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM users where user_line_id = '" +user_line_id+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        return int(row[6])
+
+    def setHobbyBet(self,user_line_id,new_hobbybet):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE users SET hobby_bet = %s WHERE user_line_id = %s"""
+        data = (new_hobbybet, user_line_id)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+        self.conn.close()
 
 
                

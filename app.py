@@ -65,6 +65,7 @@ def home():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     user_send =event.message.text
+    
     if user_send.strip().startswith("!"):
         _command_check = "!"+user_send.strip().split("!")[1].strip().lower()
     else:
@@ -146,7 +147,7 @@ def handle_message(event):
                     _room_id = diceGame.getGroupPlayingGame(group_id)["room_id"]
             else:
                 try:
-                    _room_id = content[1]
+                    _room_id = diceGame.getRoomIdByUserId(event.source.user_id)
                     bet_info = content[2]
                 except:
                     line_bot_api.reply_message(
@@ -178,7 +179,8 @@ def handle_message(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 [TextSendMessage(text="玩家:"+user_line_name+_reply),
-                    FlexSendMessage("下注囉",contents=lineMessagePacker.getDiceBetChoose())])
+                    FlexSendMessage("下注囉",contents=lineMessagePacker.getDiceBetChoose()),
+                    FlexSendMessage("下注!",contents=lineMessagePacker.getRollDiceFlex())])
         except:
             line_bot_api.reply_message(
             event.reply_token,

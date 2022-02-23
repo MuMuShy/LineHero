@@ -161,6 +161,17 @@ def getGameInfoStr(room_id):
             print("壓住:"+str(price))
     return _str
 
+def getRoomIdByUserId(user_line_id):
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    cursor = conn.cursor()
+    sql = "SELECT room_id from dicegames WHERE hoster = '"+user_line_id+"'"
+    cursor.execute(sql)
+    conn.commit()
+    row = cursor.fetchone()
+    conn.close()
+    print(row[0])
+    return row[0]
+
 
 def joinGame(user_line_id,bet_info,room_id,total_bet):
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
