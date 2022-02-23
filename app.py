@@ -73,7 +73,7 @@ def handle_message(event):
         print("此玩家沒加入好友 傳送提示訊息")
         line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text="看來你還沒有加我好友或是創建個人資料呢!\n 請先加我好友 然後使用 !info 指令"))
+        TextSendMessage(text="看來你還沒有加我好友或是創建個人資料呢!\n請先加我好友 然後使用 !info 指令"))
         return
     group_id =" "
     try:
@@ -87,7 +87,7 @@ def handle_message(event):
         line_bot_api.reply_message(
                 event.reply_token,
                 FlexSendMessage("123",contents=lineMessagePacker.getRanking(top5[0],top5[1],top5[2],top5[3],top5[4])))
-    if user_send.startswith("!set"):
+    elif user_send.startswith("!set"):
         if event.source.user_id != os.getenv("GM_LINE_ID"):
             line_bot_api.reply_message(
                 event.reply_token,
@@ -106,7 +106,7 @@ def handle_message(event):
                 TextSendMessage(text="錯誤 請確認id等資料"))
             return
 
-    if _command_check =="!create" or _command_check =="!c":
+    elif _command_check =="!create" or _command_check =="!c":
         if diceGame.checkGroupHasGame(group_id) is True:
             _inGamingRoom = diceGame.getGroupPlayingGame(group_id)
             _reply ="此群組已有房間 請先加入\n主持:"+_inGamingRoom["room_hoster"]
@@ -115,17 +115,18 @@ def handle_message(event):
                 _reply+=_info
             except:
                 _reply+="\n房號:"+str(_inGamingRoom["room_id"])+"\n"
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text=_reply))
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text=_reply))
             return
         user_id = event.source.user_id
         _reply = diceGame.createGame(user_id,group_id)
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=_reply))
+            [TextSendMessage(text=_reply),
+            FlexSendMessage("下注囉",contents=lineMessagePacker.getDiceBetChoose())])
 
-    if _command_check.startswith('!join') or _command_check.startswith('!j'):
+    elif _command_check.startswith('!join') or _command_check.startswith('!j'):
         user_id = event.source.user_id
         content =  user_send.split(" ")
         try:
@@ -176,12 +177,13 @@ def handle_message(event):
             _reply = diceGame.joinGame(user_id,bet_info,str(_room_id),_temp_money)
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text="玩家:"+user_line_name+_reply))
+                [TextSendMessage(text="玩家:"+user_line_name+_reply),
+                    FlexSendMessage("下注囉",contents=lineMessagePacker.getDiceBetChoose())])
         except:
             line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="請使用格式 !join 房號 數字:金額 使用&區隔多個數字 ex 5:100&6:200"))
-    if _command_check.startswith('!room') or _command_check.startswith('!r'):
+    elif _command_check.startswith('!room') or _command_check.startswith('!r'):
         try:
             _roomid = user_send.split(" ")[1]
             reply = diceGame.getGameInfoStr(_roomid)
@@ -192,7 +194,7 @@ def handle_message(event):
             line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="好像沒有此資料喔"))
-    if _command_check =="!dice" or _command_check.startswith('!d'):
+    elif _command_check =="!dice" or _command_check.startswith('!d'):
         user_id = event.source.user_id
         _reply = diceGame.StartGame(user_id)
         try:
@@ -206,7 +208,7 @@ def handle_message(event):
         except:
             line_bot_api.reply_message(
                 event.reply_token,TextSendMessage(text=_reply))
-    if _command_check =="!info":
+    elif _command_check =="!info":
         user_id = event.source.user_id
         try:
             profile = line_bot_api.get_profile(user_id)
@@ -227,11 +229,15 @@ def handle_message(event):
             line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="已成功創建資料 可用 !info 查詢"))
-    if _command_check =="!gamelist":
+    elif _command_check =="!gamelist":
         reply = diceGame.getRoomList()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=reply))
+    elif _command_check =="!betlist":
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("下注表來囉",contents=lineMessagePacker.getDiceBetChoose()))
     #回傳價格表
     elif user_send == "!price":
         price = apiThread.getPrice()
