@@ -67,8 +67,8 @@ def home():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    print(event)
     user_send =event.message.text
-    
     if user_send.strip().startswith("!"):
         _command_check = "!"+user_send.strip().split("!")[1].strip().lower()
     else:
@@ -265,6 +265,17 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage("擲骰紀錄來囉",contents=lineMessagePacker.getDiceHistoryFlex(_strtopackage)))
+    elif _command_check =="!watherprice":
+        _wathermoney = database.getWatherMoney()
+        line_bot_api.reply_message(
+        event.reply_token,
+        FlexSendMessage("目前彩金!",contents=lineMessagePacker.getJackPotFlex(_wathermoney)))
+    elif _command_check =="!spin":
+        user_id = event.source.user_id
+        _result = diceGame.StartSpinGame(user_id)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=_result))
     #回傳價格表
     elif user_send == "!price":
         price = apiThread.getPrice()

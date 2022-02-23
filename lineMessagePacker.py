@@ -235,6 +235,14 @@ def getHelpFlex():
                 "label": "歷史擲骰",
                 "text": "!rollhistory"
                 }
+            },
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "JACK POT查詢",
+                "text": "!watherprice"
+                }
             }
             ]
         }
@@ -763,5 +771,114 @@ def getDiceHistoryFlex(history):
         }
         }
     ]
+    }
+    return json
+
+
+def getJackPotFlex(wather_money):
+    json = {
+    "type": "bubble",
+    "hero": {
+        "type": "image",
+        "url": "https://img.freepik.com/free-vector/jackpot-background-with-flying-golden-coins_1017-23144.jpg?size=626&ext=jpg",
+        "size": "full",
+        "aspectRatio": "20:13",
+        "aspectMode": "cover",
+        "action": {
+        "type": "uri",
+        "uri": "http://linecorp.com/"
+        }
+    },
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "text",
+            "text": "$$ JACKPOT $$",
+            "weight": "bold",
+            "size": "xl",
+            "align": "center",
+            "style": "normal",
+            "decoration": "none"
+        },
+        {
+            "type": "box",
+            "layout": "baseline",
+            "margin": "md",
+            "contents": [
+            {
+                "type": "text",
+                "text": "所有玩家輸給我的金錢都會在這",
+                "size": "sm",
+                "color": "#999999",
+                "margin": "md",
+                "flex": 0
+            }
+            ]
+        },
+        {
+            "type": "box",
+            "layout": "vertical",
+            "margin": "lg",
+            "spacing": "sm",
+            "contents": [
+            {
+                "type": "text",
+                "text": "累積金額:",
+                "weight": "bold"
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "spacing": "sm",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "$: "+str(wather_money),
+                    "wrap": True,
+                    "color": "#ff0000",
+                    "size": "lg",
+                    "flex": 5
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "spacing": "sm",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "跟我玩拉霸機就有機會把獎金帶走!",
+                    "wrap": True,
+                    "color": "#666666",
+                    "size": "sm",
+                    "flex": 5
+                }
+                ]
+            }
+            ]
+        }
+        ]
+    },
+    "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+        {
+            "type": "button",
+            "style": "link",
+            "height": "sm",
+            "action": {
+            "type": "message",
+            "label": "$10 SPIN",
+            "text": "!spin"
+            }
+        }
+        ],
+        "flex": 0
+    }
     }
     return json

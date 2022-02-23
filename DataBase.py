@@ -54,6 +54,9 @@ class DataBase():
             json["locked_money"] = str(row[5])
             return json
     
+    def getUserMoney(self,user_line_id):
+        return self.getUser(user_line_id)["user_money"]
+    
     def getUserName(self,user_line_id):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
@@ -81,10 +84,19 @@ class DataBase():
     def AddUserMoneyByIndex(self,user_index_id,money):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
-        sql ="""UPDATE users SET user_money = """+str(money)+"""WHERE user_id ="""+str(user_index_id)
+        sql ="""UPDATE users SET user_money = """+str(money)+"""WHERE user_id = """+str(user_index_id)
         self.cursor.execute(sql)
         self.conn.commit()
         self.conn.close()
+    
+
+    def SetUserMoneyByLineId(self,user_line_id,money):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
+        params = {'money':money,'line_id':user_line_id}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
     
 
     def getTop5Ranking(self):
@@ -149,3 +161,33 @@ class DataBase():
         self.cursor.execute(sql)
         self.conn.commit()
         self.conn.close()
+    
+    def getWatherMoney(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """select wather_money from gameinfo"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _wathermoney = row[0]
+        print("目前水錢")
+        print(int(_wathermoney))
+        return int(_wathermoney)
+    
+    def setWatherMoney(self,new):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE gameinfo SET wather_money = """+str(new)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+    
+    def addWatherMoney(self,add):
+        now_wather_money = self.getWatherMoney()
+        if add < 0:
+            new_wather_money = now_wather_money-int(add)
+        else:
+            new_wather_money = int(add)+now_wather_money
+        self.setWatherMoney(new_wather_money)
+        print("目前水錢:"+str(new_wather_money))

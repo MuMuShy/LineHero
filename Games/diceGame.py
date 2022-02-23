@@ -6,6 +6,7 @@ import random
 import os
 import time
 import math
+import random
 from datetime import datetime, timedelta
 # adding Folder_2 to the system path
 sys.path.insert(0, '../')
@@ -276,6 +277,7 @@ def StartGame(user_line_id):
         _reply+="玩家: "+user_line_name+"\n"+"下注結果:\n"
         allbets = _player_info['bet_info'].split("&")
         _tempmoney = checkPlayerMoney(_player_id)
+        _wather_money = 0
         for _bet in allbets:
             num = _bet.split(":")[0]
             price = _bet.split(":")[1]
@@ -292,6 +294,7 @@ def StartGame(user_line_id):
                 else:
                     print("猜測失敗")
                     _reply+="猜測失敗"
+                    _wather_money+=int(price)
             #大中小 單雙
             else:
                 choice = str(num)
@@ -304,6 +307,7 @@ def StartGame(user_line_id):
                     else:
                         print("猜測失敗")
                         _reply+="猜測失敗"
+                        _wather_money+=int(price)
                 elif choice =="中":
                     if int(_dice_result) ==3 or int(_dice_result) ==4:
                         _payoff = math.ceil(int(price)*2.6)
@@ -313,6 +317,7 @@ def StartGame(user_line_id):
                     else:
                         print("猜測失敗")
                         _reply+="猜測失敗"
+                        _wather_money+=int(price)
                 elif choice =="小":
                     if int(_dice_result) ==1 or int(_dice_result) ==2:
                         _payoff = math.ceil(int(price)*2.6)
@@ -322,6 +327,7 @@ def StartGame(user_line_id):
                     else:
                         print("猜測失敗")
                         _reply+="猜測失敗"
+                        _wather_money+=int(price)
                 elif choice =="單":
                     if int(_dice_result)%2 !=0:
                         _payoff = math.ceil(int(price)*1.9)
@@ -331,6 +337,7 @@ def StartGame(user_line_id):
                     else:
                         print("猜測失敗")
                         _reply+="猜測失敗"
+                        _wather_money+=int(price)
                 elif choice =="雙":
                     if int(_dice_result)%2 ==0:
                         _payoff = math.ceil(int(price)*1.9)
@@ -340,6 +347,7 @@ def StartGame(user_line_id):
                     else:
                         print("猜測失敗")
                         _reply+="猜測失敗"
+                        _wather_money+=int(price)
                 elif choice =="奇":
                     if int(_dice_result)%2 !=0:
                         _payoff = math.ceil(int(price)*1.9)
@@ -349,6 +357,7 @@ def StartGame(user_line_id):
                     else:
                         print("猜測失敗")
                         _reply+="猜測失敗"
+                        _wather_money+=int(price)
                 elif choice =="偶":
                     if int(_dice_result)%2 ==0:
                         _payoff = math.ceil(int(price)*1.9)
@@ -358,6 +367,7 @@ def StartGame(user_line_id):
                     else:
                         print("猜測失敗")
                         _reply+="猜測失敗"
+                        _wather_money+=int(price)
             _reply+="\n"
         _reply+="\n"
         sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
@@ -365,6 +375,8 @@ def StartGame(user_line_id):
         cursor.execute(sql,params)
         conn.commit()
     conn.close()
+    print("增加水錢:"+str(_wather_money))
+    dataBase.addWatherMoney(_wather_money)
     clearGame(user_line_id)
     print(_reply)
     _reply=str(_dice_result)+"|"+_reply
@@ -392,6 +404,82 @@ def checkPlayerMoney(user_id):
     row = cursor.fetchone()
     conn.close()
     return row[0]
+
+
+
+def StartSpinGame(user_line_id):
+    # 1% 機率開到最大獎
+    # 3% 大獎 (500~1000)
+    # 5% 中獎 (50~100)
+    # 20% 小獎 (10~20)
+    # 30% 平盤 (10)
+    # 41% 輸錢 
+    #先判斷是否會贏錢
+     # 1% 機率開到最大獎
+    # 3% 大獎 (500~1000)
+    # 5% 中獎 (50~100)
+    # 20% 小獎 (10~20)
+    # 30% 平盤 (10)
+    # 41% 輸錢 
+    #先判斷是否會贏錢
+    _finalresult = ['win','loose']
+    _result = random.choices(_finalresult,weights=[20,70])[0]
+    print(_result)
+    _wather_money = dataBase.getWatherMoney()
+    user_money = int(dataBase.getUserMoney(user_line_id))
+    _reply=""
+    if _result == 'loose' or _wather_money <1000:
+        print("輸錢囉")
+        user_money-=10
+        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        cursor = conn.cursor()
+        sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
+        params = {'money':user_money,'line_id':user_line_id}
+        cursor.execute(sql,params)
+        conn.commit()
+        conn.close()
+        dataBase.addWatherMoney(10)
+        return "很可惜 沒有中獎"
+    else:
+        print("贏錢了 決定獎項")
+        _resultlist =['mega','big','center','little','none']
+        _result = random.choices(_resultlist,weights=[1,3,5,2000,10])[0]
+        print("result:"+_result)
+        if _result =="none":
+            print("平局")
+            user_money+=10
+            dataBase.addWatherMoney(-10)
+            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
+            return "恭喜中獎: $10"
+        elif _result =="little":
+            _money = random.randrange(11,20)
+            print("小獎")
+            user_money+=_money
+            dataBase.addWatherMoney(_money*-1)
+            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
+            return "恭喜中小獎: $"+str(_money)
+        elif _result =="cetner":
+            _money = random.randrange(51,100)
+            print("中獎")
+            user_money+=_money
+            dataBase.addWatherMoney(_money*-1)
+            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
+            return "恭喜中獎: $"+str(_money)
+        elif _result =="big":
+            _money = random.randrange(50,1000)
+            user_money+=_money
+            dataBase.addWatherMoney(_money*-1)
+            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
+            print("大獎")
+            return "恭喜中大獎!!!: $"+str(_money)
+        elif _result =="mega":
+            _money = _wather_money
+            user_money+=_money
+            dataBase.setWatherMoney(0)
+            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
+            print("全獎")
+            return "恭喜中jack pot!!!!: $"+str(_money)
+
 
 
 

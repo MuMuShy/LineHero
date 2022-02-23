@@ -3,7 +3,7 @@ import os
 from re import S
 import psycopg2
 from dotenv import load_dotenv
-
+import random
 load_dotenv()
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -127,11 +127,51 @@ class DataBase():
         self.cursor.execute(sql)
         self.conn.commit()
         self.conn.close()
+    
+
+    def getWatherMoney(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """select wather_money from gameinfo"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _wathermoney = row[0]
+        print("目前水錢")
+        print(int(_wathermoney))
+        return int(_wathermoney)
+    
+    def setWatherMoney(self,new):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE gameinfo SET wather_money = """+str(new)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+    
+    def addWatherMoney(self,add):
+        now_wather_money = self.getWatherMoney()
+        new_wather_money = int(add)+now_wather_money
+        self.setWatherMoney(new_wather_money)
+        
+    def SetUserMoneyByLineId(self,user_line_id,money):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        # sql ="""UPDATE users SET user_money = """+str(money)+""" WHERE user_line_id = """+str(user_line_id)
+        # self.cursor.execute(sql)
+        # self.conn.commit()
+        # self.conn.close()
+
+        sql ="""UPDATE users SET user_money = """+str(money)+"""WHERE user_id = """+str(user_line_id)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
 
 
 if __name__ == "__main__":
-    data = DataBase()
-    data.getDiceHistory()
-    data.setDiceHistory("3")
-    data.getDiceHistory()
+    database = DataBase()
+    database.SetUserMoneyByLineId(10,10000)
+
+
 
