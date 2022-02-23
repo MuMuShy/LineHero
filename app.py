@@ -148,7 +148,7 @@ def handle_message(event):
             else:
                 try:
                     _room_id = diceGame.getRoomIdByUserId(event.source.user_id)
-                    bet_info = content[2]
+                    bet_info = content[1]
                 except:
                     line_bot_api.reply_message(
                     event.reply_token,
