@@ -270,17 +270,32 @@ def handle_message(event):
         line_bot_api.reply_message(
         event.reply_token,
         FlexSendMessage("目前彩金!",contents=lineMessagePacker.getJackPotFlex(_wathermoney)))
-    elif _command_check =="!spin":
+    elif _command_check.startswith("!spin"):
+        try:
+            _times = int(_command_check.split(" ")[1])
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="輸入格式好像有問題喔... !spin 次數"))
+            return
         user_id = event.source.user_id
-        if int(database.getUserMoney(user_id)) < 10:
+        if int(database.getUserMoney(user_id)) < 10*_times:
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="餘額小於10無法進行"))
             return
-        _result = diceGame.StartSpinGame(user_id)
+        #_result = diceGame.StartSpinGame(user_id)
+        _totalbet = 10*_times
+        _origin = int(database.getUserMoney(user_id))
+        _origin-=_totalbet
+        _result = diceGame.SpinGame(_totalbet)
+        _wintype=""
+        _finalmoney = _origin+_result
+        database.SetUserMoneyByLineId(user_id,_finalmoney)
+        _str = "旋轉了"+str(_times)+"次\n花費:"+str(_totalbet)+"\n餘額: $"+str(_finalmoney)
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=_result))
+            TextSendMessage(text=_str))
     #回傳價格表
     elif user_send == "!price":
         price = apiThread.getPrice()

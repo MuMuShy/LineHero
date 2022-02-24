@@ -405,6 +405,62 @@ def checkPlayerMoney(user_id):
     conn.close()
     return row[0]
 
+def SpinGame(player_bet_money):
+    _beforeBet = player_bet_money
+    wather_money = dataBase.getWatherMoney()
+    if wather_money > 1000:
+        _resultlist =['jp','none']
+        _result = random.choices(_resultlist,weights=[1,1000])[0]
+        if _result == 'jp':
+            print("jp!")
+            player_bet_money = wather_money
+            dataBase.setWatherMoney(0)
+            return player_bet_money
+        else:
+            _resultlist =['loose','little','middle','big']
+            if player_bet_money > 50000:
+                _result = random.choices(_resultlist,weights=[80,47,1,1])[0]
+            else:
+                _result = random.choices(_resultlist,weights=[65,47,1,1])[0]
+            print(_result)
+            if _result =='loose':
+                _rtp = random.randrange(40,89)/100
+            elif _result =='little': #105%~ 110%
+                _rtp = random.randrange(120,130)/100
+            elif _result =='middle': #150~200
+                _rtp = random.randrange(200,250)/100
+            elif _result =='big': #20%~30%的彩池
+                _present = random.randrange(20,30)
+                _win = int(wather_money*_present/100)
+                _rtp = _win/player_bet_money
+            print("result:"+_result)
+            print("rtp:"+str(_rtp))
+            player_bet_money*=_rtp
+            player_bet_money = math.ceil(player_bet_money)
+            print(player_bet_money)
+    else:
+        _resultlist =['loose','little','middle']
+        _result = random.choices(_resultlist,weights=[51,47,1])[0]
+        print(_result)
+        if _result =='loose':
+            _rtp = random.randrange(90,97)
+        elif _result =='little': #105%~ 110%
+            _rtp = random.randrange(105,110)
+        elif _result =='middle': #150~200
+            _rtp = random.randrange(150,200)
+        print("result:"+_result)
+        print("rtp:"+str(_rtp))
+        player_bet_money*=_rtp
+        player_bet_money = int(player_bet_money)
+        print(player_bet_money)
+    _winfromWather = player_bet_money-_beforeBet
+    if _winfromWather > 0:
+        print("使用者總共贏了:"+str(_winfromWather))
+    else:
+        print("使用者總共輸了:"+str(_winfromWather*-1))
+    wather_money-=_winfromWather
+    dataBase.setWatherMoney(wather_money)
+    return player_bet_money
 
 
 def StartSpinGame(user_line_id):

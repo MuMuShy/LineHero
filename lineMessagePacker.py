@@ -874,7 +874,27 @@ def getJackPotFlex(wather_money):
             "action": {
             "type": "message",
             "label": "$10 SPIN",
-            "text": "!spin"
+            "text": "!spin 1"
+            }
+        },
+        {
+            "type": "button",
+            "style": "link",
+            "height": "sm",
+            "action": {
+            "type": "message",
+            "label": "$100 SPINX10",
+            "text": "!spin 10"
+            }
+        },
+        {
+            "type": "button",
+            "style": "link",
+            "height": "sm",
+            "action": {
+            "type": "message",
+            "label": "$1000 SPINX100",
+            "text": "!spin 100"
             }
         }
         ],

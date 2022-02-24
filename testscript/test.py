@@ -13,5 +13,7 @@ print(target)
 time_elapsed = (target-current)
 print(time_elapsed.total_seconds())
 
-s="!spin"
-print(int(s.split(" ")[1]))
+a=1
+b=2
+b-=a
+print(b)
