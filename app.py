@@ -109,6 +109,23 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage(text="錯誤 請確認id等資料"))
             return
+    elif user_send.startswith("!wset"):
+        if event.source.user_id != os.getenv("GM_LINE_ID"):
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="無權限執行此指令"))
+            return
+        try:
+            _money = user_send.split(" ")[1]
+            database.setWatherMoney(_money)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="成功!"))
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="錯誤 請確認等資料"))
+            return
 
     elif _command_check =="!create" or _command_check =="!c":
         if diceGame.checkGroupHasGame(group_id) is True:
