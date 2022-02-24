@@ -10,5 +10,8 @@ print(fromdatabase)
 target =current+ timedelta(minutes=5)
 print(target)
 
-time_elapsed = (target-fromdatabase)
+time_elapsed = (target-current)
 print(time_elapsed.total_seconds())
+
+s="!spin"
+print(int(s.split(" ")[1]))

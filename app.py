@@ -272,6 +272,11 @@ def handle_message(event):
         FlexSendMessage("目前彩金!",contents=lineMessagePacker.getJackPotFlex(_wathermoney)))
     elif _command_check =="!spin":
         user_id = event.source.user_id
+        if int(database.getUserMoney(user_id)) < 10:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="餘額小於10無法進行"))
+            return
         _result = diceGame.StartSpinGame(user_id)
         line_bot_api.reply_message(
             event.reply_token,
