@@ -278,6 +278,11 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage(text="輸入格式好像有問題喔... !spin 次數"))
             return
+        if _times < 0:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="轉負數次數是怎樣...?"))
+            return
         user_id = event.source.user_id
         if int(database.getUserMoney(user_id)) < 10*_times:
             line_bot_api.reply_message(
