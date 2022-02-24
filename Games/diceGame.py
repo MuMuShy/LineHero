@@ -408,7 +408,7 @@ def checkPlayerMoney(user_id):
 def SpinGame(player_bet_money):
     _beforeBet = player_bet_money
     wather_money = dataBase.getWatherMoney()
-    if wather_money > 1000:
+    if wather_money > 35000:
         _resultlist =['jp','none']
         _result = random.choices(_resultlist,weights=[1,100000])[0]
         if _result == 'jp':
@@ -458,10 +458,11 @@ def SpinGame(player_bet_money):
     _winfromWather = player_bet_money-_beforeBet
 
     if _winfromWather > 0:
-        print("使用者總共贏了:"+str(_winfromWather))
+        wather_money-=abs(_winfromWather)
+        print("使用者總共贏了:"+str(_winfromWather),"水池:"+str(wather_money))
     else:
-        wather_money+=_winfromWather
-        print("使用者總共輸了:"+str(_winfromWather*-1))
+        wather_money+=abs(_winfromWather)
+        print("使用者總共輸了:"+str(_winfromWather*-1),"水池:"+str(wather_money))
     if wather_money < 0 or wather_money ==0:
         print("reset wather money")
         wather_money = 123000

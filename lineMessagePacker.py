@@ -820,6 +820,27 @@ def getJackPotFlex(wather_money):
         {
             "type": "box",
             "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "上期中獎玩家: xxx ",
+                "size": "sm"
+            },
+            {
+                "type": "text",
+                "text": "02/25/2022 01:44:50",
+                "size": "sm"
+            },
+            {
+                "type": "text",
+                "text": " 贏得大獎: $120000000 ",
+                "size": "sm"
+            }
+            ]
+        },
+        {
+            "type": "box",
+            "layout": "vertical",
             "margin": "lg",
             "spacing": "sm",
             "contents": [
