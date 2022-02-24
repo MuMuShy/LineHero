@@ -430,6 +430,7 @@ def SpinGame(player_bet_money):
             elif _result =='middle': #150~200
                 _rtp = random.randrange(200,250)/100
             elif _result =='big': #20%~30%的彩池
+                print("中大獎")
                 _present = random.randrange(20,30)
                 _win = int(wather_money*_present/100)
                 _rtp = _win/player_bet_money
@@ -455,6 +456,7 @@ def SpinGame(player_bet_money):
         player_bet_money = int(player_bet_money)
         print(player_bet_money)
     _winfromWather = player_bet_money-_beforeBet
+
     if _winfromWather > 0:
         print("使用者總共贏了:"+str(_winfromWather))
     else:
