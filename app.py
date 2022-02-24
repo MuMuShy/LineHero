@@ -282,7 +282,7 @@ def handle_message(event):
         if int(database.getUserMoney(user_id)) < 10*_times:
             line_bot_api.reply_message(
                 event.reply_token,
-                TextSendMessage(text="餘額小於10無法進行"))
+                TextSendMessage(text="餘額小於 次數*10 無法進行"))
             return
         #_result = diceGame.StartSpinGame(user_id)
         _totalbet = 10*_times
