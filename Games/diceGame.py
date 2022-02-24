@@ -419,9 +419,9 @@ def SpinGame(player_bet_money):
         else:
             _resultlist =['loose','little','middle','big']
             if player_bet_money > 50000:
-                _result = random.choices(_resultlist,weights=[80,47,1,1])[0]
+                _result = random.choices(_resultlist,weights=[160,94,1,1])[0]
             else:
-                _result = random.choices(_resultlist,weights=[65,47,1,1])[0]
+                _result = random.choices(_resultlist,weights=[130,94,1,1])[0]
             print(_result)
             if _result =='loose':
                 _rtp = random.randrange(40,89)/100
@@ -462,7 +462,9 @@ def SpinGame(player_bet_money):
     else:
         wather_money+=_winfromWather
         print("使用者總共輸了:"+str(_winfromWather*-1))
-    
+    if wather_money < 0 or wather_money ==0:
+        print("reset wather money")
+        wather_money = 123000
     dataBase.setWatherMoney(wather_money)
     return player_bet_money
 
