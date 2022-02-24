@@ -176,6 +176,7 @@ class DataBase():
         return int(_wathermoney)
     
     def setWatherMoney(self,new):
+        print("目前水錢"+str(new))
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
         sql = """UPDATE gameinfo SET wather_money = """+str(new)
