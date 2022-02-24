@@ -824,17 +824,20 @@ def getJackPotFlex(wather_money):
             {
                 "type": "text",
                 "text": "上期中獎玩家: 嵐霖 ",
-                "size": "sm"
+                "size": "sm",
+                "align": "center"
             },
             {
                 "type": "text",
                 "text": "02/24/2022 11:28:50",
-                "size": "sm"
+                "size": "sm",
+                "align": "center"
             },
             {
                 "type": "text",
-                "text": " 贏得大獎: $4,494,041 ",
-                "size": "sm"
+                "text": "贏得大獎: $4,494,041 ",
+                "size": "sm",
+                "align": "center"
             }
             ]
         },
