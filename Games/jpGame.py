@@ -7,8 +7,9 @@ from DataBase import DataBase
 dataBase = DataBase()
 def spinJp(betmoney,user_line_id):
     _origin = int(dataBase.getUserMoney(user_line_id))
-    _origin-=betmoney #先把下注的錢扣掉
     _beforeBet = _origin
+    _origin-=betmoney #先把下注的錢扣掉
+    
     #betmoney使用這那邊會先扣掉 所以回傳的money要示小於當初投入 等於使用者虧錢
     #進彩池機率 每分 0.00001
     _jpPersent = 0.00001 
@@ -23,7 +24,9 @@ def spinJp(betmoney,user_line_id):
     #rtp -> 90 ~ 110
     #假設一次固定 100塊錢
     _oneTimeBet = 100
+    _playtime = int(betmoney/_oneTimeBet)
     _inToJp = _jpPersent*betmoney
+    print("完之前的金額:"+str(_beforeBet))
     print("投入金額:"+str(betmoney)+" 次數:"+str(betmoney/_oneTimeBet)+" 進彩池機率:"+str(_inToJp*100)+"%")
     _result = {}
     _payoff=0
@@ -63,43 +66,45 @@ def spinJp(betmoney,user_line_id):
         dataBase.setJpLastWin(_username,_money)
     else:
         print("沒進彩池 正常派獎")
-        _rtp = random.randrange(85,110)/100
-        if _rtp == 100:
-            _rtp = 98
-        print("RTP: "+str(_rtp))
-        _money = int(_origin*_rtp)
+        _temp = 0
+        for i in range(_playtime):
+            _rtp = random.randrange(60,140)
+            _temp+=_rtp
+        print("RTP: "+str(_temp/_oneTimeBet*_playtime))
+        _money = int(_temp)
+        print("派的錢:"+str(_money))
         _result={"type":"normal","money":_money}
 
     _payoff = _origin + _money
+    print("payoff:"+str(_payoff))
     dataBase.SetUserMoneyByLineId(user_line_id,_payoff)
 
     #解析回傳
-    _returnstr="投入金額:"+str(betmoney)+" 次數:"+str(betmoney/_oneTimeBet)
-    _payoff = _result["money"]  
+    _returnstr="投入金額:"+str(betmoney)+" 次數:"+str(betmoney/_oneTimeBet) 
     _payoff = int(_payoff) 
     if _result["type"] == "grand":
-        _returnstr+="\n恭喜中GRAND!! :"+str("${:,.2f}".format(_result["money"]))
-        print("中grand!"+str(_result["money"]))
+        _returnstr+="\n恭喜中GRAND!! :"+str("${:,.2f}".format(_payoff))
+        print("中grand!"+str(_payoff))
     elif _result["type"] == "major":
-        _returnstr+="\n恭喜中MAJOR!! :"+str("${:,.2f}".format(_result["money"]))
-        print("major!"+str(_result["money"]))
+        _returnstr+="\n恭喜中MAJOR!! :"+str("${:,.2f}".format(_payoff))
+        print("major!"+str(_payoff))
     elif _result["type"] == "minor":
-        _returnstr+="\n恭喜中MINOR!! :"+str("${:,.2f}".format(_result["money"]))
-        print("中minor!"+str(_result["money"]))
+        _returnstr+="\n恭喜中MINOR!! :"+str("${:,.2f}".format(_payoff))
+        print("中minor!"+str(_payoff))
     elif _result["type"] == "mini":
-        _returnstr+="\n恭喜中MINI!! :"+str("${:,.2f}".format(_result["money"]))
-        print("中mini!"+str("${:,.2f}".format(_result["money"])))
+        _returnstr+="\n恭喜中MINI!! :"+str("${:,.2f}".format(_payoff))
+        print("中mini!"+str("${:,.2f}".format(_payoff)))
     elif _result["type"] == "normal":
         _payoff = int(_payoff)
     if _payoff < _beforeBet:
-        _loose = _origin-_payoff
+        _loose = _beforeBet-_payoff
         _returnstr+="\n虧損:"+str("${:,.2f}".format(_loose))+"\n餘額: "+str("${:,.2f}".format(_payoff))
         print("增加水錢:"+str(_loose))
         dataBase.addWatherMoney(_loose)
         dataBase.addAllJp(int(_loose*0.5),int(_loose*0.3),int(_loose*0.05),int(_loose*0.03))
         print("輸 :"+str(_loose)+"餘額:"+str(_payoff))
     else:
-        _win = _payoff-_origin
+        _win = _payoff-_beforeBet
         _returnstr+="\n贏得:"+str("${:,.2f}".format(_win))+"\n餘額"+str("${:,.2f}".format(_payoff))
         print("贏:"+str(_win)+"餘額:"+str(_payoff))
     return _returnstr
