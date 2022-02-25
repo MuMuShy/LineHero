@@ -131,13 +131,14 @@ def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,us
 
 
 def getDiceResult(num):
+    _diceurl = str(num)
     if int(num) == 6:
-        num = 60
+        _diceurl = "60"
     json = {
         "type": "bubble",
         "hero": {
             "type": "image",
-            "url": "https://mumu.tw/images/dice/dice"+str(num)+".jpg",
+            "url": "https://mumu.tw/images/dice/dice"+_diceurl+".jpg",
             "size": "full",
             "aspectRatio": "5:4",
             "aspectMode": "cover",
