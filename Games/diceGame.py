@@ -377,6 +377,8 @@ def StartGame(user_line_id):
     conn.close()
     print("增加水錢:"+str(_wather_money))
     dataBase.addWatherMoney(_wather_money)
+    #50%grand 30%major 5%minor 5%mini
+    dataBase.addAllJp(int(_wather_money*0.5),int(_wather_money*0.3),int(_wather_money*0.05),int(_wather_money*0.03))
     clearGame(user_line_id)
     print(_reply)
     _reply=str(_dice_result)+"|"+_reply
@@ -404,145 +406,6 @@ def checkPlayerMoney(user_id):
     row = cursor.fetchone()
     conn.close()
     return row[0]
-
-def SpinGame(player_bet_money):
-    _beforeBet = player_bet_money
-    wather_money = dataBase.getWatherMoney()
-    if wather_money > 35000:
-        _resultlist =['jp','none']
-        _result = random.choices(_resultlist,weights=[1,100000])[0]
-        if _result == 'jp':
-            print("jp!")
-            player_bet_money = wather_money
-            dataBase.setWatherMoney(0)
-            return player_bet_money
-        else:
-            _resultlist =['loose','little','middle','big']
-            if player_bet_money > 50000:
-                _result = random.choices(_resultlist,weights=[160,94,1,1])[0]
-            else:
-                _result = random.choices(_resultlist,weights=[130,94,1,1])[0]
-            print(_result)
-            if _result =='loose':
-                _rtp = random.randrange(40,89)/100
-            elif _result =='little': #105%~ 110%
-                _rtp = random.randrange(120,130)/100
-            elif _result =='middle': #150~200
-                _rtp = random.randrange(200,250)/100
-            elif _result =='big': #20%~30%的彩池
-                print("中大獎")
-                _present = random.randrange(20,30)
-                _win = int(wather_money*_present/100)
-                _rtp = _win/player_bet_money
-            print("result:"+_result)
-            print("rtp:"+str(_rtp))
-            player_bet_money*=_rtp
-
-            player_bet_money = math.ceil(player_bet_money)
-            print(player_bet_money)
-    else:
-        _resultlist =['loose','little','middle']
-        _result = random.choices(_resultlist,weights=[51,47,1])[0]
-        print(_result)
-        if _result =='loose':
-            _rtp = random.randrange(90,97)
-        elif _result =='little': #105%~ 110%
-            _rtp = random.randrange(105,110)
-        elif _result =='middle': #150~200
-            _rtp = random.randrange(150,200)
-        print("result:"+_result)
-        print("rtp:"+str(_rtp))
-        player_bet_money*=_rtp
-        player_bet_money = int(player_bet_money)
-        print(player_bet_money)
-    _winfromWather = player_bet_money-_beforeBet
-
-    if _winfromWather > 0:
-        wather_money-=abs(_winfromWather)
-        print("使用者總共贏了:"+str(_winfromWather),"水池:"+str(wather_money))
-    else:
-        wather_money+=abs(_winfromWather)
-        print("使用者總共輸了:"+str(_winfromWather*-1),"水池:"+str(wather_money))
-    if wather_money < 0 or wather_money ==0:
-        print("reset wather money")
-        wather_money = 123000
-    dataBase.setWatherMoney(wather_money)
-    return player_bet_money
-
-
-def StartSpinGame(user_line_id):
-    # 1% 機率開到最大獎
-    # 3% 大獎 (500~1000)
-    # 5% 中獎 (50~100)
-    # 20% 小獎 (10~20)
-    # 30% 平盤 (10)
-    # 41% 輸錢 
-    #先判斷是否會贏錢
-     # 1% 機率開到最大獎
-    # 3% 大獎 (500~1000)
-    # 5% 中獎 (50~100)
-    # 20% 小獎 (10~20)
-    # 30% 平盤 (10)
-    # 41% 輸錢 
-    #先判斷是否會贏錢
-    _finalresult = ['win','loose']
-    _result = random.choices(_finalresult,weights=[20,70])[0]
-    print(_result)
-    _wather_money = dataBase.getWatherMoney()
-    user_money = int(dataBase.getUserMoney(user_line_id))
-    _reply=""
-    if _result == 'loose' or _wather_money <1000:
-        print("輸錢囉")
-        user_money-=10
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        cursor = conn.cursor()
-        sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
-        params = {'money':user_money,'line_id':user_line_id}
-        cursor.execute(sql,params)
-        conn.commit()
-        conn.close()
-        dataBase.addWatherMoney(10)
-        return "很可惜 沒有中獎"
-    else:
-        print("贏錢了 決定獎項")
-        _resultlist =['mega','big','center','little','none']
-        _result = random.choices(_resultlist,weights=[1,3,5,2000,10])[0]
-        print("result:"+_result)
-        if _result =="none":
-            print("平局")
-            user_money+=10
-            dataBase.addWatherMoney(-10)
-            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
-            return "恭喜中獎: $10"
-        elif _result =="little":
-            _money = random.randrange(11,20)
-            print("小獎")
-            user_money+=_money
-            dataBase.addWatherMoney(_money*-1)
-            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
-            return "恭喜中小獎: $"+str(_money)
-        elif _result =="cetner":
-            _money = random.randrange(51,100)
-            print("中獎")
-            user_money+=_money
-            dataBase.addWatherMoney(_money*-1)
-            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
-            return "恭喜中獎: $"+str(_money)
-        elif _result =="big":
-            _money = random.randrange(50,1000)
-            user_money+=_money
-            dataBase.addWatherMoney(_money*-1)
-            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
-            print("大獎")
-            return "恭喜中大獎!!!: $"+str(_money)
-        elif _result =="mega":
-            _money = _wather_money
-            user_money+=_money
-            dataBase.setWatherMoney(0)
-            dataBase.SetUserMoneyByLineId(user_line_id,user_money)
-            print("全獎")
-            return "恭喜中jack pot!!!!: $"+str(_money)
-
 
 
 

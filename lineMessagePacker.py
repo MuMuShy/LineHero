@@ -775,7 +775,8 @@ def getDiceHistoryFlex(history):
     return json
 
 
-def getJackPotFlex(wather_money):
+def getJackPotFlex(_jpjson):
+    _total = _jpjson['grand']+_jpjson['major']+_jpjson['minor']+_jpjson['mini']
     json = {
     "type": "bubble",
     "hero": {
@@ -795,49 +796,74 @@ def getJackPotFlex(wather_money):
         "contents": [
         {
             "type": "text",
-            "text": "$$ JACKPOT $$",
+            "text": "- JACKPOT -",
             "weight": "bold",
             "size": "xl",
             "align": "center",
             "style": "normal",
-            "decoration": "none"
+            "decoration": "none",
+            "color": "#ffffff"
         },
         {
             "type": "box",
-            "layout": "baseline",
+            "layout": "vertical",
             "margin": "md",
             "contents": [
             {
                 "type": "text",
-                "text": "所有玩家輸給我的金錢都會在這",
+                "text": "Grand: $"+str("{:,.2f}".format(_jpjson['grand'])),
                 "size": "sm",
-                "color": "#999999",
+                "color": "#ff0000",
+                "align": "center",
                 "margin": "md",
                 "flex": 0
+            },
+            {
+                "type": "text",
+                "text": "Major: $"+str("{:,.2f}".format(_jpjson['major'])),
+                "size": "sm",
+                "color": "#ff99cc",
+                "align": "center",
+                "margin": "md",
+                "flex": 0
+            },
+            {
+                "type": "text",
+                "text": "Minor: $"+str("{:,.2f}".format(_jpjson['minor'])),
+                "size": "sm",
+                "color": "#6666ff",
+                "align": "center",
+                "margin": "md",
+                "flex": 0
+            },
+            {
+                "type": "text",
+                "text": "Mini: $"+str("{:,.2f}".format(_jpjson['mini'])),
+                "size": "sm",
+                "color": "#ffff99",
+                "align": "center",
+                "margin": "md",
+                "flex": 0
+            },
+            {
+                "type": "separator"
             }
             ]
         },
         {
             "type": "box",
             "layout": "vertical",
+            "margin": "md",
             "contents": [
             {
                 "type": "text",
-                "text": "上期中獎玩家: 嵐霖 ",
-                "size": "sm",
-                "align": "center"
+                "text": "Last Win:"+str(_jpjson['last_winner'])+" $ "+str("{:,.2f}".format(_jpjson['last_win']))+" !!!",
+                "size": "xxs",
+                "align": "center",
+                "color": "#FFFFFF"
             },
             {
-                "type": "text",
-                "text": "02/24/2022 11:28:50",
-                "size": "sm",
-                "align": "center"
-            },
-            {
-                "type": "text",
-                "text": "贏得大獎: $4,494,041 ",
-                "size": "sm",
-                "align": "center"
+                "type": "separator"
             }
             ]
         },
@@ -850,7 +876,8 @@ def getJackPotFlex(wather_money):
             {
                 "type": "text",
                 "text": "累積金額:",
-                "weight": "bold"
+                "weight": "bold",
+                "color": "#FFFFFF"
             },
             {
                 "type": "box",
@@ -859,7 +886,7 @@ def getJackPotFlex(wather_money):
                 "contents": [
                 {
                     "type": "text",
-                    "text": "$: "+str(wather_money),
+                    "text": "$: "+str("{:,.2f}".format(_total)),
                     "wrap": True,
                     "color": "#ff0000",
                     "size": "lg",
@@ -876,8 +903,8 @@ def getJackPotFlex(wather_money):
                     "type": "text",
                     "text": "跟我玩拉霸機就有機會把獎金帶走!",
                     "wrap": True,
-                    "color": "#666666",
-                    "size": "sm",
+                    "color": "#FFFFFF",
+                    "size": "xxs",
                     "flex": 5
                 }
                 ]
@@ -897,7 +924,7 @@ def getJackPotFlex(wather_money):
             "height": "sm",
             "action": {
             "type": "message",
-            "label": "$10 SPIN",
+            "label": "$100 SPIN X1",
             "text": "!spin 1"
             }
         },
@@ -907,7 +934,7 @@ def getJackPotFlex(wather_money):
             "height": "sm",
             "action": {
             "type": "message",
-            "label": "$100 SPINX10",
+            "label": "$1000 SPINX10",
             "text": "!spin 10"
             }
         },
@@ -917,12 +944,17 @@ def getJackPotFlex(wather_money):
             "height": "sm",
             "action": {
             "type": "message",
-            "label": "$1000 SPINX100",
+            "label": "$10000 SPINX100",
             "text": "!spin 100"
             }
         }
         ],
         "flex": 0
+    },
+    "styles": {
+        "body": {
+        "backgroundColor": "#660000"
+        }
     }
     }
     return json

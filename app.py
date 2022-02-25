@@ -1,12 +1,10 @@
-from cgitb import text
-import threading
 from time import sleep
 from flask import Flask, request, abort
 from flask import render_template
 from dotenv import load_dotenv
 import lineMessagePacker
 from DataBase import DataBase
-from Games import diceGame
+from Games import diceGame, jpGame
 load_dotenv()
 from linebot import (
     LineBotApi, WebhookHandler
@@ -297,10 +295,11 @@ def handle_message(event):
             event.reply_token,
             FlexSendMessage("擲骰紀錄來囉",contents=lineMessagePacker.getDiceHistoryFlex(_strtopackage)))
     elif _command_check =="!watherprice":
-        _wathermoney = database.getWatherMoney()
+        _jackpot = database.getAllJackpot()
+        _jackpotjson ={"grand":_jackpot[0],"major":_jackpot[1],"minor":_jackpot[2],"mini":_jackpot[3],"last_winner":_jackpot[4],"last_win":_jackpot[5]}
         line_bot_api.reply_message(
         event.reply_token,
-        FlexSendMessage("目前彩金!",contents=lineMessagePacker.getJackPotFlex(_wathermoney)))
+        FlexSendMessage("目前彩金!",contents=lineMessagePacker.getJackPotFlex(_jackpotjson)))
     elif _command_check.startswith("!spin"):
         try:
             _times = int(_command_check.split(" ")[1])
@@ -315,23 +314,17 @@ def handle_message(event):
                 TextSendMessage(text="轉負數次數是怎樣...?"))
             return
         user_id = event.source.user_id
-        if int(database.getUserMoney(user_id)) < 10*_times:
+        if int(database.getUserMoney(user_id)) < 100*_times:
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="餘額小於 次數*10 無法進行"))
             return
         #_result = diceGame.StartSpinGame(user_id)
-        _totalbet = 10*_times
-        _origin = int(database.getUserMoney(user_id))
-        _origin-=_totalbet
-        _result = diceGame.SpinGame(_totalbet)
-        _wintype=""
-        _finalmoney = _origin+_result
-        database.SetUserMoneyByLineId(user_id,_finalmoney)
-        _str = "旋轉了"+str(_times)+"次\n花費:"+str(_totalbet)+"\n餘額: $"+str(_finalmoney)
+        _totalbet = 100*_times
+        _result = jpGame.spinJp(_totalbet,user_id)
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=_str))
+            TextSendMessage(text=_result))
     #回傳價格表
     elif user_send == "!price":
         price = apiThread.getPrice()

@@ -192,3 +192,133 @@ class DataBase():
             new_wather_money = int(add)+now_wather_money
         self.setWatherMoney(new_wather_money)
         print("目前水錢:"+str(new_wather_money))
+    
+    def getGrand(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """select grand from jackpot"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _wathermoney = row[0]
+        print("目前Grand:")
+        print(int(_wathermoney))
+        return int(_wathermoney)
+
+    def getMajor(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """select major from jackpot"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _wathermoney = row[0]
+        print("目前Major:")
+        print(int(_wathermoney))
+        return int(_wathermoney)
+    
+    def getMinor(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """select minor from jackpot"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _wathermoney = row[0]
+        print("目前Minor:")
+        print(int(_wathermoney))
+        return int(_wathermoney)
+    
+    def getMini(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """select mini from jackpot"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _wathermoney = row[0]
+        print("目前Mini:")
+        print(int(_wathermoney))
+        return int(_wathermoney)
+    
+    
+    def setGrand(self,new):
+        print("設定jackpot Grand"+str(new))
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE jackpot SET grand = """+str(new)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+    
+    def setMajor(self,new):
+        print("設定jackpot Major"+str(new))
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE jackpot SET major = """+str(new)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+    
+    def setMinor(self,new):
+        print("設定jackpot Minor"+str(new))
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE jackpot SET minor = """+str(new)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+    
+    def setMini(self,new):
+        print("設定jackpot Mini"+str(new))
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE jackpot SET mini = """+str(new)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+    
+    def getAllJackpot(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """select * from jackpot"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        print("GRAND:"+str(row[0])+" MAJOR:"+str(row[1])+" MINOR:"+str(row[2])+" MINI:"+str(row[3])+" LASTWIN:"+str(row[4])+" LASTWINprice:"+str(row[5]))
+        return row
+    
+    def setAllJackpot(self,grand,major,minor,mini):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE jackpot SET grand = %s , major = %s , minor = %s , mini = %s """
+        data = (grand, major,minor,mini)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+        self.conn.close()
+        print("更新jp:"+str(grand)+","+str(major)+","+str(minor)+","+str(mini))
+    
+    def setJpLastWin(self,_winnername,_winmoney):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE jackpot SET last_winner = %s , last_winprice = %s"""
+        data = (_winnername, _winmoney)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+        self.conn.close()
+        print("更新jp中獎者:"+str(_winnername)+":"+str(_winmoney))
+    
+    def addAllJp(self,grand,major,minor,mini):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE jackpot SET grand = grand+ %s , major = major+ %s , minor = minor+%s , mini = mini+ %s """
+        data = (grand, major,minor,mini)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+        self.conn.close()
+        print("增加jp:"+str(grand)+","+str(major)+","+str(minor)+","+str(mini))
