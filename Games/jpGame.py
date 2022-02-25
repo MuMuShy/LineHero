@@ -25,12 +25,19 @@ def spinJp(betmoney,user_line_id):
     #假設一次固定 100塊錢
     _oneTimeBet = 100
     _playtime = int(betmoney/_oneTimeBet)
-    _inToJp = _jpPersent*betmoney
+    _inToJp = _jpPersent*betmoney*100
     print("完之前的金額:"+str(_beforeBet))
-    print("投入金額:"+str(betmoney)+" 次數:"+str(betmoney/_oneTimeBet)+" 進彩池機率:"+str(_inToJp*100)+"%")
+    print("投入金額:"+str(betmoney)+" 次數:"+str(betmoney/_oneTimeBet)+" 進彩池機率:"+str(_inToJp)+"%")
     _result = {}
     _payoff=0
-    if _inToJp >= 1:
+    _nointojp = 100-_inToJp
+    if _nointojp <0:
+        _nointojp*=-1
+    print("weight in/no:"+str(_inToJp)+"/"+str(_nointojp))
+    check = ['injp','notinjp']
+    _checkintojp = random.choices(check,weights=[_inToJp,_nointojp])[0]
+    print("彩池確認結果:"+_checkintojp)
+    if _checkintojp == 'injp':
         print("進入彩池!")
         _nowJp = dataBase.getAllJackpot()
         _grand = _nowJp[0]
