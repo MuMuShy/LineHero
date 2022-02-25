@@ -1,3 +1,4 @@
+from cgitb import text
 import threading
 from time import sleep
 from flask import Flask, request, abort
@@ -86,6 +87,17 @@ def handle_message(event):
         group_id =" "
         print("no group")
     print(user_send)
+    if _command_check =="!respawn":
+        print("測試期間復活 $10000")
+        _money = database.getUserMoney(event.source.user_id)
+        if _money > 0:
+            _reply = "妳的餘額還沒有歸0 不能浴火重生喔!"
+        else:
+            database.SetUserMoneyByLineId(event.source.user_id)
+            _reply = "已幫您復活 充值 $10000"
+        line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=_reply))
     if user_send =="!ranking":
         top5 = database.getTop5Ranking()
         line_bot_api.reply_message(
