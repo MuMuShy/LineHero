@@ -31,7 +31,7 @@ class DataBase():
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
         sql ="""INSERT INTO users (user_line_name, user_line_id,user_img,user_money,locked_money) VALUES (%(user_line_name)s, %(user_line_id)s, %(user_img)s, %(user_money)s,%(locked_money)s)"""
-        params = {'user_line_name':user_line_name, 'user_line_id':user_line_id,'user_img':user_img_link,'user_money':10000,'locked_money':0}
+        params = {'user_line_name':user_line_name, 'user_line_id':user_line_id,'user_img':user_img_link,'user_money':100000,'locked_money':0}
         self.cursor.execute(sql,params)
         self.conn.commit()
         self.conn.close()
