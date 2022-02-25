@@ -48,7 +48,7 @@ def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,us
                     "contents": [
                     {
                         "type": "text",
-                        "text": "可用 $"+str("{:,.2f}".format(user_money)),
+                        "text": "可用 $"+str("{:,}".format(user_money)),
                         "color": "#00b33c",
                         "size": "sm",
                         "flex": 0
@@ -62,7 +62,7 @@ def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,us
                     "contents": [
                     {
                         "type": "text",
-                        "text": "鎖定 $"+str("{:,.2f}".format(locked_money)),
+                        "text": "鎖定 $"+str("{:,}".format(locked_money)),
                         "color": "#ff1a1a",
                         "flex": 0,
                         "size": "sm"
@@ -94,7 +94,7 @@ def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,us
                 "offsetBottom": "0px",
                 "offsetStart": "0px",
                 "offsetEnd": "0px",
-                "backgroundColor": "#03303Acc",
+                "backgroundColor": "#00000090",
                 "paddingAll": "20px",
                 "paddingTop": "18px"
             },
