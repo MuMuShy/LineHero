@@ -37,6 +37,10 @@ def spinJp(betmoney,user_line_id):
         _major = _nowJp[1]
         _minor = _nowJp[2]
         _mini = _nowJp[3]
+        if _mini > 30000:
+            _miniweight = _miniweight*2
+        if _minor > 190000:
+            _minorweight = _minorweight*2
         _username = dataBase.getUserName(user_line_id)
         _money = 0
         _resultlist =['grand','major','minor','mini']
@@ -45,25 +49,37 @@ def spinJp(betmoney,user_line_id):
         if _result =='grand':
             print("Grand!")
             _money = dataBase.getGrand()
+            #更新資料庫
+            dataBase.setJpLastWin(_username,_money)
             dataBase.setGrand(10000000)
             _result={"type":"grand","money":_money}
         elif _result == 'major':
             print("Major!!")
             _money = dataBase.getMajor()
+            #更新資料庫
+            dataBase.setJpLastWin(_username,_money)
             dataBase.setMajor(1000000)
             _result={"type":"major","money":_money}
         elif _result =='minor':
             print("minor!!")
             _money = dataBase.getMinor()
+            #更新資料庫
+            dataBase.setJpLastWin(_username,_money)
             dataBase.setMinor(100000)
             _result={"type":"minor","money":_money}
         elif _result =='mini':
             print("mini!")
             _money = dataBase.getMini()
+            #更新資料庫
+            dataBase.setJpLastWin(_username,_money)
             dataBase.setMini(10000)
+            _temp = 0
+            for i in range(_playtime):
+                _rtp = random.randrange(60,120)
+                _temp+=_rtp
+            _money+=_temp
             _result={"type":"mini","money":_money}
-        #更新資料庫
-        dataBase.setJpLastWin(_username,_money)
+
     else:
         print("沒進彩池 正常派獎")
         _temp = 0
@@ -94,6 +110,8 @@ def spinJp(betmoney,user_line_id):
     elif _result["type"] == "mini":
         _returnstr+="\n恭喜中MINI!! :"+str("${:,.2f}".format(_payoff))
         print("中mini!"+str("${:,.2f}".format(_payoff)))
+    if _result["type"] !="normal" and _playtime>1:
+        _returnstr+="\n其餘旋轉次數獎項總計:(總得分-總投入)"
     elif _result["type"] == "normal":
         _payoff = int(_payoff)
     if _payoff < _beforeBet:
