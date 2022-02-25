@@ -131,6 +131,8 @@ def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,us
 
 
 def getDiceResult(num):
+    if int(num) == 6:
+        num = 60
     json = {
         "type": "bubble",
         "hero": {
