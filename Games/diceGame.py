@@ -196,6 +196,7 @@ def joinGame(user_line_id,bet_info,room_id,total_bet):
     conn.commit()
     _money = checkPlayerMoney(user_line_id)
     _money-=total_bet
+    dataBase.SetUserLockedMoneyByLineId(user_line_id,total_bet)
     sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
     params = {'money':_money,'line_id':user_line_id}
     cursor.execute(sql,params)
@@ -372,6 +373,7 @@ def StartGame(user_line_id):
         _reply+="\n"
         sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
         params = {'money':_tempmoney,'line_id':_player_id}
+        dataBase.SetUserLockedMoneyByLineId(_player_id,0)
         cursor.execute(sql,params)
         conn.commit()
     conn.close()

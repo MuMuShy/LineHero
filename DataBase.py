@@ -98,6 +98,23 @@ class DataBase():
         self.cursor.execute(sql,params)
         self.conn.commit()
     
+    def SetUserLockedMoneyByLineId(self,user_line_id,money):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""UPDATE users SET locked_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
+        params = {'money':money,'line_id':user_line_id}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+    
+    def GetUserLockedMoneyLineId(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT locked_money from users WHERE user_line_id = '"+user_line_id+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        return row[0]
+    
 
     def getTop5Ranking(self):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')

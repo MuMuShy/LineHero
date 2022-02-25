@@ -92,6 +92,8 @@ def handle_message(event):
         _money = int(_money)
         if _money > 0:
             _reply = "妳的餘額還沒有歸0 不能浴火重生喔!"
+        elif database.GetUserLockedMoneyLineId(event.source.user_id) > 0:
+            _reply ="請先把正在進行的遊戲結算"
         else:
             database.SetUserMoneyByLineId(event.source.user_id,10000)
             _reply = "已幫您復活 充值 $10000"
@@ -209,6 +211,7 @@ def handle_message(event):
                 return
             profile = line_bot_api.get_profile(user_id)
             user_line_name = profile.display_name
+            database.SetUserLockedMoneyByLineId(user_id,_temp_money)
             _reply = diceGame.joinGame(user_id,bet_info,str(_room_id),_temp_money)
             line_bot_api.reply_message(
                 event.reply_token,
