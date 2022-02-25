@@ -87,7 +87,9 @@ def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,us
                     "type": "message",
                     "label": "玩一把",
                     "text": "!create"
-                    }
+                    },
+                    "style": "primary",
+                    "margin": "none"
                 }
                 ],
                 "position": "absolute",
