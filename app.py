@@ -89,7 +89,9 @@ def handle_message(event):
     print(user_send)
     if _command_check =="!respawn":
         print("測試期間復活 $10000")
-        _money = int(database.getUserMoney(event.source.user_id))
+        _money = database.getUserMoney(event.source.user_id)
+        print(_money)
+        _money = int(_money)
         if _money > 0:
             _reply = "妳的餘額還沒有歸0 不能浴火重生喔!"
         else:
