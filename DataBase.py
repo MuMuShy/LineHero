@@ -52,6 +52,7 @@ class DataBase():
             json["user_img_link"] = row[3]
             json["user_money"] = str(row[4])
             json["locked_money"] = str(row[5])
+            json["user_type"] = str(row[8])
             return json
     
     def getUserMoney(self,user_line_id):
@@ -81,14 +82,14 @@ class DataBase():
         return commandlist
     
 
-    def AddUserMoneyByIndex(self,user_index_id,money):
+    def SetUserMoneyByIndex(self,user_index_id,money):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
         sql ="""UPDATE users SET user_money = """+str(money)+"""WHERE user_id = """+str(user_index_id)
         self.cursor.execute(sql)
         self.conn.commit()
         self.conn.close()
-    
+
 
     def SetUserMoneyByLineId(self,user_line_id,money):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -339,3 +340,27 @@ class DataBase():
         self.conn.commit()
         self.conn.close()
         print("增加jp:"+str(grand)+","+str(major)+","+str(minor)+","+str(mini))
+    
+
+    def checkUserDaily(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT daily_request_done FROM users where user_line_id = '" +user_line_id+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        return bool(row[0])
+    
+    def setUserDaily(self,user_line_id,bool):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        if bool == True:
+            bool = "true"
+        else:
+            bool ="false"
+        sql = "UPDATE users SET daily_request_done = %s where user_line_id = %s"
+        data = (bool, user_line_id)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+        self.conn.close()

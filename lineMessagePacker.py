@@ -4,106 +4,127 @@
 import json
 
 
-def getInfoFlexJson(user_name,user_img_link,user_money,locked_money,user_id):
+def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,user_id):
+    color = "#ff0000"
+    if user_type != "GM":
+        color = "#6666ff"
     json = {
-                "type": "bubble",
-                "hero": {
-                    "type": "image",
-                    "url": user_img_link,
-                    "size": "full",
-                    "aspectRatio": "20:13",
-                    "aspectMode": "cover",
-                    "action": {
-                    "type": "uri",
-                    "uri": "http://linecorp.com/"
-                    }
-                },
-                "body": {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": user_img_link,
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
                     "type": "box",
                     "layout": "vertical",
                     "contents": [
                     {
                         "type": "text",
                         "text": user_name,
-                        "weight": "bold",
-                        "size": "xl"
-                    },
-                    {
-                        "type": "box",
-                        "layout": "vertical",
-                        "margin": "lg",
-                        "spacing": "sm",
-                        "contents": [
-                        {
-                            "type": "box",
-                            "layout": "baseline",
-                            "spacing": "sm",
-                            "contents": [
-                            {
-                                "type": "text",
-                                "text": "可用",
-                                "color": "#aaaaaa",
-                                "size": "sm",
-                                "flex": 1
-                            },
-                            {
-                                "type": "text",
-                                "text": "$"+str(user_money),
-                                "color": "#00e600",
-                                "size": "sm",
-                                "flex": 5
-                            }
-                            ]
-                        },
-                        {
-                            "type": "box",
-                            "layout": "baseline",
-                            "spacing": "sm",
-                            "contents": [
-                            {
-                                "type": "text",
-                                "text": "鎖定",
-                                "color": "#aaaaaa",
-                                "size": "sm",
-                                "flex": 1
-                            },
-                            {
-                                "type": "text",
-                                "text": "$"+str(locked_money),
-                                "color": "#ff1a1a",
-                                "size": "sm",
-                                "flex": 5
-                            }
-                            ]
-                        },
-                        {
-                            "type": "box",
-                            "layout": "baseline",
-                            "spacing": "sm",
-                            "contents": [
-                            {
-                                "type": "text",
-                                "text": "ID:",
-                                "color": "#aaaaaa",
-                                "size": "sm",
-                                "flex": 1
-                            },
-                            {
-                                "type": "text",
-                                "text": str(user_id),
-                                "color": "#944dff",
-                                "size": "sm",
-                                "flex": 5
-                            }
-                            ]
-                        }
-
-                        
-                        ]
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
                     }
                     ]
+                },
+                {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "可用 $"+str("{:,.2f}".format(user_money)),
+                        "color": "#00b33c",
+                        "size": "sm",
+                        "flex": 0
+                    }
+                    ],
+                    "spacing": "lg"
+                },
+                {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "鎖定 $"+str("{:,.2f}".format(locked_money)),
+                        "color": "#ff1a1a",
+                        "flex": 0,
+                        "size": "sm"
+                    }
+                    ],
+                    "spacing": "lg"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "ID : "+str(user_id),
+                        "color": "#ffffff"
+                    }
+                    ]
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "玩一把",
+                    "text": "!create"
+                    }
                 }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px",
+                    "text": user_type
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": color,
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "53px"
             }
+            ],
+            "paddingAll": "0px"
+        }
+        }
+    ]
+    }
     return json
 
 
@@ -166,104 +187,389 @@ def getDiceResult(num):
 
 def getHelpFlex():
     json = {
-    "type": "bubble",
-    "hero": {
-        "type": "image",
-        "url": "https://bukku.com.tw/wp-content/uploads/sites/6/2021/04/%E6%88%AA%E5%9C%96-2021-04-02-%E4%B8%8A%E5%8D%8812.56.22-300x298.png",
-        "size": "full",
-        "aspectRatio": "20:13",
-        "aspectMode": "cover",
-        "action": {
-        "type": "uri",
-        "uri": "http://linecorp.com/"
-        }
-    },
-    "body": {
-        "type": "box",
-        "layout": "vertical",
-        "contents": [
+    "type": "carousel",
+    "contents": [
         {
-            "type": "text",
-            "text": "通殺骰手",
-            "weight": "bold",
-            "size": "xl",
-            "color": "#ff0000",
-            "align": "center"
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "url": "https://mumu.tw/images/dice/daily.jpg",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213"
         },
-        {
+        "body": {
             "type": "box",
             "layout": "vertical",
-            "margin": "lg",
-            "spacing": "sm",
             "contents": [
             {
-                "type": "button",
-                "action": {
-                "type": "message",
-                "label": "房間列表",
-                "text": "!gamelist"
-                }
+                "type": "text",
+                "text": "每日獎賞",
+                "weight": "bold",
+                "size": "sm",
+                "wrap": True
             },
             {
-                "type": "button",
-                "action": {
-                "type": "message",
-                "label": "創建房間",
-                "text": "!create"
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "每天都先點我一下吧!",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0,
+                    "align": "start"
                 }
+                ]
             },
             {
-                "type": "button",
-                "action": {
-                "type": "message",
-                "label": "確認資料",
-                "text": "!info"
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "baseline",
+                    "spacing": "sm",
+                    "contents": []
+                },
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "點我",
+                    "text": "!dailyrequest"
+                    }
                 }
-            },
-            {
-                "type": "button",
-                "action": {
-                "type": "message",
-                "label": "排行榜",
-                "text": "!ranking"
-                }
-            },
-            {
-                "type": "button",
-                "action": {
-                "type": "message",
-                "label": "歷史擲骰",
-                "text": "!rollhistory"
-                }
-            },
-            {
-                "type": "button",
-                "action": {
-                "type": "message",
-                "label": "JACK POT查詢",
-                "text": "!watherprice"
-                }
+                ]
             }
-            ]
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
         }
-        ]
-    },
-    "footer": {
-        "type": "box",
-        "layout": "vertical",
-        "spacing": "sm",
-        "contents": [
+        },
         {
-            "type": "text",
-            "text": "請勿沉迷賭博",
-            "style": "italic",
-            "weight": "bold",
-            "decoration": "line-through",
-            "align": "center"
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "url": "https://mumu.tw/images/dice/startroll.jpg",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "開始遊戲",
+                "weight": "bold",
+                "size": "sm",
+                "wrap": True
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "開始一場擲骰遊戲",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "創建房間",
+                    "text": "!create"
+                    }
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
         }
-        ],
-        "flex": 0
-    }
+        },
+        {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "url": "https://mumu.tw/images/dice/jpselect.jpg",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "幸運抽獎",
+                "weight": "bold",
+                "size": "sm"
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "一次$100拼大獎!",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "查看獎池",
+                    "text": "!watherprice"
+                    }
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "url": "https://mumu.tw/images/dice/person.png",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "個人資訊",
+                "weight": "bold",
+                "size": "sm"
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "查看使用者資料",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "查看個人資料",
+                    "text": "!info"
+                    }
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "url": "https://mumu.tw/images/dice/ranking.jpg",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "排行榜",
+                "weight": "bold",
+                "size": "sm"
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "分數排行榜",
+                    "size": "xxs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "查看排行榜",
+                    "text": "!ranking"
+                    }
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "url": "https://mumu.tw/images/dice/roomlist.png",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "房間列表",
+                "weight": "bold",
+                "size": "sm"
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "列出所有房間",
+                    "size": "xxs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "查看",
+                    "text": "!gamelist"
+                    }
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "url": "https://mumu.tw/images/dice/history.png",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "歷史擲骰",
+                "weight": "bold",
+                "size": "sm"
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "所有擲骰結果",
+                    "size": "xxs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "查看",
+                    "text": "!rollhistory"
+                    }
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        }
+        }
+    ]
     }
     return json
 

@@ -97,7 +97,7 @@ def getRoomList():
         print(dataBase.getUserName(str(room[0])))
         print("房間編號:")
         print(str(room[1]))
-    _str+="使用 !join 房間編號 骰子號碼:金額&骰子號碼2:金額\nEx: !join 666 1:100&2:300&3:300\n\n"
+    _str+="使用 !join 房間編號 骰子號碼:金額&骰子號碼2:金額\n!!請盡量不要加入不是自己群組的房間以免他人房間未開導致錢被鎖死!!\nEx: !join 666 1:100&2:300&3:300\n\n"
     return _str
 
 

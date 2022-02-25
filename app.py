@@ -105,6 +105,22 @@ def handle_message(event):
         line_bot_api.reply_message(
                 event.reply_token,
                 FlexSendMessage("123",contents=lineMessagePacker.getRanking(top5[0],top5[1],top5[2],top5[3],top5[4])))
+        return
+    if user_send =="!dailyrequest":
+        if database.checkUserDaily(event.source.user_id) == True:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你已領取過每日獎賞囉"))
+            return
+        else:
+            _nowmoney = int(database.getUserMoney(event.source.user_id))
+            _nowmoney+=10000
+            database.SetUserMoneyByLineId(event.source.user_id,_nowmoney)
+            database.setUserDaily(event.source.user_id,True)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("每日獎賞已到帳!"))
+            return
     elif user_send.startswith("!set"):
         if event.source.user_id != os.getenv("GM_LINE_ID"):
             line_bot_api.reply_message(
@@ -114,7 +130,7 @@ def handle_message(event):
         try:
             _user_id = user_send.split(" ")[1]
             _money = user_send.split(" ")[2]
-            database.AddUserMoneyByIndex(_user_id,_money)
+            database.SetUserMoneyByIndex(_user_id,_money)
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="成功到賬!"))
@@ -265,7 +281,7 @@ def handle_message(event):
             _userjson = database.getUser(user_id)
             flex_message = FlexSendMessage(
             alt_text='玩家資料來囉~',
-            contents=lineMessagePacker.getInfoFlexJson(_userjson["user_line_name"],_userjson["user_img_link"],_userjson["user_money"],_userjson["locked_money"],_userjson["user_info_id"]))
+            contents=lineMessagePacker.getInfoFlexJson(_userjson["user_line_name"],_userjson["user_type"],_userjson["user_img_link"],int(_userjson["user_money"]),int(_userjson["locked_money"]),_userjson["user_info_id"]))
             line_bot_api.reply_message(event.reply_token, flex_message)
         else:
             database.createUser(user_id,user_line_name,user_line_img)

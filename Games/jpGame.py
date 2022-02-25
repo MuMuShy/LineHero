@@ -48,6 +48,10 @@ def spinJp(betmoney,user_line_id):
             _miniweight = _miniweight*2
         if _minor > 190000:
             _minorweight = _minorweight*2
+        if _major < 1500000:
+            _majorweight = 0
+        if _grand < 17000000:
+            _grandweight = 0
         _username = dataBase.getUserName(user_line_id)
         _money = 0
         _resultlist =['grand','major','minor','mini']
