@@ -95,7 +95,7 @@ def handle_message(event):
         if _money > 0:
             _reply = "妳的餘額還沒有歸0 不能浴火重生喔!"
         else:
-            database.SetUserMoneyByLineId(event.source.user_id)
+            database.SetUserMoneyByLineId(event.source.user_id,10000)
             _reply = "已幫您復活 充值 $10000"
         line_bot_api.reply_message(
                 event.reply_token,
