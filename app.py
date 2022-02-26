@@ -3,8 +3,9 @@ from flask import Flask, request, abort
 from flask import render_template
 from dotenv import load_dotenv
 import lineMessagePacker
+import lineMessagePackerRpg
 from DataBase import DataBase
-from Games import diceGame, jpGame
+from Games import diceGame, jpGame,rpgGame
 load_dotenv()
 from linebot import (
     LineBotApi, WebhookHandler
@@ -39,6 +40,8 @@ else:
     handler = WebhookHandler(os.getenv("LINE_BOT_SECRET"))
 
 database = DataBase()
+
+
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -121,6 +124,59 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage("每日獎賞已到帳!"))
             return
+    elif _command_check.startswith("!initjob"):
+        try:
+            _job = user_send.split(" ")[1]
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="資料格式錯誤"))
+            return
+        if database.checkUserHasJob(event.source.user_id) == True:
+            _userjson = database.getUser(event.source.user_id)
+            _jobjson = database.getUserJob(event.source.user_id)
+            _flex = lineMessagePackerRpg.getCheckJobButton()
+            _reply = "你已經有職業囉"
+            print("已經有職業!")
+            print(_flex)
+            line_bot_api.reply_message(
+                        event.reply_token,
+                        [TextSendMessage(text="你已經有職業囉"),
+                        FlexSendMessage("確認職業",_flex)]
+            )
+            return
+        else:
+            if rpgGame.checkstrjobLegal(_job) == True:
+                _reply = rpgGame.createrJob(event.source.user_id,_job)
+                _userjson = database.getUser(event.source.user_id)
+                _jobjson = database.getUserJob(event.source.user_id)
+                _imglink = _userjson["user_img_link"]
+                _flex = lineMessagePackerRpg.getJobInfo(_imglink,_jobjson)
+                line_bot_api.reply_message(
+                        event.reply_token,
+                        [TextSendMessage(text=_reply),
+                        FlexSendMessage("職業資訊",contents=_flex)
+                        ])
+            else:
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="資料格式錯誤"))
+            return
+    elif user_send == "@jobinfo":
+        if database.checkUserHasJob(event.source.user_id) == False:
+            _replyflex = lineMessagePackerRpg.getCreaterJobList()
+            line_bot_api.reply_message(
+            event.reply_token,[
+            TextSendMessage(text="看來你好像還沒成為冒險家呢 請選擇職業吧!"),
+            FlexSendMessage("職業資料",contents=_replyflex)])
+            return
+        _jobjson = database.getUserJob(event.source.user_id)
+        profile = line_bot_api.get_profile(event.source.user_id)
+        user_line_img = profile.picture_url
+        _packagejson = lineMessagePackerRpg.getJobInfo(user_line_img,_jobjson)
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("職業資料",contents=_packagejson))
     elif user_send.startswith("!set"):
         if event.source.user_id != os.getenv("GM_LINE_ID"):
             line_bot_api.reply_message(

@@ -382,3 +382,53 @@ class DataBase():
         self.cursor.execute(sql,data)
         self.conn.commit()
         self.conn.close()
+    
+    def setAllUserDaily(self,bool):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        if bool == True:
+            bool = "true"
+        else:
+            bool ="false"
+        sql = "UPDATE users SET daily_request_done = %s"
+        data = (bool)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+        self.conn.close()
+    
+    def checkUserHasJob(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="SELECT user_line_id FROM users_job where user_line_id = '"+user_line_id+"'"
+        self.cursor.execute(sql)
+        row = self.cursor.fetchone()
+        # 事物提交
+        self.conn.commit()
+        self.conn.close()
+        if row is not None:
+            return True
+        else:
+            return False
+    
+    #初始
+    def createUserJob(self,user_line_id,jobs):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""INSERT INTO users_job (user_line_id, jobs, str, dex, intelligence, level, hp, exp) VALUES (%(user_line_id)s, %(jobs)s,10,10,10,1,100,0)"""
+        params = {'user_line_id':user_line_id, 'jobs':jobs}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+        self.conn.close()
+    
+    def getUserJob(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM users_job where user_line_id = '" +user_line_id+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _json = {}
+        _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7]}
+        print(_json)
+        return _json

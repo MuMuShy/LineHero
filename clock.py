@@ -3,9 +3,9 @@ import urllib.request
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('cron', day_of_week='mon-fri', minute='*/20')
+@sched.scheduled_job('cron', day_of_week='mon-sun',hour='0')
 def scheduled_job():
-    print("例行性喚醒....")
+    print("12.00過後每日任務重置")
     url = "https://bybitline.herokuapp.com/"
     conn = urllib.request.urlopen(url)
         
