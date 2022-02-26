@@ -63,21 +63,21 @@ def spinJp(betmoney,user_line_id):
             #更新資料庫
             dataBase.setJpLastWin(_username,_money)
             dataBase.setGrand(10000000)
-            _result={"type":"grand","money":_money}
+            _result={"type":"grand","jp":_money}
         elif _result == 'major':
             print("Major!!")
             _money = dataBase.getMajor()
             #更新資料庫
             dataBase.setJpLastWin(_username,_money)
             dataBase.setMajor(1000000)
-            _result={"type":"major","money":_money}
+            _result={"type":"major","jp":_money}
         elif _result =='minor':
             print("minor!!")
             _money = dataBase.getMinor()
             #更新資料庫
             dataBase.setJpLastWin(_username,_money)
             dataBase.setMinor(100000)
-            _result={"type":"minor","money":_money}
+            _result={"type":"minor","jp":_money}
         elif _result =='mini':
             print("mini!")
             _money = dataBase.getMini()
@@ -85,11 +85,12 @@ def spinJp(betmoney,user_line_id):
             dataBase.setJpLastWin(_username,_money)
             dataBase.setMini(10000)
             _temp = 0
+            _result={"type":"mini","jp":_money}
             for i in range(_playtime):
                 _rtp = random.randrange(60,120)
                 _temp+=_rtp
             _money+=_temp
-            _result={"type":"mini","money":_money}
+            
 
     else:
         print("沒進彩池 正常派獎")
@@ -110,16 +111,16 @@ def spinJp(betmoney,user_line_id):
     _returnstr="投入金額:"+str(betmoney)+" 次數:"+str(betmoney/_oneTimeBet) 
     _payoff = int(_payoff) 
     if _result["type"] == "grand":
-        _returnstr+="\n恭喜中GRAND!! :"+str("${:,.2f}".format(_payoff))
+        _returnstr+="\n恭喜中GRAND!! :"+str("${:,.2f}".format(_result["jp"]))
         print("中grand!"+str(_payoff))
     elif _result["type"] == "major":
-        _returnstr+="\n恭喜中MAJOR!! :"+str("${:,.2f}".format(_payoff))
+        _returnstr+="\n恭喜中MAJOR!! :"+str("${:,.2f}".format(_result["jp"]))
         print("major!"+str(_payoff))
     elif _result["type"] == "minor":
-        _returnstr+="\n恭喜中MINOR!! :"+str("${:,.2f}".format(_payoff))
+        _returnstr+="\n恭喜中MINOR!! :"+str("${:,.2f}".format(_result["jp"]))
         print("中minor!"+str(_payoff))
     elif _result["type"] == "mini":
-        _returnstr+="\n恭喜中MINI!! :"+str("${:,.2f}".format(_payoff))
+        _returnstr+="\n恭喜中MINI!! :"+str("${:,.2f}".format(_result["jp"]))
         print("中mini!"+str("${:,.2f}".format(_payoff)))
     if _result["type"] !="normal" and _playtime>1:
         _returnstr+="\n其餘旋轉次數獎項總計:(總得分-總投入)"
