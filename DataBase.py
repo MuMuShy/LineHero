@@ -110,7 +110,7 @@ class DataBase():
         rank = 1
         if row is not None:
             for item in row:
-                if item[1] == user_line_id:
+                if item[0] == user_line_id:
                     return rank
                 rank+=1
         return rank
