@@ -179,6 +179,11 @@ def handle_message(event):
             event.reply_token,
             FlexSendMessage("職業資料",contents=_packagejson))
     elif user_send =="@exper":
+        if database.checkUserHasJob(event.source.user_id) == False:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你還沒有創建冒險者喔\n請先使用 !info 裡面的冒險者之旅按鈕開始旅程"))
+            return
         if database.getUserJob(event.source.user_id)["hp"] <= 0:
             line_bot_api.reply_message(
                 event.reply_token,
@@ -189,12 +194,18 @@ def handle_message(event):
             event.reply_token,
             FlexSendMessage("冒險列表",contents=_reply))
     elif user_send.startswith("@goto"):
+        
         try:
             _map = user_send.split(" ")[1]
         except:
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage("指令格式有問題"))
+            return
+        if database.checkUserHasJob(event.source.user_id) == False:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你還沒有創建冒險者喔\n請先使用 !info 裡面的冒險者之旅按鈕開始旅程"))
             return
         if rpgGame.checkstrMapLegal(_map) == False:
             line_bot_api.reply_message(
@@ -241,6 +252,11 @@ def handle_message(event):
                 TextSendMessage(text=_reply))
             return
     elif user_send =="@health":
+        if database.checkUserHasJob(event.source.user_id) == False:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你還沒有創建冒險者喔\n請先使用 !info 裡面的冒險者之旅按鈕開始旅程"))
+            return
         print("花費10000回滿血")
         _money =  int(database.getUserMoney(event.source.user_id))
         if _money - 10000 < 0:
@@ -258,6 +274,11 @@ def handle_message(event):
                 TextSendMessage(text="已補滿狀態"))
 
     elif user_send =="@attack":
+        if database.checkUserHasJob(event.source.user_id) == False:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你還沒有創建冒險者喔\n請先使用 !info 裡面的冒險者之旅按鈕開始旅程"))
+            return
         if database.UserIsInCombat(event.source.user_id) == False:
             line_bot_api.reply_message(
                 event.reply_token,
