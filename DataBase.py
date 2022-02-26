@@ -434,3 +434,109 @@ class DataBase():
         _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7]}
         print(_json)
         return _json
+    
+    def setUserJobStatus(self,user_line_id,user_job_json):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE users_job SET str = %s , dex = %s ,intelligence = %s , hp = %s,level = %s,exp = %s Where user_line_id = %s"""
+        data = (user_job_json["str"], user_job_json["dex"],user_job_json["int"],user_job_json["hp"],user_job_json["level"],user_job_json["exp"],user_line_id)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+        self.conn.close()
+        print("更新使用者狀態:")
+        print(user_job_json)
+    
+    def setUserMaxHp(self,user_line_id,hp):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE users_job SET hp = %s Where user_line_id = %s"""
+        data = (hp,user_line_id)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+        self.conn.close()
+        print("補滿血:")
+
+    
+    def getMapInfo(self,map_command_name):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM maps where map_command_name = '" +map_command_name+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _json = {}
+        _json={"map_id":row[0],"content_monster":row[1],"map_name":row[2],"monster_weight":row[4]}
+        print(_json)
+        return _json
+    
+    def UserIsInCombat(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="SELECT user_line_id FROM battle_status_list where user_line_id = '"+user_line_id+"'"
+        self.cursor.execute(sql)
+        row = self.cursor.fetchone()
+        # 事物提交
+        self.conn.commit()
+        self.conn.close()
+        if row is not None:
+            return True
+        else:
+            return False
+    
+    def ClearUserBattle(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="DELETE FROM battle_status_list where user_line_id = '"+user_line_id+"'"
+        self.cursor.execute(sql)
+        # 事物提交
+        self.conn.commit()
+        self.conn.close()
+        print("清空戰鬥:"+user_line_id)
+    
+    def getMonsterInfo(self,monster_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="SELECT * FROM monsters where monster_id = '"+str(monster_id)+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        print("怪物基礎資料:")
+        print(row)
+        # 事物提交
+        self.conn.close()
+        _json = {}
+        _json={"monster_id":row[0],"monster_name":row[4],"attack":row[1],"speed":row[2],"exp":row[3],"defend":row[5],"hp":row[6]}
+        return _json
+    
+    def setUserbattleStatus(self,user_line_id,monster_id,now_turn,monster_hp):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""INSERT INTO battle_status_list (user_line_id, target_monster_id,now_turn,monster_hp) VALUES (%(user_line_id)s, %(target_monster_id)s, %(now_turn)s, %(monster_hp)s)"""
+        params = {'user_line_id':user_line_id, 'target_monster_id':monster_id,'now_turn':now_turn,'monster_hp':monster_hp,}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+        self.conn.close()
+        print("進入對戰列表:"+user_line_id)
+    
+    def UpdateUserBattleStatus(self,user_line_id,monster_id,now_turn,monster_hp):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""UPDATE battle_status_list SET target_monster_id = (%(target_monster_id)s),monster_hp =(%(monster_hp)s)  WHERE user_line_id = (%(line_id)s)"""
+        params = {'line_id':user_line_id, 'target_monster_id':monster_id,'monster_hp':monster_hp,}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+        self.conn.close()
+        print("更新對戰列表:"+user_line_id)
+    
+    def getUserRoundInfo(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="SELECT * FROM battle_status_list where user_line_id = '"+user_line_id+"'"
+        self.cursor.execute(sql)
+        row = self.cursor.fetchone()
+        # 事物提交
+        self.conn.commit()
+        self.conn.close()
+        _json ={"user_line_id":row[0],"target_monster_id":row[1],"now_turn":row[2],"monster_hp":row[3]}
+        return _json

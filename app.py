@@ -1,3 +1,4 @@
+import random
 from time import sleep
 from flask import Flask, request, abort
 from flask import render_template
@@ -178,9 +179,120 @@ def handle_message(event):
             event.reply_token,
             FlexSendMessage("職業資料",contents=_packagejson))
     elif user_send =="@exper":
+        if database.getUserJob(event.source.user_id)["hp"] <= 0:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你沒有錢了... 想辦法賺錢復活吧 復活指令: @health"))
+            return
+        _reply = lineMessagePackerRpg.getExperList()
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text = "緊鑼密鼓開發中..."))
+            FlexSendMessage("冒險列表",contents=_reply))
+    elif user_send.startswith("@goto"):
+        try:
+            _map = user_send.split(" ")[1]
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("指令格式有問題"))
+            return
+        if rpgGame.checkstrMapLegal(_map) == False:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("地圖有問題... 可能還未開放"))
+            return
+        if database.getUserJob(event.source.user_id)["hp"] <= 0:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("請先復活 復活指令: @health"))
+            return
+        
+        _result = rpgGame.goToMap(_map,event.source.user_id)
+        if _result["intobattle"] == False:
+            _reply = _result["reply_text"]
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=_reply))
+            return
+        else:
+            _monster_json = _result["_monster"]
+            _flex = lineMessagePackerRpg.getMonsterPacker(_monster_json,_monster_json["hp"]) 
+            line_bot_api.reply_message(
+                    event.reply_token,
+                    [TextSendMessage(text=_result["reply_text"]),
+                    FlexSendMessage("遭遇怪物!",contents=_flex)
+                    ])
+    elif user_send =="@run":
+        if database.UserIsInCombat(event.source.user_id) == False:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="沒戰鬥是要跑去哪~"))
+            return
+        else:
+            _escape = random.randrange(0,10)
+            _reply = ""
+            if _escape > 5:
+                database.ClearUserBattle(event.source.user_id)
+                _reply = "運氣很好 跑掉了"
+            else:
+                _reply ="逃跑失敗..."
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=_reply))
+            return
+    elif user_send =="@health":
+        print("花費10000回滿血")
+        _money =  int(database.getUserMoney(event.source.user_id))
+        if _money - 10000 < 0:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="沒錢還敢補血啊...."))
+            return
+        _money-=10000
+        _user_job = database.getUserJob(event.source.user_id)
+        _maxhp = rpgGame.getMaxHp(_user_job["job"],_user_job["level"])
+        database.setUserMaxHp(event.source.user_id,_maxhp)
+        database.SetUserMoneyByLineId(event.source.user_id,_money)
+        line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="已補滿狀態"))
+
+    elif user_send =="@attack":
+        if database.UserIsInCombat(event.source.user_id) == False:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="你還沒有進入戰鬥喔"))
+            return
+        else:
+            _round_info = database.getUserRoundInfo(event.source.user_id)
+            _palyer_job_info = database.getUserJob(event.source.user_id)
+            _monsterbase = database.getMonsterInfo(_round_info["target_monster_id"])
+            _game_result_json = rpgGame.attackround(event.source.user_id,_palyer_job_info,_monsterbase["monster_id"],_round_info["monster_hp"])
+            if _game_result_json["Result"] == "monster_alive":
+                _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json["dice_result"])
+                _monsterFlex = lineMessagePackerRpg.getMonsterPacker(_monsterbase,_game_result_json["monster_result_json"]["hp"])
+                _strtext = "遭到怪物攻擊:"+ str(_game_result_json["mosnter_damage"]) +" 玩家剩餘血量:"+ str(_game_result_json["player_result_json"]["hp"])
+                line_bot_api.reply_message(
+                    event.reply_token,[
+                    FlexSendMessage("攻擊!",contents=_attackbtnFlex),
+                    FlexSendMessage("怪物存活!",contents=_monsterFlex),
+                    TextSendMessage(text = _strtext),])
+            elif _game_result_json["Result"] =="win":
+                _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json["dice_result"])
+                _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])
+                if _game_result_json["is_level_up"] == True:
+                    _strtext+="\n恭喜升等!!"
+                line_bot_api.reply_message(
+                    event.reply_token,[
+                    FlexSendMessage("最終一擊",contents=_attackbtnFlex),
+                    FlexSendMessage("戰鬥結束!",contents=lineMessagePackerRpg.getBattleEnd(_game_result_json)),
+                    TextSendMessage(text = _strtext),])
+            elif _game_result_json["Result"] == "loose":
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage("戰鬥結束! 很可惜你承受不住怪物的傷害 已死亡 復活指令: @health"),
+                    )
+            return
     elif user_send.startswith("!set"):
         if event.source.user_id != os.getenv("GM_LINE_ID"):
             line_bot_api.reply_message(
@@ -449,4 +561,8 @@ if __name__ == "__main__":
     apiThread.start()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+    if environment =="DEV":
+        app.run(host='0.0.0.0', port=port,debug=True)
+    else:
+        app.run(host='0.0.0.0', port=port)
     
