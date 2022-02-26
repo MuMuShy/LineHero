@@ -412,10 +412,12 @@ class DataBase():
     
     #初始
     def createUserJob(self,user_line_id,jobs):
+        from Games import rpgGame
+        maxhp = rpgGame.getMaxHp(jobs,1)
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
-        sql ="""INSERT INTO users_job (user_line_id, jobs, str, dex, intelligence, level, hp, exp) VALUES (%(user_line_id)s, %(jobs)s,10,10,10,1,100,0)"""
-        params = {'user_line_id':user_line_id, 'jobs':jobs}
+        sql ="""INSERT INTO users_job (user_line_id, jobs, str, dex, intelligence, level, hp, exp) VALUES (%(user_line_id)s, %(jobs)s,10,10,10,1,%(maxhp)s,0)"""
+        params = {'user_line_id':user_line_id, 'jobs':jobs,'maxhp':maxhp}
         self.cursor.execute(sql,params)
         self.conn.commit()
         self.conn.close()
