@@ -72,7 +72,7 @@ def getMaxHp(job,level):
     if job == "warrior":
         return level*150
     elif job =="majic":
-        return level*40
+        return level*100
     elif job =="rog":
         return level*70
 
