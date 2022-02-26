@@ -137,6 +137,18 @@ def addPlayerExp(_user_job_json,_exp):
     while _user_job_json["exp"] >= _now_max_exp:
         _user_job_json["exp"] -= _now_max_exp
         _user_job_json["level"]+=1
+        if _user_job_json["job"] == "warrior":
+            _user_job_json["str"]+=4
+            _user_job_json["dex"]+=2
+            _user_job_json["int"]+=1
+        elif _user_job_json["job"] =="majic":
+            _user_job_json["str"]+=1
+            _user_job_json["dex"]+=2
+            _user_job_json["int"]+=4
+        else:
+            _user_job_json["str"]+=2
+            _user_job_json["dex"]+=3
+            _user_job_json["int"]+=2
         _user_job_json["hp"] = getMaxHp(_user_job_json["job"], _user_job_json["level"])
         _now_max_exp = getMaxExp(_user_job_json["level"])
         
