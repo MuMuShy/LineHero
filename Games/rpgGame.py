@@ -169,6 +169,8 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     _result={}
     print("怪物攻擊:"+str(_monsterAttack))
     print("玩家傷害:"+str(_attack_result)+" 怪物剩餘血量:"+str(_monster_hp))
+    if dataBase.getUserRoundInfo(_user_line_id)["use_run_chance"] == True:
+        dataBase.setUserRoundRunChance(_user_line_id,False)
     if _monster_hp > 0:
         #怪物沒有死亡 把怪物的攻擊結果一起帶回
         if _playerhp <= 0:
@@ -187,6 +189,10 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
             _monster_base_info["hp"] = _monster_hp
             _result={"Result":"monster_alive","dice_result":attackpow,"mosnter_damage":_monsterAttack,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json}
     else:
+        #掉落金錢 先隨機
+        _money = random.randrange(500,2000)
+        _originmoney = int(dataBase.getUserMoney(_user_line_id))+_money
+        dataBase.SetUserMoneyByLineId(_user_line_id,_originmoney)
         dataBase.ClearUserBattle(_user_line_id)
         _origlevel = _user_job_json["level"]
         _user_job_json = addPlayerExp(_user_job_json,_monster_base_info["exp"])
@@ -194,7 +200,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
         if _user_job_json["level"] > _origlevel:
             _islevelup = True
         dataBase.setUserJobStatus(_user_line_id,_user_job_json)
-        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup}
+        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money}
 
     return _result
     

@@ -521,7 +521,7 @@ class DataBase():
         # 事物提交
         self.conn.close()
         _json = {}
-        _json={"monster_id":row[0],"monster_name":row[4],"attack":row[1],"speed":row[2],"exp":row[3],"defend":row[5],"hp":row[6]}
+        _json={"monster_id":row[0],"monster_name":row[4],"attack":row[1],"speed":row[2],"exp":row[3],"defend":row[5],"hp":row[6],"description":row[7]}
         return _json
     
     def setUserbattleStatus(self,user_line_id,monster_id,now_turn,monster_hp):
@@ -553,5 +553,16 @@ class DataBase():
         # 事物提交
         self.conn.commit()
         self.conn.close()
-        _json ={"user_line_id":row[0],"target_monster_id":row[1],"now_turn":row[2],"monster_hp":row[3]}
+        print(row)
+        _json ={"user_line_id":row[0],"target_monster_id":row[1],"now_turn":row[2],"monster_hp":row[3],"use_run_chance":row[4]}
         return _json
+    
+    def setUserRoundRunChance(self,user_line_id,bool):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""UPDATE battle_status_list SET use_run_chance = (%(use_run_chance)s) WHERE user_line_id = (%(line_id)s)"""
+        params = {'line_id':user_line_id, 'use_run_chance':bool}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+        self.conn.close()
+        print("更新對戰逃跑列表:"+user_line_id)

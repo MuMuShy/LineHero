@@ -243,16 +243,25 @@ def handle_message(event):
                 TextSendMessage(text="沒戰鬥是要跑去哪~"))
             return
         else:
-            _escape = random.randrange(0,10)
-            _reply = ""
-            if _escape > 5:
-                database.ClearUserBattle(event.source.user_id)
-                _reply = "運氣很好 跑掉了"
+            _status = database.getUserRoundInfo(event.source.user_id)
+            print(_status)
+            if _status["use_run_chance"] == False:
+                database.setUserRoundRunChance(event.source.user_id,True)
+                _escape = random.randrange(0,10)
+                print("escape result:"+str(_escape))
+                _reply = ""
+                if _escape > 5:
+                    database.ClearUserBattle(event.source.user_id)
+                    _reply = "運氣很好 跑掉了"
+                else:
+                    _reply ="逃跑失敗..."
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text=_reply))
             else:
-                _reply ="逃跑失敗..."
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text=_reply))
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="逃跑已經失敗了 請認命吧\n撐到下回合還可以再次逃跑"))
             return
     elif user_send =="@health":
         if database.checkUserHasJob(event.source.user_id) == False:
@@ -262,12 +271,12 @@ def handle_message(event):
             return
         print("花費10000回滿血")
         _money =  int(database.getUserMoney(event.source.user_id))
-        if _money - 10000 < 0:
+        if _money - 5000 < 0:
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="沒錢還敢補血啊...."))
             return
-        _money-=10000
+        _money-=5000
         _user_job = database.getUserJob(event.source.user_id)
         _maxhp = rpgGame.getMaxHp(_user_job["job"],_user_job["level"])
         database.setUserMaxHp(event.source.user_id,_maxhp)
@@ -303,7 +312,7 @@ def handle_message(event):
                     TextSendMessage(text = _strtext),])
             elif _game_result_json["Result"] =="win":
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json["dice_result"])
-                _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])
+                _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])+ "金幣:" + str(_game_result_json["get_money"])
                 if _game_result_json["is_level_up"] == True:
                     _strtext+="\n恭喜升等!!"
                 line_bot_api.reply_message(

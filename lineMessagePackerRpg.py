@@ -778,7 +778,7 @@ def getMonsterPacker(monster_json,now_hp):
                     },
                     {
                         "type": "text",
-                        "text": "先填空還沒想到...",
+                        "text": monster_json["description"],
                         "wrap": True,
                         "color": "#666666",
                         "size": "sm",
@@ -1120,7 +1120,7 @@ def getBattleEnd(game_result_json):
                 },
                 {
                     "type": "text",
-                    "text": "花費: $ 10000",
+                    "text": "花費:$5000",
                     "size": "xs"
                 },
                 {
