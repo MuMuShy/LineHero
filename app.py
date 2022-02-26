@@ -177,6 +177,10 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage("職業資料",contents=_packagejson))
+    elif user_send =="@exper":
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text = "緊鑼密鼓開發中..."))
     elif user_send.startswith("!set"):
         if event.source.user_id != os.getenv("GM_LINE_ID"):
             line_bot_api.reply_message(

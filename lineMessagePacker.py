@@ -90,6 +90,20 @@ def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,us
                     },
                     "style": "primary",
                     "margin": "none"
+                },
+                {
+                    "type": "separator",
+                    "margin": "sm",
+                    "color": "#ffffff00"
+                },{
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "冒險者之旅",
+                    "text": "@jobinfo"
+                    },
+                    "style": "primary",
+                    "margin": "none"
                 }
                 ],
                 "position": "absolute",
