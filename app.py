@@ -279,9 +279,10 @@ def handle_message(event):
         user_line_img = profile.picture_url
         if database.checkUser(user_id) is True:
             _userjson = database.getUser(user_id)
+            _rank = database.getUserRank(user_id)
             flex_message = FlexSendMessage(
             alt_text='玩家資料來囉~',
-            contents=lineMessagePacker.getInfoFlexJson(_userjson["user_line_name"],_userjson["user_type"],_userjson["user_img_link"],int(_userjson["user_money"]),int(_userjson["locked_money"]),_userjson["user_info_id"]))
+            contents=lineMessagePacker.getInfoFlexJson(_userjson["user_line_name"],_userjson["user_type"],_userjson["user_img_link"],int(_userjson["user_money"]),int(_userjson["locked_money"]),_userjson["user_info_id"],_rank))
             line_bot_api.reply_message(event.reply_token, flex_message)
         else:
             database.createUser(user_id,user_line_name,user_line_img)

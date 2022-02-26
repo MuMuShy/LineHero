@@ -4,7 +4,7 @@
 import json
 
 
-def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,user_id):
+def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,user_id,ranking):
     color = "#ff0000"
     if user_type != "GM":
         color = "#6666ff"
@@ -109,7 +109,7 @@ def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,us
                     "color": "#ffffff",
                     "align": "center",
                     "size": "xs",
-                    "offsetTop": "3px",
+                    "offsetTop": "4.5px",
                     "text": user_type
                 }
                 ],
@@ -120,6 +120,29 @@ def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,us
                 "offsetStart": "18px",
                 "height": "25px",
                 "width": "53px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xxs",
+                    "text": "排名: "+str(ranking),
+                    "style": "normal",
+                    "offsetTop": "5px",
+                    "weight": "bold"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#3366cc",
+                "offsetStart": "200px",
+                "height": "25px",
+                "width": "90px"
             }
             ],
             "paddingAll": "0px"

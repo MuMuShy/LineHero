@@ -54,6 +54,7 @@ class DataBase():
             json["locked_money"] = str(row[5])
             json["user_type"] = str(row[8])
             return json
+
     
     def getUserMoney(self,user_line_id):
         return self.getUser(user_line_id)["user_money"]
@@ -80,6 +81,23 @@ class DataBase():
             for item in row:
                 commandlist[item[0]]=[item[1]]
         return commandlist
+    
+    def getUserRank(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * from users order by user_money DESC"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchall()
+        commandlist = {}
+        self.conn.close()
+        rank = 1
+        if row is not None:
+            for item in row:
+                if item[1] == user_line_id:
+                    return rank
+                rank+=1
+        return rank
     
 
     def SetUserMoneyByIndex(self,user_index_id,money):
