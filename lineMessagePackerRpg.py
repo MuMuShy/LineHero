@@ -2,7 +2,7 @@
 import json
 
 
-def getJobInfo(user_img_link,user_job_info):
+def getJobInfo(user_img_link,user_job_info,_rank):
     print(user_job_info)
     from Games import rpgGame 
     #userjobinfo = {"job","exp","hp","str","int","dex","level"}
@@ -202,7 +202,7 @@ def getJobInfo(user_img_link,user_job_info):
                     "color": "#ffffff",
                     "align": "center",
                     "size": "xxs",
-                    "text": "LV: "+str(user_job_info["level"]),
+                    "text": "LV排名: "+str(_rank),
                     "style": "normal",
                     "offsetTop": "4.5px",
                     "weight": "bold"

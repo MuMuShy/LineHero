@@ -99,6 +99,21 @@ class DataBase():
                 rank+=1
         return rank
     
+    def getUserRpgRank(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * from users_job order by level DESC"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchall()
+        self.conn.close()
+        rank = 1
+        if row is not None:
+            for item in row:
+                if item[1] == user_line_id:
+                    return rank
+                rank+=1
+        return rank
 
     def SetUserMoneyByIndex(self,user_index_id,money):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
