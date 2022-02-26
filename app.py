@@ -153,7 +153,7 @@ def handle_message(event):
                 _jobjson = database.getUserJob(event.source.user_id)
                 _imglink = _userjson["user_img_link"]
                 _rank = database.getUserRpgRank(event.source.user_id)
-                _flex = lineMessagePackerRpg.getJobInfo(_imglink,_jobjson)
+                _flex = lineMessagePackerRpg.getJobInfo(_imglink,_jobjson,_rank)
                 line_bot_api.reply_message(
                         event.reply_token,
                         [TextSendMessage(text=_reply),
