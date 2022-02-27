@@ -115,9 +115,9 @@ def getJobRollResult(_job):
     #法師 ->　兩顆骰子　結果　1-4
     #盜賊 ->三顆骰子　結果1-4
     if _job == "warrior":
-        return random.randrange(4,6)
+        return random.randrange(6,7)
     elif _job =="majic":
-        return random.randrange(2,8)
+        return random.randrange(3,8)
     elif _job =="rog":
         return random.randrange(3,12)
 
