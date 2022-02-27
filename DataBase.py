@@ -521,7 +521,7 @@ class DataBase():
         # 事物提交
         self.conn.close()
         _json = {}
-        _json={"monster_id":row[0],"monster_name":row[4],"attack":row[1],"speed":row[2],"exp":row[3],"defend":row[5],"hp":row[6],"description":row[7]}
+        _json={"monster_id":row[0],"monster_name":row[4],"attack":row[1],"speed":row[2],"exp":row[3],"defend":row[5],"hp":row[6],"description":row[7],"image_type":row[8]}
         return _json
     
     def setUserbattleStatus(self,user_line_id,monster_id,now_turn,monster_hp):

@@ -718,7 +718,8 @@ def getExperList():
 
 
 def getMonsterPacker(monster_json,now_hp):
-    _url = "https://mumu.tw/images/monstersimg/"+str(monster_json["monster_id"])+".jpg"
+    _image_type = monster_json["image_type"]
+    _url = "https://mumu.tw/images/monstersimg/"+str(monster_json["monster_id"])+"."+str(_image_type)
     json = {
         "type": "bubble",
         "hero": {
