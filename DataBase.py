@@ -66,6 +66,7 @@ class DataBase():
         self.cursor.execute(sql)
         self.conn.commit()
         row = self.cursor.fetchone()
+        self.conn.close()
         return row[0]
 
     def getCommandList(self):
@@ -131,6 +132,7 @@ class DataBase():
         params = {'money':money,'line_id':user_line_id}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
     
     def SetUserLockedMoneyByLineId(self,user_line_id,money):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -139,6 +141,7 @@ class DataBase():
         params = {'money':money,'line_id':user_line_id}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
     
     def GetUserLockedMoneyLineId(self,user_line_id):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -147,16 +150,18 @@ class DataBase():
         self.cursor.execute(sql)
         self.conn.commit()
         row = self.cursor.fetchone()
+        self.conn.close()
         return row[0]
     
 
     def getTop5Ranking(self):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
-        sql ="Select user_line_name, user_money from users ORDER BY user_money desc"
+        sql ="Select user_line_na me, user_money from users ORDER BY user_money desc"
         self.cursor.execute(sql)
         self.conn.commit()
         row = self.cursor.fetchall()
+        self.conn.close()
         result=[]
         for col in row:
             _reply =str(col[0])+" : $"+str(col[1])
