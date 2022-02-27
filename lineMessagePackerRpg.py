@@ -731,7 +731,8 @@ def getMonsterPacker(monster_json,now_hp):
             "action": {
             "type": "uri",
             "uri": "http://linecorp.com/"
-            }
+            },
+            "animated": True
         },
         "body": {
             "type": "box",
