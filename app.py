@@ -155,10 +155,12 @@ def handle_message(event):
                 _rank = database.getUserRpgRank(event.source.user_id)
 
                 _flex = lineMessagePackerRpg.getJobInfo(_imglink,_jobjson,_rank)
+                _flex_sub_menu = lineMessagePackerRpg.getJobInfoSubMenu()
                 line_bot_api.reply_message(
                         event.reply_token,
                         [TextSendMessage(text=_reply),
-                        FlexSendMessage("職業資訊",contents=_flex)
+                        FlexSendMessage("職業資訊",contents=_flex),
+                        FlexSendMessage("職業資訊",contents=_flex_sub_menu),
                         ])
             else:
                 line_bot_api.reply_message(
@@ -178,9 +180,12 @@ def handle_message(event):
         user_line_img = profile.picture_url
         _rank = database.getUserRpgRank(event.source.user_id)
         _packagejson = lineMessagePackerRpg.getJobInfo(user_line_img,_jobjson,_rank)
+        _flex_sub_menu = lineMessagePackerRpg.getJobInfoSubMenu()
         line_bot_api.reply_message(
-            event.reply_token,
-            FlexSendMessage("職業資料",contents=_packagejson))
+            event.reply_token,[
+            FlexSendMessage("職業資料",contents=_packagejson),
+            FlexSendMessage("職業資料",contents=_flex_sub_menu)
+            ])
     elif user_send =="@exper":
         if database.checkUserHasJob(event.source.user_id) == False:
             line_bot_api.reply_message(
@@ -196,6 +201,12 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage("冒險列表",contents=_reply))
+    elif user_send == "@equipment":
+        _flex_equipment = lineMessagePackerRpg.getEquipmentNow()
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("裝備列表",contents=_flex_equipment))
+        return
     elif user_send.startswith("@goto"):
         
         try:
@@ -302,7 +313,7 @@ def handle_message(event):
             _monsterbase = database.getMonsterInfo(_round_info["target_monster_id"])
             _game_result_json = rpgGame.attackround(event.source.user_id,_palyer_job_info,_monsterbase["monster_id"],_round_info["monster_hp"])
             if _game_result_json["Result"] == "monster_alive":
-                _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json["dice_result"])
+                _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
                 _monsterFlex = lineMessagePackerRpg.getMonsterPacker(_monsterbase,_game_result_json["monster_result_json"]["hp"])
                 _strtext = "遭到怪物攻擊:"+ str(_game_result_json["mosnter_damage"]) +" 玩家剩餘血量:"+ str(_game_result_json["player_result_json"]["hp"])
                 line_bot_api.reply_message(
@@ -311,7 +322,7 @@ def handle_message(event):
                     FlexSendMessage("怪物存活!",contents=_monsterFlex),
                     TextSendMessage(text = _strtext),])
             elif _game_result_json["Result"] =="win":
-                _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json["dice_result"])
+                _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
                 _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])+ "金幣:" + str(_game_result_json["get_money"])
                 if _game_result_json["is_level_up"] == True:
                     _strtext+="\n恭喜升等!!"

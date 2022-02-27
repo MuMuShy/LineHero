@@ -846,10 +846,97 @@ def getMonsterPacker(monster_json,now_hp):
         }
     return json
 
-def getAttackButton(_totaldamage,_diceResult):
+def getAttackButton(_totaldamage,_gameResult):
+    #戰士 -> 一顆骰子 結果 4-6
+    #法師 ->　兩顆骰子　結果　1-4
+    #盜賊 ->三顆骰子　結果1-4
+    _dicenum = 0
+    _diceresult = _gameResult["dice_result"]
+    _iscredit = "未爆擊"
+    
+    _color_credit = "#b30000"
+    _color = "#ffffff"
+    job = _gameResult["player_result_json"]["job"]
+    if job =="warrior":
+        _dicenum = 1
+        if _diceresult >5:
+            _iscredit="爆擊!"
+            _color = _color_credit
+    elif job =="rog":
+        _dicenum = 3
+        if _diceresult > 9:
+            _iscredit="爆擊!"
+            _color = _color_credit
+    else:
+        _dicenum = 2
+        if _diceresult >6:
+            _iscredit="爆擊!"
+            _color = _color_credit
+    
     json = {
     "type": "carousel",
     "contents": [
+        {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "url": "https://mumu.tw/images/menu_icons/1.png",
+            "size": "full",
+            "align": "center"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "總傷害",
+                "weight": "bold",
+                "size": "lg",
+                "align": "center",
+                "color":"#ffffff"
+            },
+            {
+                "type": "text",
+                "text": str(_totaldamage),
+                "weight": "bold",
+                "size": "lg",
+                "align": "center",
+                "offsetTop": "2%",
+                "color":_color
+            }
+            ],
+            "paddingAll": "0px",
+            "offsetTop": "5px"
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "攻擊",
+                "text": "@attack"
+                },
+                "style": "primary",
+                "offsetTop": "8%",
+                "height": "sm"
+            }
+            ],
+        "backgroundColor": "#1f1f2e"
+        },
+        "styles": {
+            "hero": {
+            "backgroundColor": "#1f1f2e"
+            },
+            "body": {
+            "backgroundColor": "#1f1f2e"
+            }
+        }
+        },
         {
         "type": "bubble",
         "size": "micro",
@@ -858,75 +945,78 @@ def getAttackButton(_totaldamage,_diceResult):
             "layout": "vertical",
             "contents": [
             {
-                "type": "image",
-                "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB4jbFeg7PyLS7I7RQhww-OjfeuYa3PznaNg&usqp=CAU",
-                "size": "sm",
-                "aspectMode": "fit",
-                "aspectRatio": "2:3",
-                "gravity": "top"
+                "type": "text",
+                "text": "可擲骰子 : "+str(_dicenum),
+                "weight": "bold",
+                "size": "lg",
+                "align": "center",
+                "color": "#ffffff"
+            },
+            {
+                "type": "text",
+                "text": "擲骰結果 : "+str(_gameResult["dice_result"]),
+                "weight": "bold",
+                "size": "lg",
+                "align": "center",
+                "color": "#ffffff"
             },
             {
                 "type": "box",
                 "layout": "vertical",
                 "contents": [
                 {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "DMG "+str(_totaldamage),
-                        "size": "xl",
-                        "color": "#ffffff",
-                        "weight": "bold"
-                    }
-                    ]
-                },
-                {
-                    "type": "box",
-                    "layout": "baseline",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "骰:"+str(_diceResult)+"* 職業攻擊係數",
-                        "color": "#ebebeb",
-                        "size": "sm",
-                        "flex": 0
-                    }
-                    ],
-                    "spacing": "lg"
-                },
-                {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                    {
-                        "type": "button",
-                        "action": {
-                        "type": "message",
-                        "label": "攻擊",
-                        "text": "@attack"
-                        },
-                        "style": "primary",
-                        "height": "sm"
-                    }
-                    ],
-                    "spacing": "sm",
-                    "borderColor": "#ffffff",
-                    "margin": "xxl",
-                    "height": "90px"
+                    "type": "text",
+                    "text": _iscredit,
+                    "align": "center",
+                    "size": "xxl",
+                    "color": "#ff0000",
+                    "weight": "bold",
+                    "offsetTop": "50%"
                 }
                 ],
-                "position": "relative",
-                "offsetBottom": "0px",
-                "offsetStart": "0px",
-                "offsetEnd": "0px",
-                "backgroundColor": "#03303Acc",
-                "height": "150px",
-                "paddingAll": "20px"
+                "height": "100px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "傷害加總公式:",
+                    "size": "xxs",
+                    "color": "#ffffff"
+                },
+                {
+                    "type": "text",
+                    "text": "擲骰結果*基本數值係數",
+                    "size": "xxs",
+                    "weight": "bold",
+                    "style": "italic",
+                    "color": "#ffffff"
+                },
+                {
+                    "type": "text",
+                    "text": "+武器數值*武器係數",
+                    "size": "xxs",
+                    "weight": "bold",
+                    "style": "italic",
+                    "color": "#ffffff"
+                }
+                ],
+                "height": "80px",
+                "paddingAll": "10%"
             }
             ],
-            "paddingAll": "0px"
+            "paddingAll": "0px",
+            "offsetTop": "20px"
+        },
+        "styles": {
+            "hero": {
+            "backgroundColor": "#000000"
+            },
+            "body": {
+            "backgroundColor": "#1f1f2e"
+            }
         }
         }
     ]
@@ -1144,6 +1234,400 @@ def getBattleEnd(game_result_json):
             "footer": {
             "separator": False
             }
+        }
+        }
+    ]
+    }
+    return json
+
+#裝備欄 技能選單... 等等
+def getJobInfoSubMenu():
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "裝備欄",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "設定裝備物品",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#27ACB2",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "裝備",
+                "text": "@equipment"
+                },
+                "style": "primary",
+                "margin": "md",
+                "height": "sm"
+            }
+            ],
+            "borderWidth": "2px",
+            "height": "55px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "技能列表",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "查看&升級技能",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#FF6B6E",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "技能",
+                "text": "@skill"
+                },
+                "style": "primary",
+                "margin": "md",
+                "height": "sm"
+            }
+            ],
+            "borderWidth": "2px",
+            "height": "55px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "背包",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "查看&使用道具",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#A17DF5",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "背包",
+                    "text": "@bag"
+                    },
+                    "style": "primary",
+                    "margin": "md",
+                    "height": "sm"
+                }
+                ],
+                "borderWidth": "2px",
+                "height": "55px"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        }
+    ]
+    }
+    return json
+
+def getEquipmentNow():
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213",
+            "url": "https://play-lh.googleusercontent.com/fRCXsd2tJcqLnt7rgSZexQtUuKcU7yUooPcr1M6umtOpe3tYxBk7uBs-tsleczEFYs4"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "勇者之劍 +15",
+                "weight": "bold",
+                "size": "sm",
+                "wrap": True
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
+                },
+                {
+                    "type": "text",
+                    "text": "4.0",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "STR + 5",
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                    },
+                    {
+                        "type": "text",
+                        "text": "ATK + 3",
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                    },
+                    {
+                        "type": "text",
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5,
+                        "text": " "
+                    }
+                    ]
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213",
+            "url": "https://cdnb.artstation.com/p/assets/covers/images/025/345/507/large/maksim-kovtik-helmet3.jpg?1585512582"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "勇者頭盔 + 15",
+                "weight": "bold",
+                "size": "sm",
+                "wrap": True
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
+                },
+                {
+                    "type": "text",
+                    "text": "1.0",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "STR+3",
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                    },
+                    {
+                        "type": "text",
+                        "text": " ",
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                    },
+                    {
+                        "type": "text",
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5,
+                        "text": " "
+                    }
+                    ]
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
         }
         }
     ]

@@ -96,7 +96,6 @@ def goToMap(command_map_name,user_line_id):
         _mapinfo = dataBase.getMapInfo(command_map_name)
         _monster_list = _mapinfo["content_monster"]
         _which_monster = random.choices(_monster_list,weights=_mapinfo["monster_weight"])[0]
-        #_which_monster = 1
         _monster = dataBase.getMonsterInfo(_which_monster)
         _user_status = dataBase.getUserJob(user_line_id)
         print("get monster:")
