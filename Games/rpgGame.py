@@ -190,12 +190,12 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
         _monster_hp = 0
     print("怪物攻擊:"+str(_monsterAttack)+"玩家剩餘血量:"+str(_playerhp))
     print("玩家傷害:"+str(_attack_result)+" 怪物剩餘血量:"+str(_monster_hp))
-    _user_job_json["hp"] = _playerhp
-
+    
     if dataBase.getUserRoundInfo(_user_line_id)["use_run_chance"] == True:
         dataBase.setUserRoundRunChance(_user_line_id,False)
     if _monster_hp > 0:
         #怪物沒有死亡 把怪物的攻擊結果一起帶回
+        _user_job_json["hp"] = _playerhp
         if _playerhp <= 0:
             #輸囉
             _result={"Result":"loose"}
