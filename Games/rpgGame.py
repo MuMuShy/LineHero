@@ -45,7 +45,7 @@ def checkstrjobLegal(job):
     else:
         return False
 def checkstrMapLegal(map_command):
-    _maps = ["forest"]
+    _maps = ["forest","elfforest"]
     if map_command in _maps:
         return True
     else:

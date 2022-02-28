@@ -592,7 +592,7 @@ def getExperList():
             "contents": [
             {
                 "type": "text",
-                "text": "墮落街口",
+                "text": "妖精密林",
                 "color": "#ffffff",
                 "align": "start",
                 "size": "md",
@@ -653,21 +653,21 @@ def getExperList():
                 "contents": [
                 {
                     "type": "text",
-                    "text": "地鐵癡漢",
+                    "text": "妖精戰士",
                     "color": "#8C8C8C",
                     "size": "sm",
                     "wrap": True
                 },
                 {
                     "type": "text",
-                    "text": "扒手",
+                    "text": "妖精法師",
                     "color": "#8C8C8C",
                     "size": "sm",
                     "wrap": True
                 },
                 {
                     "type": "text",
-                    "text": "小混混",
+                    "text": "妖精使者",
                     "color": "#8C8C8C",
                     "size": "sm",
                     "wrap": True
@@ -694,8 +694,8 @@ def getExperList():
                 "type": "button",
                 "action": {
                 "type": "message",
-                "label": "封閉中..",
-                "text": "@goto subway"
+                "label": "出發",
+                "text": "@goto elfforest"
                 },
                 "margin": "xs",
                 "style": "primary",
