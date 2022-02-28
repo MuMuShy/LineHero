@@ -711,6 +711,135 @@ def getExperList():
             "separator": False
             }
         }
+        },
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "蠻族部落",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "推薦LV: 20-30",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            },
+            {
+                "type": "text",
+                "text": "危險指數",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "xs"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "width": "50%",
+                    "backgroundColor": "#ff0000",
+                    "height": "6px"
+                }
+                ],
+                "backgroundColor": "#9FD8E36E",
+                "height": "6px",
+                "margin": "sm"
+            }
+            ],
+            "backgroundColor": "#27ACB2",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "蠻族守護者",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                },
+                {
+                    "type": "text",
+                    "text": "蠻族長老",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                },
+                {
+                    "type": "text",
+                    "text": "依塔洛斯",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                },
+                {
+                    "type": "text",
+                    "text": "隱藏腳色",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                }
+                ],
+                "flex": 1
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "封閉中",
+                "text": "@goto barbarian"
+                },
+                "margin": "xs",
+                "style": "primary",
+                "offsetBottom": "10px",
+                "height": "sm"
+            }
+            ],
+            "spacing": "sm",
+            "height": "50px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
         }
     ]
     }
@@ -842,7 +971,7 @@ def getMonsterPacker(monster_json,now_hp):
             }
             ],
             "flex": 0
-        }
+        },
         }
     return json
 
@@ -867,7 +996,10 @@ def getAttackButton(_totaldamage,_gameResult):
     else:
         _dicenum = 2
 
-    
+    _weapon = _gameResult["player_result_json"]["weapon"]
+    _weapon_url = 'https://mumu.tw/images/weapons/'+str(_weapon)+".png"
+    if _weapon == 3:
+        _weapon_url = 'https://mumu.tw/images/weapons/'+str(_weapon)+".jpg"
     json = {
     "type": "carousel",
     "contents": [
@@ -1012,7 +1144,61 @@ def getAttackButton(_totaldamage,_gameResult):
             "backgroundColor": "#1f1f2e"
             }
         }
+        },
+    {
+      "type": "bubble",
+      "size": "micro",
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "裝備武器",
+            "weight": "bold",
+            "size": "lg",
+            "align": "center",
+            "color": "#ffffff"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "image",
+                "url": _weapon_url,
+                "size": "xl"
+              }
+            ],
+            "height": "120px"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "武器係數會進入傷害加總的進一步運算",
+                "size": "xxs",
+                "color": "#ffffff"
+              }
+            ],
+            "height": "80px",
+            "paddingAll": "10%"
+          }
+        ],
+        "paddingAll": "0px",
+        "offsetTop": "20px"
+      },
+      "styles": {
+        "hero": {
+          "backgroundColor": "#000000"
+        },
+        "body": {
+          "backgroundColor": "#1f1f2e"
         }
+      }
+    }
     ]
     }
     return json
