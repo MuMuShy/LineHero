@@ -195,7 +195,8 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
             _result={"Result":"loose"}
             _user_job_json["hp"] = 0
             _tempexp = _user_job_json["exp"]
-            _tempexp = _tempexp-(_tempexp*0.3)
+            _maxexp = getMaxExp(_user_job_json["level"])
+            _tempexp = _tempexp-(_maxexp*0.1)
             if _tempexp<=0:
                 _tempexp = 0
             _user_job_json["exp"] = _tempexp

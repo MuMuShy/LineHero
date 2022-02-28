@@ -355,7 +355,7 @@ def handle_message(event):
                     TextSendMessage(text = _strtext),])
             elif _game_result_json["Result"] =="win":
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
-                _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])+ "金幣:" + str(_game_result_json["get_money"])+"\n"
+                _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])+ "金幣:" + str(_game_result_json["get_money"])+"\n"+"剩餘血量:"+str(_game_result_json["player_result_json"]["hp"])+"/"+str(rpgGame.getMaxHp(_game_result_json["player_result_json"]["job"],_game_result_json["player_result_json"]["level"]))
                 if _palyer_job_info["job"] == "warrior":
                     _strtext +=_game_result_json["end_job_result"]
                 if _game_result_json["is_level_up"] == True:
@@ -369,7 +369,7 @@ def handle_message(event):
             elif _game_result_json["Result"] == "loose":
                 line_bot_api.reply_message(
                     event.reply_token,
-                    TextSendMessage("戰鬥結束! 很可惜你承受不住怪物的傷害 已死亡 -百分之30 exp 復活指令: @health"),
+                    TextSendMessage("戰鬥結束! 很可惜你承受不住怪物的傷害 已死亡 -百分之10 exp 復活指令: @health"),
                     )
             return
     elif user_send.startswith("!set"):
