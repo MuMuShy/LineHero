@@ -158,16 +158,34 @@ def addPlayerExp(_user_job_json,_exp):
 def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     _playerjob = _user_job_json["job"]
     print("職業:"+_playerjob)
+    skill_effec = "無觸發交戰技能"
     baseAttack = getJobAttackByjson(_user_job_json)
+    if _playerjob == "majic":
+        _skill_active = random.randrange(0,100)
+        if _skill_active >= 31:
+            _afterjson = _user_job_json
+            print(_afterjson)
+            _afterint = int(_afterjson["int"]*0.3)
+            _afterjson["int"] = _afterjson["int"]+_afterint
+            print(_afterjson)
+            skill_effec = "觸發法師被動技能! 賢者之力 增加INT30% 目前INT:"+str(_afterjson["int"])
+            baseAttack = getJobAttackByjson(_afterjson)
+        
     attackpow = getJobRollResult(_playerjob)
     _attack_result = int(baseAttack*attackpow)
     _monster_base_info = dataBase.getMonsterInfo(_target_monster_id)
     _monster_hp = monster_hp-_attack_result
     _monsterAttack = int(random.randrange(int(_monster_base_info["attack"]*0.7),int(_monster_base_info["attack"])))
     _playerhp = _user_job_json["hp"] - _monsterAttack
+    if _playerjob =="rog":
+        _playerhp+=int(_attack_result*0.1)
+        if _playerhp > getMaxHp(_playerjob,_user_job_json["level"]):
+            _playerhp = getMaxHp(_playerjob,_user_job_json["level"])
+        skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))
     _result={}
-    print("怪物攻擊:"+str(_monsterAttack))
+    print("怪物攻擊:"+str(_monsterAttack)+"玩家剩餘血量:"+str(_playerhp))
     print("玩家傷害:"+str(_attack_result)+" 怪物剩餘血量:"+str(_monster_hp))
+    _user_job_json["hp"] = _playerhp
     if dataBase.getUserRoundInfo(_user_line_id)["use_run_chance"] == True:
         dataBase.setUserRoundRunChance(_user_line_id,False)
     if _monster_hp > 0:
@@ -182,13 +200,23 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
         else:
             #玩家沒死 怪物也沒死 
             #更新status
-            _user_job_json["hp"] -= _monsterAttack
             dataBase.UpdateUserBattleStatus(_user_line_id,_target_monster_id,"player",_monster_hp)
             dataBase.setUserJobStatus(_user_line_id,_user_job_json)
             _monster_base_info["hp"] = _monster_hp
-            _result={"Result":"monster_alive","dice_result":attackpow,"mosnter_damage":_monsterAttack,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json}
+            _result={"Result":"monster_alive","dice_result":attackpow,"mosnter_damage":_monsterAttack,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"skill_efect":skill_effec}
     else:
+        
+        #統計職業效果觸發
+        _end_job_result = ""
         #掉落金錢 先隨機
+        if _user_job_json["job"] == "warrior":
+            _maxhp = getMaxHp(_user_job_json["job"],_user_job_json["level"])
+            _health = _maxhp*0.1
+            if _user_job_json["hp"] + _health <= _maxhp:
+                _user_job_json["hp"] +=_health
+            else:
+                _user_job_json["hp"] = _maxhp
+            _end_job_result ="觸發戰士被動效果 戰士精神 回復血量:"+str(int(_health))
         _money = random.randrange(500,2000)
         _originmoney = int(dataBase.getUserMoney(_user_line_id))+_money
         dataBase.SetUserMoneyByLineId(_user_line_id,_originmoney)
@@ -199,7 +227,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
         if _user_job_json["level"] > _origlevel:
             _islevelup = True
         dataBase.setUserJobStatus(_user_line_id,_user_job_json)
-        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money}
+        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec}
 
     return _result
     

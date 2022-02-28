@@ -1,3 +1,4 @@
+from modulefinder import replacePackageMap
 import random
 from time import sleep
 from flask import Flask, request, abort
@@ -220,10 +221,12 @@ def handle_message(event):
             FlexSendMessage("裝備列表",contents=_flex_equipment))
         return
     elif user_send =="@skill":
+        _status = database.getUserJob(event.source.user_id)
+        _skillflex = lineMessagePackerRpg.getSkillList(_status)
         #先未開放
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="敬請期待..."))
+            FlexSendMessage("玩家技能",contents=_skillflex))
         return
     elif user_send =="@bag":
         #先未開放
@@ -336,6 +339,7 @@ def handle_message(event):
             _palyer_job_info = database.getUserJob(event.source.user_id)
             _monsterbase = database.getMonsterInfo(_round_info["target_monster_id"])
             _game_result_json = rpgGame.attackround(event.source.user_id,_palyer_job_info,_monsterbase["monster_id"],_round_info["monster_hp"])
+            _str_skill_text = _game_result_json["skill_efect"]
             if _game_result_json["Result"] == "monster_alive":
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
                 _monsterFlex = lineMessagePackerRpg.getMonsterPacker(_monsterbase,_game_result_json["monster_result_json"]["hp"])
@@ -343,16 +347,20 @@ def handle_message(event):
                 line_bot_api.reply_message(
                     event.reply_token,[
                     FlexSendMessage("攻擊!",contents=_attackbtnFlex),
+                    TextSendMessage(text = _str_skill_text),
                     FlexSendMessage("怪物存活!",contents=_monsterFlex),
                     TextSendMessage(text = _strtext),])
             elif _game_result_json["Result"] =="win":
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
-                _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])+ "金幣:" + str(_game_result_json["get_money"])
+                _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])+ "金幣:" + str(_game_result_json["get_money"])+"\n"
+                if _palyer_job_info["job"] == "warrior":
+                    _strtext +=_game_result_json["end_job_result"]
                 if _game_result_json["is_level_up"] == True:
                     _strtext+="\n恭喜升等!!"
                 line_bot_api.reply_message(
                     event.reply_token,[
                     FlexSendMessage("最終一擊",contents=_attackbtnFlex),
+                    TextSendMessage(text = _str_skill_text),
                     FlexSendMessage("戰鬥結束!",contents=lineMessagePackerRpg.getBattleEnd(_game_result_json)),
                     TextSendMessage(text = _strtext),])
             elif _game_result_json["Result"] == "loose":

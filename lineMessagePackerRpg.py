@@ -1767,3 +1767,93 @@ def getRpgTop5Rank(top5rankarr):
     }
     }
     return json
+
+def getSkillList(_player_job_json):
+    _description = "戰鬥勝利後 回復10%最大生命值"
+    _skillname = "戰士精神"
+    skill = "1.png"
+    if _player_job_json["job"] == "majic":
+        skill = "2.jpg"
+        _description = "每回合戰鬥 30%機率增加自身INT30%"
+        _skillname = "賢者之力"
+    elif _player_job_json["job"] == "rog":
+        skill = "3.png"
+        _description = "攻擊附帶10%傷害吸血"
+        _skillname = "嗜血如命"
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213",
+            "url": "https://mumu.tw/images/skill/"+skill
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": _skillname,
+                "weight": "bold",
+                "color": "#ffffff",
+                "size": "sm",
+                "wrap": True,
+                "align": "center"
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "被動 不可升級",
+                    "size": "xs",
+                    "color": "#ffffff",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": _description,
+                        "wrap": True,
+                        "color": "#ffffff",
+                        "size": "xs",
+                        "flex": 5
+                    }
+                    ]
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        },
+        "styles": {
+            "hero": {
+            "backgroundColor": "#142952"
+            },
+            "body": {
+            "backgroundColor": "#142952"
+            }
+        }
+        }
+    ]
+    }
+    return json
