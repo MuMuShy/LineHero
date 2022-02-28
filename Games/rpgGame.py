@@ -194,6 +194,11 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
             #輸囉
             _result={"Result":"loose"}
             _user_job_json["hp"] = 0
+            _tempexp = _user_job_json["exp"]
+            _tempexp = _tempexp-(_tempexp*0.3)
+            if _tempexp<=0:
+                _tempexp = 0
+            _user_job_json["exp"] = _tempexp
             dataBase.ClearUserBattle(_user_line_id)
             dataBase.setUserJobStatus(_user_line_id,_user_job_json)
             print("die")

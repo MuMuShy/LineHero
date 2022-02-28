@@ -369,7 +369,7 @@ def handle_message(event):
             elif _game_result_json["Result"] == "loose":
                 line_bot_api.reply_message(
                     event.reply_token,
-                    TextSendMessage("戰鬥結束! 很可惜你承受不住怪物的傷害 已死亡 復活指令: @health"),
+                    TextSendMessage("戰鬥結束! 很可惜你承受不住怪物的傷害 已死亡 -百分之30 exp 復活指令: @health"),
                     )
             return
     elif user_send.startswith("!set"):
