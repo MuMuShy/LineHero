@@ -903,7 +903,6 @@ def getAttackButton(_totaldamage,_gameResult):
                 "weight": "bold",
                 "size": "lg",
                 "align": "center",
-                "offsetTop": "2%",
                 "color":_color
             }
             ],
@@ -1631,5 +1630,140 @@ def getEquipmentNow():
         }
         }
     ]
+    }
+    return json
+
+def getRpgTop5Rank(top5rankarr):
+    json = {
+    "type": "bubble",
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "image",
+            "url": "https://mumu.tw/images/game_ui/ui.png",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "1:1",
+            "gravity": "center",
+            "animated": True
+        },
+        {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "image",
+                    "url": "https://mumu.tw/images/game_ui/rank_head.png",
+                    "offsetTop": "5px"
+                },
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "1."+top5rankarr[0],
+                        "size": "md",
+                        "color": "#ff3333",
+                        "align": "center"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "2."+top5rankarr[1],
+                            "color": "#ffffff",
+                            "size": "xs",
+                            "flex": 0,
+                            "align": "center"
+                        }
+                        ],
+                        "flex": 0,
+                        "spacing": "xs"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "3."+top5rankarr[2],
+                            "color": "#ffffff",
+                            "size": "xs",
+                            "flex": 0,
+                            "align": "center"
+                        }
+                        ],
+                        "flex": 0,
+                        "spacing": "sm"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "4."+top5rankarr[3],
+                            "color": "#ffffff",
+                            "size": "xs",
+                            "flex": 0,
+                            "align": "center"
+                        }
+                        ],
+                        "flex": 0,
+                        "spacing": "sm"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "5."+top5rankarr[4],
+                            "color": "#ffffff",
+                            "size": "xs",
+                            "flex": 0,
+                            "align": "center"
+                        }
+                        ],
+                        "flex": 0,
+                        "spacing": "lg"
+                    }
+                    ],
+                    "paddingBottom": "2%"
+                }
+                ],
+                "spacing": "xs"
+            }
+            ],
+            "position": "absolute",
+            "offsetBottom": "24%",
+            "offsetStart": "0px",
+            "offsetEnd": "0px",
+            "paddingAll": "20px"
+        }
+        ],
+        "paddingAll": "0px",
+        "background": {
+        "type": "linearGradient",
+        "angle": "0deg",
+        "startColor": "#000000",
+        "endColor": "#ffffff"
+        }
+    }
     }
     return json

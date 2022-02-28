@@ -108,9 +108,16 @@ def handle_message(event):
         top5 = database.getTop5Ranking()
         line_bot_api.reply_message(
                 event.reply_token,
-                FlexSendMessage("123",contents=lineMessagePacker.getRanking(top5[0],top5[1],top5[2],top5[3],top5[4])))
+                FlexSendMessage("財力排行",contents=lineMessagePacker.getRanking(top5[0],top5[1],top5[2],top5[3],top5[4])))
         return
-    if user_send =="!dailyrequest":
+    if user_send =="@ranking":
+        top5 = database.getTop5RpgRanking()
+        print(top5)
+        line_bot_api.reply_message(
+                event.reply_token,
+                FlexSendMessage("LV排行",contents=lineMessagePackerRpg.getRpgTop5Rank(top5)))
+        return
+    elif user_send =="!dailyrequest":
         if database.checkUserDaily(event.source.user_id) == True:
             line_bot_api.reply_message(
                 event.reply_token,
@@ -202,10 +209,27 @@ def handle_message(event):
             event.reply_token,
             FlexSendMessage("冒險列表",contents=_reply))
     elif user_send == "@equipment":
+        #先未開放
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="敬請期待..."))
+        return
         _flex_equipment = lineMessagePackerRpg.getEquipmentNow()
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage("裝備列表",contents=_flex_equipment))
+        return
+    elif user_send =="@skill":
+        #先未開放
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="敬請期待..."))
+        return
+    elif user_send =="@bag":
+        #先未開放
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="敬請期待..."))
         return
     elif user_send.startswith("@goto"):
         

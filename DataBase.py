@@ -2,6 +2,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 
+
 load_dotenv()
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -160,13 +161,32 @@ class DataBase():
         sql ="Select user_line_name, user_money from users ORDER BY user_money desc"
         self.cursor.execute(sql)
         self.conn.commit()
-        row = self.cursor.fetchall()
+        row = self.cursor.fetchmany(5)
         self.conn.close()
         result=[]
         for col in row:
             _reply =str(col[0])+" : $"+str(col[1])
             print(col[0])
             print(col[1])
+            result.append(_reply)
+        return result
+    
+    def getTop5RpgRanking(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="Select * from users_job ORDER BY level desc"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchmany(5)
+        self.conn.close()
+        result=[]
+        for col in row:
+            _name = self.getUserName(col[0])
+            _money = int(self.getUserMoney(col[0]))
+            _money = str("{:,}".format(_money))
+            _parser = {"warrior":"戰士","majic":"法師","rog":"盜賊"}
+            _job = _parser[col[1]]
+            _reply =str(_name)+" : LV"+str(col[5])+_job+" $: "+str(_money)
             result.append(_reply)
         return result
     
