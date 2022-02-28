@@ -339,7 +339,10 @@ def handle_message(event):
             _palyer_job_info = database.getUserJob(event.source.user_id)
             _monsterbase = database.getMonsterInfo(_round_info["target_monster_id"])
             _game_result_json = rpgGame.attackround(event.source.user_id,_palyer_job_info,_monsterbase["monster_id"],_round_info["monster_hp"])
-            _str_skill_text = _game_result_json["skill_efect"]
+            try:
+                _str_skill_text = _game_result_json["skill_efect"]
+            except:
+                print("no skill text")
             if _game_result_json["Result"] == "monster_alive":
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
                 _monsterFlex = lineMessagePackerRpg.getMonsterPacker(_monsterbase,_game_result_json["monster_result_json"]["hp"])
