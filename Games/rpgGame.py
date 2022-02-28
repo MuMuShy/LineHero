@@ -184,9 +184,14 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
             _playerhp = getMaxHp(_playerjob,_user_job_json["level"])
         skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))
     _result={}
+    if _playerhp <= 0:
+        _playerhp = 0
+    if _monster_hp<=0:
+        _monster_hp = 0
     print("怪物攻擊:"+str(_monsterAttack)+"玩家剩餘血量:"+str(_playerhp))
     print("玩家傷害:"+str(_attack_result)+" 怪物剩餘血量:"+str(_monster_hp))
     _user_job_json["hp"] = _playerhp
+
     if dataBase.getUserRoundInfo(_user_line_id)["use_run_chance"] == True:
         dataBase.setUserRoundRunChance(_user_line_id,False)
     if _monster_hp > 0:
