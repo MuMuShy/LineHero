@@ -121,6 +121,40 @@ def getJobRollResult(_job):
     elif _job =="rog":
         return random.randrange(3,12)
 
+def getJobCreditResult(_job,weapon_info):
+    #基礎爆擊率  戰士: 10% 盜賊 30% 法師 15%
+    #基礎爆擊傷害 1.3
+    if _job == "warrior":
+        _basic = 10
+    elif _job =="majic":
+        _basic = 15
+    elif _job =="rog":
+        _basic = 30
+    _addcredit = 0
+    _addcreditdmg = 0
+    _creditdmg = 1.3
+    try:
+        _addcredit+=weapon_info["credit_add"]
+    except:
+        _addcredit = 0
+    try:
+        _addcreditdmg=weapon_info["credit_damage_add"]/100
+        _creditdmg+=_addcreditdmg
+    except:
+        _creditdmg = 1.3
+    _basic+=_addcredit
+    _basic = 100-_basic
+    if _basic<=0:
+        _basic = 0
+    _result = random.randrange(0,100)
+    print("爆擊率:"+str(100-_basic)+" 骰出:"+str(_result))
+    if _result >= _basic:
+        #爆擊
+        return _creditdmg
+    else:
+        return 1
+        
+
 def getJobAttackByjson(_user_job_json):
     _job = _user_job_json["job"]
     print(_job)
@@ -130,6 +164,18 @@ def getJobAttackByjson(_user_job_json):
         return _user_job_json["int"]*2
     elif _job =="rog":
         return _user_job_json["dex"]*1.5
+
+def getJobWeaponAttackByjson(_user_job_json,weapon_atk):
+    _job = _user_job_json["job"]
+    print(_job)
+    _random = random.randrange(90,110)
+    _random/=100
+    if _job == "warrior":
+        return 1+(weapon_atk/100)*weapon_atk*1.3*_random
+    elif _job =="majic":
+        return 1+(weapon_atk/100)*weapon_atk*1.7*_random
+    elif _job =="rog":
+        return 1+(weapon_atk/100)*weapon_atk*1.5*_random
 
 def addPlayerExp(_user_job_json,_exp):
     _user_job_json["exp"]+=_exp
@@ -157,23 +203,43 @@ def addPlayerExp(_user_job_json,_exp):
 
 
 def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
+    _isCredit = False
     _playerjob = _user_job_json["job"]
     print("職業:"+_playerjob)
     skill_effec = "無觸發交戰技能"
-    baseAttack = getJobAttackByjson(_user_job_json)
+    _weapon_info = dataBase.getWeaponInfo(_user_job_json["weapon"])
+    _user_job_temp = copy.deepcopy(_user_job_json)
+    _user_job_temp["str"]+=_weapon_info["str_add"]
+    _user_job_temp["int"]+=_weapon_info["int_add"]
+    _user_job_temp["dex"]+=_weapon_info["dex_add"]
+    baseAttack = getJobAttackByjson(_user_job_temp)
     if _playerjob == "majic":
         _skill_active = random.randrange(0,100)
         if _skill_active >= 31:
-            _afterjson = copy.deepcopy(_user_job_json)
+            _afterjson = copy.deepcopy(_user_job_temp)
             print(_afterjson)
             _afterint = int(_afterjson["int"]*0.3)
             _afterjson["int"] = _afterjson["int"]+_afterint
             print(_afterjson)
             skill_effec = "觸發法師被動技能! 賢者之力 增加INT30% 目前INT:"+str(_afterjson["int"])
             baseAttack = getJobAttackByjson(_afterjson)
-        
+    #基礎傷害 -> 骰子 * 能力點   
     attackpow = getJobRollResult(_playerjob)
-    _attack_result = int(baseAttack*attackpow)
+    #基礎爆擊率  戰士: 10% 盜賊 30% 法師 20% 基礎爆擊傷害: 1.3
+    _credit = getJobCreditResult(_playerjob,_weapon_info)
+    if _credit > 1:
+        _isCredit = True
+    #武器數值計算
+    _weaponpow = getJobWeaponAttackByjson(_user_job_temp,_weapon_info["atk_add"])
+    
+    print("武器傷害:"+str(_weaponpow))
+    _attack_result = int(int(baseAttack*attackpow)+int(_weaponpow)*_credit)
+    if _playerjob == "majic":
+        _weaponpow += 1+(1*int(_weapon_info["other_effect"]["matk_add"]))
+    #浮動率 85~120%
+    _random = random.randrange(85,120)
+    _attack_result*=_random/100
+    _attack_result = int(_attack_result)
     _monster_base_info = dataBase.getMonsterInfo(_target_monster_id)
     _monster_hp = monster_hp-_attack_result
     _monsterAttack = int(random.randrange(int(_monster_base_info["attack"]*0.7),int(_monster_base_info["attack"])))
@@ -215,7 +281,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
             dataBase.UpdateUserBattleStatus(_user_line_id,_target_monster_id,"player",_monster_hp)
             dataBase.setUserJobStatus(_user_line_id,_user_job_json)
             _monster_base_info["hp"] = _monster_hp
-            _result={"Result":"monster_alive","dice_result":attackpow,"mosnter_damage":_monsterAttack,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"skill_efect":skill_effec}
+            _result={"Result":"monster_alive","dice_result":attackpow,"mosnter_damage":_monsterAttack,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"skill_efect":skill_effec,"is_credit":_isCredit}
     else:
         
         #統計職業效果觸發
@@ -239,7 +305,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
         if _user_job_json["level"] > _origlevel:
             _islevelup = True
         dataBase.setUserJobStatus(_user_line_id,_user_job_json)
-        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec}
+        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec,"is_credit":_isCredit}
 
     return _result
     

@@ -2,7 +2,7 @@
 import json
 
 
-def getJobInfo(user_img_link,user_job_info,_rank):
+def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
     print(user_job_info)
     from Games import rpgGame 
     #userjobinfo = {"job","exp","hp","str","int","dex","level"}
@@ -166,7 +166,7 @@ def getJobInfo(user_img_link,user_job_info,_rank):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "STR :"+str(user_job_info["str"])+"/ INT"+str(user_job_info["int"])+"/ DEX"+str(user_job_info["dex"]),
+                        "text": "STR :"+str(user_job_info["str"])+"+("+str(equipment_weapon_info["str_add"])+")"+"/ INT"+str(user_job_info["int"])+"+("+str(equipment_weapon_info["int_add"])+")"+"/ DEX"+str(user_job_info["dex"])+"+("+str(equipment_weapon_info["dex_add"])+")",
                         "color": "#ffffff",
                         "flex": 0,
                         "size": "sm"
@@ -857,21 +857,16 @@ def getAttackButton(_totaldamage,_gameResult):
     _color_credit = "#b30000"
     _color = "#ffffff"
     job = _gameResult["player_result_json"]["job"]
+    if _gameResult["is_credit"] == True:
+        _iscredit = "爆擊!"
+        _color = _color_credit
     if job =="warrior":
         _dicenum = 1
-        if _diceresult >5:
-            _iscredit="爆擊!"
-            _color = _color_credit
     elif job =="rog":
         _dicenum = 3
-        if _diceresult > 9:
-            _iscredit="爆擊!"
-            _color = _color_credit
     else:
         _dicenum = 2
-        if _diceresult >6:
-            _iscredit="爆擊!"
-            _color = _color_credit
+
     
     json = {
     "type": "carousel",
@@ -1421,7 +1416,68 @@ def getJobInfoSubMenu():
     }
     return json
 
-def getEquipmentNow():
+def getEquipmentNow(weapon_json):
+    from Games import rpgDictionary
+    url = "https://mumu.tw/images/weapons/"+str(weapon_json["weapon_id"])+"."+weapon_json["img_type"]
+    _start_list =["https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"]
+    _rare = int(weapon_json["rare"])-1
+    _star = 0
+    for i in range(0,_rare):
+        _start_list[i] = "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+        _star+=1
+    contents = [
+                    {
+                        "type": "text",
+                        "text": "STR + "+str(weapon_json["str_add"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                    },
+                    {
+                        "type": "text",
+                        "text": "DEX + "+str(weapon_json["dex_add"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                    },
+                    {
+                        "type": "text",
+                        "text": "INT + "+str(weapon_json["int_add"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                    },
+                    {
+                        "type": "text",
+                        "text": "攻擊力 + "+str(weapon_json["atk_add"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                    },
+
+    ]
+    for i in weapon_json["other_effect"]:
+        _effectchinese = rpgDictionary.getChineseEffectName(i)
+        print (weapon_json["other_effect"])
+        contents.append(
+            {
+                        "type": "text",
+                        "text": _effectchinese+" : +"+str(weapon_json["other_effect"][i]),
+                        "wrap": True,
+                        "color": "#ff0000",
+                        "size": "xs",
+                        "flex": 5
+            }
+        )
+
     json = {
     "type": "carousel",
     "contents": [
@@ -1433,7 +1489,7 @@ def getEquipmentNow():
             "size": "full",
             "aspectMode": "cover",
             "aspectRatio": "320:213",
-            "url": "https://play-lh.googleusercontent.com/fRCXsd2tJcqLnt7rgSZexQtUuKcU7yUooPcr1M6umtOpe3tYxBk7uBs-tsleczEFYs4"
+            "url": url
         },
         "body": {
             "type": "box",
@@ -1441,7 +1497,7 @@ def getEquipmentNow():
             "contents": [
             {
                 "type": "text",
-                "text": "勇者之劍 +15",
+                "text": weapon_json["weapon_name"],
                 "weight": "bold",
                 "size": "sm",
                 "wrap": True
@@ -1453,31 +1509,31 @@ def getEquipmentNow():
                 {
                     "type": "icon",
                     "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+                    "url": _start_list[0]
                 },
                 {
                     "type": "icon",
                     "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+                    "url": _start_list[1]
                 },
                 {
                     "type": "icon",
                     "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+                    "url": _start_list[2]
                 },
                 {
                     "type": "icon",
                     "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+                    "url": _start_list[3]
                 },
                 {
                     "type": "icon",
                     "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
+                    "url": _start_list[4]
                 },
                 {
                     "type": "text",
-                    "text": "4.0",
+                    "text": str(_star)+".0",
                     "size": "xs",
                     "color": "#8c8c8c",
                     "margin": "md",
@@ -1493,134 +1549,7 @@ def getEquipmentNow():
                     "type": "box",
                     "layout": "vertical",
                     "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "STR + 5",
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5
-                    },
-                    {
-                        "type": "text",
-                        "text": "ATK + 3",
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5
-                    },
-                    {
-                        "type": "text",
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5,
-                        "text": " "
-                    }
-                    ]
-                }
-                ]
-            }
-            ],
-            "spacing": "sm",
-            "paddingAll": "13px"
-        }
-        },
-        {
-        "type": "bubble",
-        "size": "micro",
-        "hero": {
-            "type": "image",
-            "size": "full",
-            "aspectMode": "cover",
-            "aspectRatio": "320:213",
-            "url": "https://cdnb.artstation.com/p/assets/covers/images/025/345/507/large/maksim-kovtik-helmet3.jpg?1585512582"
-        },
-        "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-            {
-                "type": "text",
-                "text": "勇者頭盔 + 15",
-                "weight": "bold",
-                "size": "sm",
-                "wrap": True
-            },
-            {
-                "type": "box",
-                "layout": "baseline",
-                "contents": [
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-                },
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
-                },
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
-                },
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
-                },
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"
-                },
-                {
-                    "type": "text",
-                    "text": "1.0",
-                    "size": "xs",
-                    "color": "#8c8c8c",
-                    "margin": "md",
-                    "flex": 0
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "sm",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "STR+3",
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5
-                    },
-                    {
-                        "type": "text",
-                        "text": " ",
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5
-                    },
-                    {
-                        "type": "text",
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5,
-                        "text": " "
-                    }
-                    ]
+                    "contents": contents
                 }
                 ]
             }
@@ -1629,7 +1558,7 @@ def getEquipmentNow():
             "paddingAll": "13px"
         }
         }
-    ]
+     ]
     }
     return json
 

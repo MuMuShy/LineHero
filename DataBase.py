@@ -456,8 +456,13 @@ class DataBase():
         maxhp = rpgGame.getMaxHp(jobs,1)
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
-        sql ="""INSERT INTO users_job (user_line_id, jobs, str, dex, intelligence, level, hp, exp) VALUES (%(user_line_id)s, %(jobs)s,10,10,10,1,%(maxhp)s,0)"""
-        params = {'user_line_id':user_line_id, 'jobs':jobs,'maxhp':maxhp}
+        _weapon = 1
+        if jobs =="rog":
+            _weapon = 2
+        elif jobs =="majic":
+            _weapon = 3
+        sql ="""INSERT INTO users_job (user_line_id, jobs, str, dex, intelligence, level, hp, exp, equipment_weapon) VALUES (%(user_line_id)s, %(jobs)s,10,10,10,1,%(maxhp)s,0,%(weapon)s)"""
+        params = {'user_line_id':user_line_id, 'jobs':jobs,'maxhp':maxhp,'weapon':_weapon}
         self.cursor.execute(sql,params)
         self.conn.commit()
         self.conn.close()
@@ -471,7 +476,27 @@ class DataBase():
         row = self.cursor.fetchone()
         self.conn.close()
         _json = {}
-        _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7]}
+        _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7],"weapon":row[8]}
+        print(_json)
+        return _json
+    
+    def getWeaponInfo(self,weapon_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM weapon_list where weapon_id = '" +weapon_id+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        print("fdsaf")
+        print(row)
+        self.conn.close()
+        _json = {}
+        _weapon_other_effect={}
+        for _line in row[8]:
+            _type = _line.split(":")[0]
+            _value = _line.split(":")[1]
+            _weapon_other_effect[_type] = _value
+        _json={"weapon_id":row[0],"str_add":row[1],"int_add":row[2],"dex_add":row[3],"atk_add":row[4],"rare":row[5],"weapon_name":row[6],"img_type":row[7],"other_effect":_weapon_other_effect}
         print(_json)
         return _json
     
