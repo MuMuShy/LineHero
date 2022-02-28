@@ -7,6 +7,7 @@ import random
 import os
 import time
 import math
+import copy
 import random
 from datetime import datetime, timedelta
 # adding Folder_2 to the system path
@@ -163,7 +164,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     if _playerjob == "majic":
         _skill_active = random.randrange(0,100)
         if _skill_active >= 31:
-            _afterjson = _user_job_json
+            _afterjson = copy.deepcopy(_user_job_json)
             print(_afterjson)
             _afterint = int(_afterjson["int"]*0.3)
             _afterjson["int"] = _afterjson["int"]+_afterint
