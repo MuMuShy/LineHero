@@ -283,6 +283,14 @@ def handle_message(event):
         else:
             _status = database.getUserRoundInfo(event.source.user_id)
             print(_status)
+            _userjob = database.getUserJob(event.source.user_id)
+            _monster = database.getMonsterInfo(_status["target_monster_id"])
+            if rpgGame.getMaxHp(_userjob["job"],_userjob["level"]) < _monster["attack"]:
+                database.ClearUserBattle(event.source.user_id)
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="這個怪物似乎對你不削一顧 就任由你離開"))
+                return
             if _status["use_run_chance"] == False:
                 database.setUserRoundRunChance(event.source.user_id,True)
                 _escape = random.randrange(0,10)
