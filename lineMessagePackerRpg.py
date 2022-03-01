@@ -1,7 +1,8 @@
 
 import json
+from re import L
 
-from Games import rpgGame
+from Games import rpgDictionary, rpgGame
 
 
 def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
@@ -1546,6 +1547,69 @@ def getJobInfoSubMenu():
             "contents": [
             {
                 "type": "text",
+                "text": "寵物",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "派遣寵物去探險",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#a64dff",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "寵物",
+                    "text": "@pet"
+                    },
+                    "style": "primary",
+                    "margin": "md",
+                    "height": "sm"
+                }
+                ],
+                "borderWidth": "2px",
+                "height": "55px"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
                 "text": "背包",
                 "color": "#ffffff",
                 "align": "start",
@@ -2122,5 +2186,422 @@ def getRoundMonsterAliveButton(game_result_json):
         }
         }
     ]
+    }
+    return json
+
+def getEquipmentPet(pet_info_json):
+    _start_list =["https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"]
+    _rare = int(pet_info_json["rare"])-1
+    _star = 0
+    for i in range(0,_rare):
+        _start_list[i] = "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+        _star+=1
+    contents = []
+    print(pet_info_json)
+    for i in pet_info_json["other_effect"]:
+        _str = rpgDictionary.getChineseEffectName(i)+"+"+pet_info_json["other_effect"][i]
+        print("123456")
+        contents.append(
+            {
+                        "type": "text",
+                        "text": _str,
+                        "color": "#ffffff",
+                        "size": "md",
+                        "flex": 0,
+                        "align": "end"
+            }
+        )
+
+    print(contents)
+    
+    _filename = str(pet_info_json["pet_id"])+"."+pet_info_json["img_type"]
+    json = {
+    "type": "bubble",
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "image",
+            "url": "https://mumu.tw/images/pets/"+_filename,
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "1:1",
+            "gravity": "center"
+        },
+        {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [],
+            "position": "absolute",
+            "background": {
+            "type": "linearGradient",
+            "angle": "0deg",
+            "endColor": "#00000000",
+            "startColor": "#00000099"
+            },
+            "width": "100%",
+            "height": "40%",
+            "offsetBottom": "0px",
+            "offsetStart": "0px",
+            "offsetEnd": "0px"
+        },
+        {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": pet_info_json["pet_name"],
+                        "size": "xl",
+                        "color": "#ffffff"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                    {
+                        "type": "icon",
+                        "url": _start_list[0]
+                    },
+                    {
+                        "type": "icon",
+                        "url": _start_list[1]
+                    },
+                    {
+                        "type": "icon",
+                        "url": _start_list[2]
+                    },
+                    {
+                        "type": "icon",
+                        "url": _start_list[3]
+                    },
+                    {
+                        "type": "icon",
+                        "url": _start_list[4]
+                    },
+                    {
+                        "type": "text",
+                        "text": str(_rare)+".0",
+                        "color": "#a9a9a9"
+                    }
+                    ],
+                    "spacing": "xs"
+                },
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": contents,
+                        "flex": 0,
+                        "spacing": "lg"
+                    }
+                    ]
+                }
+                ],
+                "spacing": "xs",
+                "backgroundColor": "#00000090"
+            }
+            ],
+            "position": "absolute",
+            "offsetBottom": "0px",
+            "offsetStart": "0px",
+            "offsetEnd": "0px",
+            "paddingAll": "20px"
+        }
+        ],
+        "paddingAll": "0px"
+    },
+    "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "button",
+            "action": {
+            "type": "message",
+            "label": "遠征隊",
+            "text": "@pet_adventure"
+            },
+            "style": "primary"
+        }
+        ]
+    }
+    }
+    return json
+
+
+def getAdventureMap():
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "幽暗的洞口",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "EXP : 50/MIN ",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#27ACB2",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "其他掉落物:",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                },
+                {
+                    "type": "text",
+                    "text": "金幣",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                }
+                ],
+                "flex": 1
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "掛機開始",
+                "text": "@petadventureGoto hole"
+                },
+                "margin": "xs",
+                "style": "primary"
+            }
+            ]
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "敬請期待",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            }
+            ],
+            "backgroundColor": "#FF6B6E",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [],
+                "flex": 1
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        }
+    ]
+    }
+    return json
+
+#遠征隊目前的狀態
+def getAdventureNowStatus(pet_info_json,adventure_info_json):
+    _filename = str(pet_info_json["pet_id"])+"."+pet_info_json["img_type"]
+    json = {
+    "type": "bubble",
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "image",
+            "url": "https://mumu.tw/images/pets/"+_filename,
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "1:1",
+            "gravity": "center"
+        },
+        {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [],
+            "position": "absolute",
+            "background": {
+            "type": "linearGradient",
+            "angle": "0deg",
+            "endColor": "#00000000",
+            "startColor": "#00000099"
+            },
+            "width": "100%",
+            "height": "40%",
+            "offsetBottom": "0px",
+            "offsetStart": "0px",
+            "offsetEnd": "0px"
+        },
+        {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "遠征狀態: "+adventure_info_json["map_name"],
+                        "size": "xl",
+                        "color": "#ffffff"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "累積分鐘數 : "+str(adventure_info_json["pass_min"])+"min",
+                        "color": "#a9a9a9"
+                    }
+                    ],
+                    "spacing": "xs"
+                },
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "EXP:"+str(adventure_info_json["total_exp"])+"("+str(adventure_info_json["pet_add_exp"])+"寵)",
+                            "color": "#ffffff",
+                            "size": "md",
+                            "flex": 0,
+                            "align": "end"
+                        },
+                        {
+                            "type": "text",
+                            "text": "累積金錢: "+str(adventure_info_json["total_money"])+"("+str(adventure_info_json["pet_add_money"])+"寵)",
+                            "color": "#ffffff",
+                            "size": "md",
+                            "flex": 0,
+                            "align": "end"
+                        }
+                        ],
+                        "flex": 0,
+                        "spacing": "lg"
+                    }
+                    ]
+                }
+                ],
+                "spacing": "xs",
+                "backgroundColor": "#00000090"
+            }
+            ],
+            "position": "absolute",
+            "offsetBottom": "0px",
+            "offsetStart": "0px",
+            "offsetEnd": "0px",
+            "paddingAll": "20px"
+        }
+        ],
+        "paddingAll": "0px"
+    },
+    "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "button",
+            "action": {
+            "type": "message",
+            "label": "招回",
+            "text": "@petadventureback"
+            },
+            "style": "primary"
+        }
+        ]
+    }
     }
     return json

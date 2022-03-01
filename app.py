@@ -1,5 +1,6 @@
 from modulefinder import replacePackageMap
 import random
+from this import d
 from time import sleep
 from flask import Flask, request, abort
 from flask import render_template
@@ -175,7 +176,88 @@ def handle_message(event):
                     event.reply_token,
                     TextSendMessage(text="資料格式錯誤"))
             return
+    elif user_send =="@pet":
+        user_id = event.source.user_id
+        try:
+            profile = line_bot_api.get_profile(user_id)
+        except:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="看來你沒有加我好友! 請先加我好友喔"))
+        _player_jobinfo = database.getUserJob(user_id)
+        _pet_info = database.getPetInfo(_player_jobinfo["pet"])
+        _flex_pet = lineMessagePackerRpg.getEquipmentPet(_pet_info)
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("寵物資訊",contents=_flex_pet)
+            )
+    elif user_send =="@pet_adventure":
+        user_id = event.source.user_id
+        try:
+            profile = line_bot_api.get_profile(user_id)
+        except:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="看來你沒有加我好友! 請先加我好友喔"))
+            return
+        #已經在掛機了 進入結算畫面 
+        if database.UserIsInAdventure(event.source.user_id) == True:
+            _nowstatus = database.getUserAdventureStatus(event.source.user_id)
+            _adventure_result = rpgGame.checkAdventureResult(_nowstatus)
+            _pet_info = database.getPetInfo(_nowstatus["pet_id"])
+            _flex_adventure_result = lineMessagePackerRpg.getAdventureNowStatus(_pet_info,_adventure_result)
+            line_bot_api.reply_message(
+                event.reply_token,
+                FlexSendMessage("目前遠征資訊",contents=_flex_adventure_result)
+                )
+            return
+        _flex_adventure = lineMessagePackerRpg.getAdventureMap()
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("遠征團地圖資訊",contents=_flex_adventure)
+            )
+    elif user_send == "@petadventureback":
+        if database.UserIsInAdventure(event.source.user_id) == False:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="沒有派處遠征軍喔!"))
+            return
+        _nowstatus = database.getUserAdventureStatus(event.source.user_id)
+        _adventure_result = rpgGame.checkAdventureResult(_nowstatus)
+        _user_job_json = database.getUserJob(event.source.user_id)
+        _user_job_json = rpgGame.addPlayerExp(_user_job_json,_adventure_result["total_exp"])
+        database.setUserJobStatus(event.source.user_id,_user_job_json)
+        database.AddUserMoneyByLineId(event.source.user_id,_adventure_result["total_money"])
+        database.ClearUserAdventureStatus(event.source.user_id)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="已招回遠征軍隊!!\n獲得EXP : "+str(_adventure_result["total_exp"])+"\n獲得金錢 : "+str(_adventure_result["total_money"])))
+    elif user_send.startswith("@petadventureGoto"):
+        if database.UserIsInAdventure(event.source.user_id) == True:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="遠征隊已經出發了喔 要查看詳請可以進入寵物資訊頁面"))
+            return
+        try:
+            _map = user_send.split(" ")[1]
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("指令格式有問題"))
+            return
+        _map_info = database.getAdventureMapInfo(_map)
+        database.setUserAdventureStatus(event.source.user_id,_map_info["map_id"])
+        line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text="掛機成功 記得要按時來領取冒險隊獎勵,最多累積24HR"))
     elif user_send == "@jobinfo":
+        user_id = event.source.user_id
+        try:
+            profile = line_bot_api.get_profile(user_id)
+        except:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="看來你沒有加我好友! 請先加我好友喔"))
         if database.checkUserHasJob(event.source.user_id) == False:
             _replyflex = lineMessagePackerRpg.getCreaterJobList()
             line_bot_api.reply_message(

@@ -7,6 +7,7 @@ import random
 import os
 import time
 import math
+from decimal import Decimal
 import copy
 import random
 from datetime import datetime, timedelta
@@ -86,6 +87,34 @@ def getMapInfo(command_map_name):
     print("冒險囉")
     print(dataBase.getMapInfp(command_map_name))
 
+def checkAdventureResult(adventure_json):
+    current =  datetime.now()
+    _begintime = datetime.strptime(adventure_json["start_time"],"%m/%d/%Y %H:%M:%S")
+    time_elapsed = (current-_begintime) #經過的掛機時間
+    time_elapsed = math.floor(time_elapsed.total_seconds())
+    if time_elapsed > 86400: #如果超過24小時 設定為一小時
+        time_elapsed = 86400
+    print(time_elapsed)
+    _monster_info = dataBase.getPetInfo(adventure_json["pet_id"])
+    _adventure_map_info = dataBase.getAdventureMapInfoById(adventure_json["map_id"])
+    _exp = _adventure_map_info["exp_min"]
+    _money =  _adventure_map_info["money_min"]
+    time_elapsed = math.floor(time_elapsed/60)
+    _pet_exp_value = int(_monster_info["other_effect"]["exp_add"].split("%")[0])
+    _pet_money_value = int(_monster_info["other_effect"]["money_add"].split("%")[0])
+    _pet_exp_percent = Decimal(_pet_exp_value/100)
+    _pet_money_percent = Decimal(_pet_money_value/100)
+    _pet_add_exp =_exp*time_elapsed*_pet_exp_percent
+    _pet_add_money = _exp*time_elapsed*_pet_money_percent
+    print("pet add:")
+    _pet_add_exp = math.ceil(_pet_add_exp)
+    _pet_add_money = math.ceil(_pet_add_money)
+    print(_pet_add_exp)
+    print(_pet_add_money)
+    _totalexp = _exp*time_elapsed+_pet_add_exp
+    _totalmoney = _money*time_elapsed+_pet_add_money
+    _result_json = {"pass_min":time_elapsed,"total_exp":_totalexp,"total_money":_totalmoney,"map_name":_adventure_map_info["map_name"],"pet_add_exp":_pet_add_exp,"pet_add_money":_pet_add_money}
+    return _result_json
 
 def goToMap(command_map_name,user_line_id):
     _replyjson={}

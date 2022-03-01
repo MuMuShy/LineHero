@@ -1,7 +1,8 @@
 import os
 import psycopg2
 from dotenv import load_dotenv
-
+import time
+from datetime import datetime, timedelta
 
 load_dotenv()
 DATABASE_URL = os.environ['DATABASE_URL']
@@ -134,6 +135,16 @@ class DataBase():
         self.cursor.execute(sql,params)
         self.conn.commit()
         self.conn.close()
+    
+    def AddUserMoneyByLineId(self,user_lind_id,money):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""UPDATE users SET user_money = user_money+(%(money)s) WHERE user_line_id = (%(line_id)s)"""
+        params = {'money':money,'line_id':user_lind_id}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+        self.conn.close()
+        print("增加:"+user_lind_id+"金錢:"+str(money))
     
     def SetUserLockedMoneyByLineId(self,user_line_id,money):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
@@ -476,7 +487,26 @@ class DataBase():
         row = self.cursor.fetchone()
         self.conn.close()
         _json = {}
-        _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7],"weapon":row[8]}
+        _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7],"weapon":row[8],"pet":row[9]}
+        print(_json)
+        return _json
+    
+    def getPetInfo(self,pet_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM pets_list where pet_id = '" +str(pet_id)+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        print(row)
+        self.conn.close()
+        _json = {}
+        _other_effect={}
+        for _line in row[3]:
+            _type = _line.split(":")[0]
+            _value = _line.split(":")[1]
+            _other_effect[_type] = _value
+        _json={"pet_id":row[0],"rare":row[2],"pet_name":row[1],"img_type":row[4],"other_effect":_other_effect}
         print(_json)
         return _json
     
@@ -535,10 +565,50 @@ class DataBase():
         print(_json)
         return _json
     
+    def getAdventureMapInfo(self,map_command_name):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM adventure_map_list where map_command_name = '" +map_command_name+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _json = {}
+        _json={"map_id":row[0],"exp_min":row[1],"money_min":row[2],"map_name":row[3],"map_command_name":row[4]}
+        print(_json)
+        return _json
+    
+    def getAdventureMapInfoById(self,map_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM adventure_map_list where adventure_map_id = '" +str(map_id)+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        self.conn.close()
+        _json = {}
+        _json={"map_id":row[0],"exp_min":row[1],"money_min":row[2],"map_name":row[3],"map_command_name":row[4]}
+        print(_json)
+        return _json
+    
     def UserIsInCombat(self,user_line_id):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
         sql ="SELECT user_line_id FROM battle_status_list where user_line_id = '"+user_line_id+"'"
+        self.cursor.execute(sql)
+        row = self.cursor.fetchone()
+        # 事物提交
+        self.conn.commit()
+        self.conn.close()
+        if row is not None:
+            return True
+        else:
+            return False
+    
+    def UserIsInAdventure(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="SELECT user_line_id FROM users_adventure_list where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         row = self.cursor.fetchone()
         # 事物提交
@@ -583,6 +653,42 @@ class DataBase():
         self.conn.commit()
         self.conn.close()
         print("進入對戰列表:"+user_line_id)
+    
+    def setUserAdventureStatus(self,user_line_id,map_id):
+        current =  datetime.now()
+        str_todatabase = (current.strftime("%m/%d/%Y %H:%M:%S"))
+        _user_pet = self.getUserJob(user_line_id)["pet"]
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""INSERT INTO users_adventure_list (user_line_id, adventure_map_id,pet_id,start_time) VALUES (%(user_line_id)s, %(adventure_map_id)s, %(pet_id)s, %(start_time)s)"""
+        params = {'user_line_id':user_line_id, 'adventure_map_id':map_id,'pet_id':_user_pet,'start_time':str_todatabase,}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+        self.conn.close()
+        print("進入探險隊列表:"+user_line_id)
+    
+    def getUserAdventureStatus(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="SELECT * FROM users_adventure_list where user_line_id = '"+user_line_id+"'"
+        self.cursor.execute(sql)
+        row = self.cursor.fetchone()
+        # 事物提交
+        self.conn.commit()
+        self.conn.close()
+        print(row)
+        _json ={"user_line_id":row[0],"map_id":row[1],"pet_id":row[2],"start_time":row[3]}
+        return _json
+    
+    def ClearUserAdventureStatus(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="DELETE FROM users_adventure_list where user_line_id = '"+user_line_id+"'"
+        self.cursor.execute(sql)
+        # 事物提交
+        self.conn.commit()
+        self.conn.close()
+        print("清空探險隊:"+user_line_id)
     
     def UpdateUserBattleStatus(self,user_line_id,monster_id,now_turn,monster_hp):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')

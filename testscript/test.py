@@ -1,6 +1,6 @@
 import time
 from datetime import datetime, timedelta
-import random
+
 t1 = time.localtime()
 current =  datetime.now()
 print(current)
@@ -14,7 +14,4 @@ print(target)
 time_elapsed = (target-current)
 print(time_elapsed.total_seconds())
 
-a = 100
-b = 0.9
-print(int(a*b))
 
