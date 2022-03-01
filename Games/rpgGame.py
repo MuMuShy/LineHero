@@ -46,7 +46,7 @@ def checkstrjobLegal(job):
     else:
         return False
 def checkstrMapLegal(map_command):
-    _maps = ["forest","elfforest"]
+    _maps = ["forest","elfforest","barbarian"]
     if map_command in _maps:
         return True
     else:
@@ -73,9 +73,9 @@ def getMaxHp(job,level):
     if job == "warrior":
         return level*150
     elif job =="majic":
-        return level*100
+        return level*100+level*10*2.5
     elif job =="rog":
-        return level*70
+        return level*70+level*10*1.5
 
 def getMaxExp(level):
     level = int(level)
@@ -223,6 +223,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
             print(_afterjson)
             skill_effec = "觸發法師被動技能! 賢者之力 增加INT30% 目前INT:"+str(_afterjson["int"])
             baseAttack = getJobAttackByjson(_afterjson)
+    #BASE ATTACK 戰士STR*1.3 法師INT*2 盜賊DEX*1.5
     #基礎傷害 -> 骰子 * 能力點   
     attackpow = getJobRollResult(_playerjob)
     #基礎爆擊率  戰士: 10% 盜賊 30% 法師 20% 基礎爆擊傷害: 1.3
@@ -234,8 +235,12 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     
     print("武器傷害:"+str(_weaponpow))
     _attack_result = int(int(baseAttack*attackpow)+int(_weaponpow)*_credit)
+    #法師武器攻擊會另外算魔法傷害
     if _playerjob == "majic":
-        _weaponpow += 1+(1*int(_weapon_info["other_effect"]["matk_add"]))
+        try:
+            _weaponpow += 1+(1*int(_weapon_info["other_effect"]["matk_add"]))
+        except:
+            _weaponpow = _weaponpow
     #浮動率 85~120%
     _random = random.randrange(85,120)
     _attack_result*=_random/100

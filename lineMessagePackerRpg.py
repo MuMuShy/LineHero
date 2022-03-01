@@ -823,7 +823,7 @@ def getExperList():
                 "type": "button",
                 "action": {
                 "type": "message",
-                "label": "封閉中",
+                "label": "出發",
                 "text": "@goto barbarian"
                 },
                 "margin": "xs",
