@@ -1,3 +1,4 @@
+import decimal
 from attr import dataclass
 import psycopg2
 from psycopg2.extras import Json
@@ -162,21 +163,29 @@ def getJobCreditResult(_job,weapon_info):
     _addcredit = 0
     _addcreditdmg = 0
     _creditdmg = 1.3
+
     try:
-        _addcredit+=weapon_info["credit_add"]
+        _weapon_credit = decimal.Decimal(weapon_info["other_effect"]["credit_add"].split("%")[0])
+        print("武器增加爆擊機率:"+str(_weapon_credit))
+        _addcredit+=_weapon_credit
     except:
         _addcredit = 0
+        
     try:
-        _addcreditdmg=weapon_info["credit_damage_add"]/100
-        _creditdmg+=_addcreditdmg
+        _addcreditdmg_percent = int(weapon_info["other_effect"]["credit_damage_add"])
+        _addcreditdmg_percent = _addcreditdmg_percent/100
+        print("武器增加爆商:"+str(_addcreditdmg_percent))
+        _creditdmg+=_addcreditdmg_percent
+        print("爆擊傷害:"+str(_creditdmg))
     except:
         _creditdmg = 1.3
+
     _basic+=_addcredit
     _basic = 100-_basic
     if _basic<=0:
         _basic = 0
     _result = random.randrange(0,100)
-    print("爆擊率:"+str(100-_basic)+" 骰出:"+str(_result))
+    print("爆擊 要骰大於:"+str(_basic)+" 骰出:"+str(_result))
     if _result >= _basic:
         #爆擊
         return _creditdmg
@@ -262,14 +271,19 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     #武器數值計算
     _weaponpow = getJobWeaponAttackByjson(_user_job_temp,_weapon_info["atk_add"])
     
-    print("武器傷害:"+str(_weaponpow))
-    _attack_result = int(int(baseAttack*attackpow)+int(_weaponpow)*_credit)
+    
     #法師武器攻擊會另外算魔法傷害
     if _playerjob == "majic":
         try:
-            _weaponpow += 1+(1*int(_weapon_info["other_effect"]["matk_add"]))
+            _majic_weaponpower = int(_weapon_info["other_effect"]["matk_add"])
+            _majic_weaponpower = _majic_weaponpower/100
+            _weaponpow += 1+(1*_majic_weaponpower)
+            print("法師Weapon power"+str(_majic_weaponpower))
         except:
             _weaponpow = _weaponpow
+
+    print("武器傷害:"+str(_weaponpow))
+    _attack_result = int(int(baseAttack*attackpow)+int(_weaponpow)*_credit)
     #浮動率 85~120%
     _random = random.randrange(85,120)
     _attack_result*=_random/100
@@ -277,12 +291,23 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     _monster_base_info = dataBase.getMonsterInfo(_target_monster_id)
     _monster_hp = monster_hp-_attack_result
     _monsterAttack = int(random.randrange(int(_monster_base_info["attack"]*0.7),int(_monster_base_info["attack"])))
+
+    #盜賊閃避機制
+    if _playerjob =="rog":
+        _avoid_str=""
+        _avoid_damage = random.randrange(0,100)
+        if _avoid_damage >= 70:
+            _avoid_str="\n盜賊觸發閃避!(30%) 免疫此輪傷害"
+            _monsterAttack = 0
+
     _playerhp = _user_job_json["hp"] - _monsterAttack
     if _playerjob =="rog":
         _playerhp+=int(_attack_result*0.1)
         if _playerhp > getMaxHp(_playerjob,_user_job_json["level"]):
             _playerhp = getMaxHp(_playerjob,_user_job_json["level"])
-        skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))
+        skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))+_avoid_str
+        
+
     _result={}
     if _playerhp <= 0:
         _playerhp = 0

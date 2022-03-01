@@ -2148,7 +2148,7 @@ def getRoundMonsterAliveButton(game_result_json):
                     }
                     ],
                     "width": str(_present)+"%",
-                    "backgroundColor": "#0D8186",
+                    "backgroundColor": "#ff0000",
                     "height": "6px"
                 }
                 ],
