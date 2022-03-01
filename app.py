@@ -354,13 +354,14 @@ def handle_message(event):
             if _game_result_json["Result"] == "monster_alive":
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
                 _monsterFlex = lineMessagePackerRpg.getMonsterPacker(_monsterbase,_game_result_json["monster_result_json"]["hp"])
+                _lastFlex = lineMessagePackerRpg.getRoundMonsterAliveButton(_game_result_json)
                 _strtext = "遭到怪物攻擊:"+ str(_game_result_json["mosnter_damage"]) +" 玩家剩餘血量:"+ str(_game_result_json["player_result_json"]["hp"])
                 line_bot_api.reply_message(
                     event.reply_token,[
                     FlexSendMessage("攻擊!",contents=_attackbtnFlex),
                     TextSendMessage(text = _str_skill_text),
                     FlexSendMessage("怪物存活!",contents=_monsterFlex),
-                    TextSendMessage(text = _strtext),])
+                    FlexSendMessage("怪物存活" ,contents= _lastFlex),])
             elif _game_result_json["Result"] =="win":
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
                 _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])+ "金幣:" + str(_game_result_json["get_money"])+"\n"+"剩餘血量:"+str(_game_result_json["player_result_json"]["hp"])+"/"+str(rpgGame.getMaxHp(_game_result_json["player_result_json"]["job"],_game_result_json["player_result_json"]["level"]))

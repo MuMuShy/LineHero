@@ -288,7 +288,13 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
             _monster_base_info["hp"] = _monster_hp
             _result={"Result":"monster_alive","dice_result":attackpow,"mosnter_damage":_monsterAttack,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"skill_efect":skill_effec,"is_credit":_isCredit}
     else:
-        
+        if _playerjob =="rog":
+            _temp = _user_job_json["hp"]
+            _temp+=int(_attack_result*0.1)
+            if _temp > getMaxHp(_playerjob,_user_job_json["level"]):
+                _temp = getMaxHp(_playerjob,_user_job_json["level"])
+            _user_job_json["hp"] = _temp
+        skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))
         #統計職業效果觸發
         _end_job_result = ""
         #掉落金錢 先隨機

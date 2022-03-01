@@ -1,6 +1,8 @@
 
 import json
 
+from Games import rpgGame
+
 
 def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
     print(user_job_info)
@@ -1966,6 +1968,156 @@ def getSkillList(_player_job_json):
             },
             "body": {
             "backgroundColor": "#142952"
+            }
+        }
+        }
+    ]
+    }
+    return json
+
+#獲得怪物傷害,玩家剩餘血量的結果按鈕
+def getRoundMonsterAliveButton(game_result_json):
+    _maxhp = rpgGame.getMaxHp(game_result_json["player_result_json"]["job"],game_result_json["player_result_json"]["level"])
+    _present = (game_result_json["player_result_json"]["hp"]/_maxhp)*100
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "怪物傷害",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": str(game_result_json["mosnter_damage"]),
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#FF6B6E",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "color": "#8C8C8C",
+                    "size": "xs",
+                    "wrap": True,
+                    "text": "傷害計算公式:"
+                },
+                {
+                    "type": "text",
+                    "color": "#8C8C8C",
+                    "size": "xs",
+                    "wrap": True,
+                    "text": "(怪物基礎傷害*浮動)-玩家防禦"
+                }
+                ],
+                "flex": 1
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "補血",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "剩餘血量: "+str(game_result_json["player_result_json"]["hp"]),
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "width": str(_present)+"%",
+                    "backgroundColor": "#0D8186",
+                    "height": "6px"
+                }
+                ],
+                "backgroundColor": "#9FD8E36E",
+                "height": "6px",
+                "margin": "sm"
+            }
+            ],
+            "backgroundColor": "#27ACB2",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "$5000",
+                "text": "@health"
+                },
+                "style": "primary"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
             }
         }
         }
