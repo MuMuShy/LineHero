@@ -468,12 +468,15 @@ class DataBase():
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         self.cursor = self.conn.cursor()
         _weapon = 1
+        _pet = 2
         if jobs =="rog":
             _weapon = 2
+            _pet = 1
         elif jobs =="majic":
             _weapon = 3
-        sql ="""INSERT INTO users_job (user_line_id, jobs, str, dex, intelligence, level, hp, exp, equipment_weapon) VALUES (%(user_line_id)s, %(jobs)s,10,10,10,1,%(maxhp)s,0,%(weapon)s)"""
-        params = {'user_line_id':user_line_id, 'jobs':jobs,'maxhp':maxhp,'weapon':_weapon}
+            _pet = 3
+        sql ="""INSERT INTO users_job (user_line_id, jobs, str, dex, intelligence, level, hp, exp, equipment_weapon,equipment_pet) VALUES (%(user_line_id)s, %(jobs)s,10,10,10,1,%(maxhp)s,0,%(weapon)s,%(pet)s)"""
+        params = {'user_line_id':user_line_id, 'jobs':jobs,'maxhp':maxhp,'weapon':_weapon,'pet':_pet}
         self.cursor.execute(sql,params)
         self.conn.commit()
         self.conn.close()
