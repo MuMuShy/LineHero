@@ -2733,3 +2733,4 @@ def getAdventureNowStatus(pet_info_json,adventure_info_json):
     }
     }
     return json
+

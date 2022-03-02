@@ -1306,3 +1306,185 @@ def getJackPotFlex(_jpjson):
     }
     }
     return json
+
+def getBugReport():
+    json = {
+    "type": "bubble",
+    "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+        {
+            "type": "text",
+            "text": "BUG回報&建議",
+            "weight": "bold",
+            "color": "#1DB446",
+            "size": "sm"
+        },
+        {
+            "type": "text",
+            "text": "感謝您的遊玩",
+            "weight": "bold",
+            "size": "xxl",
+            "margin": "md"
+        },
+        {
+            "type": "text",
+            "text": "目前遊戲還只是開發階段,有一些有趣的小東西都在慢慢實現,怪物的圖片等等也會在未來進行外包的方式取得",
+            "size": "xs",
+            "color": "#aaaaaa",
+            "wrap": True
+        },
+        {
+            "type": "separator",
+            "margin": "xxl"
+        },
+        {
+            "type": "box",
+            "layout": "vertical",
+            "margin": "xxl",
+            "spacing": "sm",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "LINE: @mumustudio",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "E-MAIL:  mumushy850421@gmail.com",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "separator",
+                "margin": "xxl"
+            },
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "margin": "xxl",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "python後端工程師",
+                    "size": "sm",
+                    "color": "#555555"
+                },
+                {
+                    "type": "text",
+                    "text": "缺",
+                    "size": "sm",
+                    "color": "#111111",
+                    "align": "end"
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "前端工程師",
+                    "size": "sm",
+                    "color": "#555555"
+                },
+                {
+                    "type": "text",
+                    "text": "缺",
+                    "size": "sm",
+                    "color": "#111111",
+                    "align": "end"
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "美術設計(2d)",
+                    "size": "sm",
+                    "color": "#555555"
+                },
+                {
+                    "type": "text",
+                    "text": "缺",
+                    "size": "sm",
+                    "color": "#111111",
+                    "align": "end"
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "遊戲企劃",
+                    "size": "sm",
+                    "color": "#555555"
+                },
+                {
+                    "type": "text",
+                    "text": "缺",
+                    "size": "sm",
+                    "color": "#111111",
+                    "align": "end"
+                }
+                ]
+            }
+            ]
+        },
+        {
+            "type": "separator",
+            "margin": "xxl"
+        },
+        {
+            "type": "box",
+            "layout": "vertical",
+            "margin": "md",
+            "contents": [
+            {
+                "type": "text",
+                "text": "遊戲中如有任何素材疑慮請立即聯繫我們 ",
+                "size": "xs",
+                "color": "#aaaaaa",
+                "flex": 0
+            },
+            {
+                "type": "text",
+                "text": "也歡迎有上述技能的小夥伴加入開發團隊",
+                "size": "xs",
+                "color": "#aaaaaa",
+                "flex": 0
+            }
+            ]
+        }
+        ]
+    },
+    "styles": {
+        "footer": {
+        "separator": True
+        }
+    }
+    }
+    return json

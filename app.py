@@ -106,6 +106,11 @@ def handle_message(event):
         line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=_reply))
+    if user_send =="@bugreport":
+        line_bot_api.reply_message(
+                event.reply_token,
+                FlexSendMessage("BUG回報",contents=lineMessagePacker.getBugReport()))
+        return
     if user_send =="!ranking":
         top5 = database.getTop5Ranking()
         line_bot_api.reply_message(
