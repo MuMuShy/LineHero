@@ -48,7 +48,7 @@ def checkstrjobLegal(job):
     else:
         return False
 def checkstrMapLegal(map_command):
-    _maps = ["forest","elfforest","barbarian"]
+    _maps = ["forest","elfforest","barbarian","ghostroad"]
     if map_command in _maps:
         return True
     else:
@@ -199,9 +199,9 @@ def getJobAttackByjson(_user_job_json):
     if _job == "warrior":
         return _user_job_json["str"]*1.3
     elif _job =="majic":
-        return _user_job_json["int"]*2
+        return _user_job_json["int"]*1.6
     elif _job =="rog":
-        return _user_job_json["dex"]*1.5
+        return _user_job_json["dex"]*1.7
 
 def getJobWeaponAttackByjson(_user_job_json,weapon_atk):
     _job = _user_job_json["job"]
