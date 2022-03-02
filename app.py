@@ -399,12 +399,12 @@ def handle_message(event):
             return
         print("花費10000回滿血")
         _money =  int(database.getUserMoney(event.source.user_id))
-        if _money - 5000 < 0:
+        if _money - 1500 < 0:
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="沒錢還敢補血啊...."))
             return
-        _money-=5000
+        _money-=1500
         _user_job = database.getUserJob(event.source.user_id)
         _maxhp = rpgGame.getMaxHp(_user_job["job"],_user_job["level"])
         database.setUserMaxHp(event.source.user_id,_maxhp)

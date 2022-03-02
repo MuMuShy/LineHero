@@ -86,7 +86,7 @@ def getMaxExp(level):
 
 def getMapInfo(command_map_name):
     print("冒險囉")
-    print(dataBase.getMapInfp(command_map_name))
+    print(dataBase.getMapInfo(command_map_name))
 
 def checkAdventureResult(adventure_json):
     current =  datetime.now()
@@ -360,6 +360,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
                 _user_job_json["hp"] = _maxhp
             _end_job_result ="觸發戰士被動效果 戰士精神 回復血量:"+str(int(_health))
         _money = random.randrange(500,2000)
+        _money+=_user_job_json["level"]*30
         _originmoney = int(dataBase.getUserMoney(_user_line_id))+_money
         dataBase.SetUserMoneyByLineId(_user_line_id,_originmoney)
         dataBase.ClearUserBattle(_user_line_id)

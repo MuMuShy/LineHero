@@ -1523,7 +1523,7 @@ def getBattleEnd(game_result_json):
                 },
                 {
                     "type": "text",
-                    "text": "花費:$5000",
+                    "text": "花費:$1500",
                     "size": "xs"
                 },
                 {
@@ -2298,7 +2298,7 @@ def getRoundMonsterAliveButton(game_result_json):
                 "type": "button",
                 "action": {
                 "type": "message",
-                "label": "$5000",
+                "label": "$1500",
                 "text": "@health"
                 },
                 "style": "primary"
