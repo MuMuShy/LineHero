@@ -1797,151 +1797,6 @@ def getJobInfoSubMenu():
     }
     return json
 
-def getEquipmentNow(weapon_json):
-    from Games import rpgDictionary
-    url = "https://mumu.tw/images/weapons/"+str(weapon_json["weapon_id"])+"."+weapon_json["img_type"]
-    _start_list =["https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
-    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
-    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
-    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
-    "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"]
-    _rare = int(weapon_json["rare"])-1
-    _star = 0
-    for i in range(0,_rare):
-        _start_list[i] = "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
-        _star+=1
-    contents = [
-                    {
-                        "type": "text",
-                        "text": "STR + "+str(weapon_json["str_add"]),
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5
-                    },
-                    {
-                        "type": "text",
-                        "text": "DEX + "+str(weapon_json["dex_add"]),
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5
-                    },
-                    {
-                        "type": "text",
-                        "text": "INT + "+str(weapon_json["int_add"]),
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5
-                    },
-                    {
-                        "type": "text",
-                        "text": "攻擊力 + "+str(weapon_json["atk_add"]),
-                        "wrap": True,
-                        "color": "#8c8c8c",
-                        "size": "xs",
-                        "flex": 5
-                    },
-
-    ]
-    for i in weapon_json["other_effect"]:
-        _effectchinese = rpgDictionary.getChineseEffectName(i)
-        print (weapon_json["other_effect"])
-        contents.append(
-            {
-                        "type": "text",
-                        "text": _effectchinese+" : +"+str(weapon_json["other_effect"][i]),
-                        "wrap": True,
-                        "color": "#ff0000",
-                        "size": "xs",
-                        "flex": 5
-            }
-        )
-
-    json = {
-    "type": "carousel",
-    "contents": [
-        {
-        "type": "bubble",
-        "size": "micro",
-        "hero": {
-            "type": "image",
-            "size": "full",
-            "aspectMode": "cover",
-            "aspectRatio": "320:213",
-            "url": url
-        },
-        "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-            {
-                "type": "text",
-                "text": weapon_json["weapon_name"],
-                "weight": "bold",
-                "size": "sm",
-                "wrap": True
-            },
-            {
-                "type": "box",
-                "layout": "baseline",
-                "contents": [
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": _start_list[0]
-                },
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": _start_list[1]
-                },
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": _start_list[2]
-                },
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": _start_list[3]
-                },
-                {
-                    "type": "icon",
-                    "size": "xs",
-                    "url": _start_list[4]
-                },
-                {
-                    "type": "text",
-                    "text": str(_star)+".0",
-                    "size": "xs",
-                    "color": "#8c8c8c",
-                    "margin": "md",
-                    "flex": 0
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                {
-                    "type": "box",
-                    "layout": "vertical",
-                    "spacing": "sm",
-                    "contents": contents
-                }
-                ]
-            }
-            ],
-            "spacing": "sm",
-            "paddingAll": "13px"
-        }
-        }
-     ]
-    }
-    return json
 
 def getRpgTop5Rank(top5rankarr):
     json = {
@@ -2740,13 +2595,16 @@ def getEquipmentList(_weapon_json_list):
     index = 0 # 0的時候為裝備中道具
     bubble_contents=[]
     for weapon in _weapon_json_list:
+        _buttontext = "@changeequipment "+str(weapon["backpack_loc"])
         if index == 0:
             _btnstyle = "secondary"
             _btnlabel = "裝備中"
+            _buttontext = " "
         else:
             _btnstyle = "primary"
             _btnlabel = "裝備"
-        _buttontext = "@changeequipment "+str(weapon["backpack_loc"])
+        
+        
         url = "https://mumu.tw/images/weapons/"+str(weapon["weapon_id"])+"."+weapon["img_type"]
         _start_list =["https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
         "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
