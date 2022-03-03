@@ -340,7 +340,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
             dataBase.UpdateUserBattleStatus(_user_line_id,_target_monster_id,"player",_monster_hp)
             dataBase.setUserJobStatus(_user_line_id,_user_job_json)
             _monster_base_info["hp"] = _monster_hp
-            _result={"Result":"monster_alive","dice_result":attackpow,"mosnter_damage":_monsterAttack,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"skill_efect":skill_effec,"is_credit":_isCredit}
+            _result={"Result":"monster_alive","dice_result":attackpow,"mosnter_damage":_monsterAttack,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"skill_efect":skill_effec,"is_credit":_isCredit,"weapon_info":_weapon_info}
     else:
         if _playerjob =="rog":
             _temp = _user_job_json["hp"]
@@ -370,7 +370,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
         if _user_job_json["level"] > _origlevel:
             _islevelup = True
         dataBase.setUserJobStatus(_user_line_id,_user_job_json)
-        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec,"is_credit":_isCredit}
+        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec,"is_credit":_isCredit,"weapon_info":_weapon_info}
 
     return _result
     

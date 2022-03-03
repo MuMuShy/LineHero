@@ -1,7 +1,6 @@
 
 import json
 from re import L
-import requests
 from Games import rpgDictionary, rpgGame
 
 
@@ -1128,11 +1127,10 @@ def getAttackButton(_totaldamage,_gameResult):
         _dicenum = 2
 
     _weapon = _gameResult["player_result_json"]["weapon"]
+    _imgtype = _gameResult["weapon_info"]["img_type"]
     
-    _weapon_url = 'https://mumu.tw/images/weapons/'+str(_weapon)+".png"
-    r = requests.get(_weapon_url)
-    if r.status_code == 404:
-        _weapon_url = 'https://mumu.tw/images/weapons/'+str(_weapon)+".jpg"
+    _weapon_url = 'https://mumu.tw/images/weapons/'+str(_weapon)+"."+_imgtype
+
     json = {
     "type": "carousel",
     "contents": [
