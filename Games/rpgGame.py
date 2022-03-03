@@ -245,7 +245,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     _playerjob = _user_job_json["job"]
     print("職業:"+_playerjob)
     skill_effec = "無觸發交戰技能"
-    _weapon_info = dataBase.getWeaponInfo(_user_job_json["weapon"])
+    _weapon_info = dataBase.getUserEquipmentWeapon(_user_line_id)
     _user_job_temp = copy.deepcopy(_user_job_json)
     _user_job_temp["str"]+=_weapon_info["str_add"]
     _user_job_temp["int"]+=_weapon_info["int_add"]

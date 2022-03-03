@@ -167,7 +167,7 @@ def handle_message(event):
                 _jobjson = database.getUserJob(event.source.user_id)
                 _imglink = _userjson["user_img_link"]
                 _rank = database.getUserRpgRank(event.source.user_id)
-                _weapon = database.getWeaponInfo(_jobjson["weapon"])
+                _weapon = database.getUserEquipmentWeapon(event.source.user_id)
                 _flex = lineMessagePackerRpg.getJobInfo(_imglink,_jobjson,_rank,_weapon)
                 _flex_sub_menu = lineMessagePackerRpg.getJobInfoSubMenu()
                 line_bot_api.reply_message(
@@ -274,7 +274,7 @@ def handle_message(event):
         profile = line_bot_api.get_profile(event.source.user_id)
         user_line_img = profile.picture_url
         _rank = database.getUserRpgRank(event.source.user_id)
-        _weapon = database.getWeaponInfo(_jobjson["weapon"])
+        _weapon = database.getUserEquipmentWeapon(event.source.user_id)
         _packagejson = lineMessagePackerRpg.getJobInfo(user_line_img,_jobjson,_rank,_weapon)
         _flex_sub_menu = lineMessagePackerRpg.getJobInfoSubMenu()
         line_bot_api.reply_message(
@@ -298,15 +298,27 @@ def handle_message(event):
             event.reply_token,
             FlexSendMessage("冒險列表",contents=_reply))
     elif user_send == "@equipment":
-        #先未開放
-        _user_weapon = database.getUserJob(event.source.user_id)["weapon"]
-        print(_user_weapon)
-        _weaponjson = database.getWeaponInfo(_user_weapon)
-        _flex_equipment = lineMessagePackerRpg.getEquipmentNow(_weaponjson)
+        _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
+        _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list)
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage("裝備列表",contents=_flex_equipment))
         return
+    elif user_send.startswith("@changeequipment"):
+        try:
+            loc = int(user_send.split(" ")[1])
+        except:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="裝備編號好像有問題呢.."))
+            return
+        database.changeEquipmentWeapon(event.source.user_id,loc)
+        _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
+        _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list)
+        line_bot_api.reply_message(
+            event.reply_token,[
+            TextSendMessage(text="切換裝備成功"),
+            FlexSendMessage("切換裝備",contents=_flex_equipment)])
     elif user_send =="@skill":
         _status = database.getUserJob(event.source.user_id)
         _skillflex = lineMessagePackerRpg.getSkillList(_status)

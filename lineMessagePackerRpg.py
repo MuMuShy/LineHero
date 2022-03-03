@@ -1126,9 +1126,10 @@ def getAttackButton(_totaldamage,_gameResult):
     else:
         _dicenum = 2
 
-    _weapon = _gameResult["player_result_json"]["weapon"]
+    _weapon = _gameResult["weapon_info"]["weapon_id"]
     _imgtype = _gameResult["weapon_info"]["img_type"]
     
+    print("img type:"+_imgtype)
     _weapon_url = 'https://mumu.tw/images/weapons/'+str(_weapon)+"."+_imgtype
 
     json = {
@@ -2734,3 +2735,173 @@ def getAdventureNowStatus(pet_info_json,adventure_info_json):
     }
     return json
 
+def getEquipmentList(_weapon_json_list):
+    from Games import rpgDictionary
+    index = 0 # 0的時候為裝備中道具
+    bubble_contents=[]
+    for weapon in _weapon_json_list:
+        if index == 0:
+            _btnstyle = "secondary"
+            _btnlabel = "裝備中"
+        else:
+            _btnstyle = "primary"
+            _btnlabel = "裝備"
+        _buttontext = "@changeequipment "+str(weapon["backpack_loc"])
+        url = "https://mumu.tw/images/weapons/"+str(weapon["weapon_id"])+"."+weapon["img_type"]
+        _start_list =["https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"]
+        _rare = int(weapon["rare"])-1
+        _star = 0
+        for i in range(0,_rare):
+            _start_list[i] = "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+            _star+=1
+            contents = [
+                            {
+                                "type": "text",
+                                "text": "STR + "+str(weapon["str_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "DEX + "+str(weapon["dex_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "INT + "+str(weapon["int_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "攻擊力 + "+str(weapon["atk_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+
+            ]
+        for i in weapon["other_effect"]:
+            _effectchinese = rpgDictionary.getChineseEffectName(i)
+            print (weapon["other_effect"])
+            contents.append(
+                {
+                            "type": "text",
+                            "text": _effectchinese+" : +"+str(weapon["other_effect"][i]),
+                            "wrap": True,
+                            "color": "#ff0000",
+                            "size": "xs",
+                            "flex": 5
+                }
+            )
+        bubbble = {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213",
+            "url": url
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": weapon["weapon_name"],
+                "weight": "bold",
+                "size": "sm",
+                "wrap": True
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[0]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[1]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[2]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[3]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[4]
+                },
+                {
+                    "type": "text",
+                    "text": str(_star)+".0",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": contents
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                 "type": "button",
+                "action": {
+                "type": "message",
+                "label": _btnlabel,
+                "text": _buttontext
+                },
+                "style": _btnstyle
+            }
+            ]
+        }
+        }
+        index+=1
+        bubble_contents.append(bubbble)
+    json = {
+    "type": "carousel",
+    "contents":bubble_contents
+    }
+    return json
