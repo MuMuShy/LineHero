@@ -725,3 +725,12 @@ class DataBase():
         self.conn.commit()
         self.conn.close()
         print("更新對戰逃跑列表:"+user_line_id)
+    
+    def clearDailyRequest(self):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""UPDATE users SET daily_request_done = false"""
+        self.cursor.execute(sql)
+        self.conn.commit()
+        self.conn.close()
+        print("0.00 DAILY CLEAR REQUEST DONE")
