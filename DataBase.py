@@ -640,8 +640,11 @@ class DataBase():
         else:
             return num+1
     
-    def addToUserBackPack(self,user_line_id,item_type,item_id,quantity):
-        _nowpackindex = self.checkUserPackMaxLoc(user_line_id)
+    def addToUserBackPack(self,user_line_id,item_type,item_id,quantity,loc=-1):
+        if loc ==-1:
+            _nowpackindex = self.checkUserPackMaxLoc(user_line_id)
+        else:
+            _nowpackindex = loc
         self.cursor = self.conn.cursor()
         sql ="""INSERT INTO user_backpack (user_line_id, backpack_loc,item_type,item_id,quantity) VALUES (%(user_line_id)s, %(backpack_loc)s, %(item_type)s, %(item_id)s,%(quantity)s)"""
         params = {'user_line_id':user_line_id,'backpack_loc':_nowpackindex,'item_type':item_type,'item_id':item_id,'quantity':quantity}

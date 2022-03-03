@@ -2599,7 +2599,7 @@ def getEquipmentList(_weapon_json_list):
         if index == 0:
             _btnstyle = "secondary"
             _btnlabel = "裝備中"
-            _buttontext = " "
+            _buttontext = ""
         else:
             _btnstyle = "primary"
             _btnlabel = "裝備"
