@@ -15,12 +15,24 @@ def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
     if user_job_info['job'] == "warrior":
         maxhp = rpgGame.getMaxHp("warrior",user_job_info["level"])        
         jobrul = "https://mumu.tw/images/game_icons/icon_itemicon_sword.png"
+        _jobtext="戰士一轉"
+        _weponatk = 1+(equipment_weapon_info["atk_add"]/100)*equipment_weapon_info["atk_add"]*1.3
+        _atk = user_job_info["str"]*1.3*_weponatk
+        _matk = 0
     elif user_job_info['job'] == "majic":
         maxhp = rpgGame.getMaxHp("majic",user_job_info["level"])     
         jobrul = "https://mumu.tw/images/game_icons/icon_itemicon_book_magic.png"
+        _jobtext="法師一轉"
+        _weponatk = 1+(equipment_weapon_info["atk_add"]/100)*equipment_weapon_info["atk_add"]*1.7
+        _atk = 0
+        _matk = user_job_info["int"]*1.6*_weponatk
     else:
         maxhp = rpgGame.getMaxHp("rog",user_job_info["level"])   
         jobrul = "https://mumu.tw/images/game_icons/icon_itemicon_arrow.png"
+        _jobtext="盜賊一轉"
+        _matk = 0
+        _weponatk = 1+(equipment_weapon_info["dex_add"]/100)*equipment_weapon_info["dex_add"]*1.5
+        _atk = user_job_info["dex"]*1.7*_weponatk
     if user_job_info["hp"] !=0:
         _hppersent = int((user_job_info["hp"]/maxhp)*100)
     else:
@@ -163,20 +175,6 @@ def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
                     ]
                 },
                 {
-                    "type": "box",
-                    "layout": "baseline",
-                    "contents": [
-                    {
-                        "type": "text",
-                        "text": "STR :"+str(user_job_info["str"])+"+("+str(equipment_weapon_info["str_add"])+")"+"/ INT"+str(user_job_info["int"])+"+("+str(equipment_weapon_info["int_add"])+")"+"/ DEX"+str(user_job_info["dex"])+"+("+str(equipment_weapon_info["dex_add"])+")",
-                        "color": "#ffffff",
-                        "flex": 0,
-                        "size": "sm"
-                    }
-                    ],
-                    "spacing": "lg"
-                },
-                {
                     "type": "button",
                     "action": {
                     "type": "message",
@@ -221,7 +219,260 @@ def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
             ],
             "paddingAll": "0px"
         }
-        }
+        },
+    {
+      "type": "bubble",
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "image",
+            "url": "https://mumu.tw/images/game_ui/job_bkg.jpg",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "2:3",
+            "gravity": "top"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "JOB",
+                    "color": "#ffffff",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": _jobtext,
+                        "color": "#a366ff",
+                        "size": "sm",
+                        "flex": 0
+                      }
+                    ],
+                    "spacing": "lg",
+                    "margin": "none",
+                    "justifyContent": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "STR ",
+                    "color": "#ffffff",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": str(user_job_info["str"])+"+("+str(equipment_weapon_info["str_add"])+")",
+                        "color": "#e60000",
+                        "size": "sm",
+                        "flex": 0
+                      }
+                    ],
+                    "spacing": "lg",
+                    "justifyContent": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "INT",
+                    "color": "#ffffff",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": str(user_job_info["int"])+"+("+str(equipment_weapon_info["int_add"])+")",
+                        "color": "#b380ff",
+                        "size": "sm",
+                        "flex": 0
+                      }
+                    ],
+                    "spacing": "lg",
+                    "justifyContent": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "DEX",
+                    "color": "#ffffff",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": str(user_job_info["dex"])+"+("+str(equipment_weapon_info["dex_add"])+")",
+                        "color": "#99ebff",
+                        "size": "sm",
+                        "flex": 0
+                      }
+                    ],
+                    "spacing": "lg",
+                    "justifyContent": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "ATK",
+                    "color": "#ffffff",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": str(_atk),
+                        "color": "#ff6666",
+                        "size": "sm",
+                        "flex": 0,
+                        "weight": "bold",
+                        "align": "center"
+                      }
+                    ],
+                    "spacing": "xs",
+                    "justifyContent": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "MATK",
+                    "color": "#ffffff",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": str(_matk),
+                        "color": "#ff8080",
+                        "size": "sm",
+                        "flex": 0,
+                        "align": "center"
+                      }
+                    ],
+                    "spacing": "xs",
+                    "justifyContent": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "DEFEND",
+                    "color": "#ffffff",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "1000",
+                        "color": "#ffffff",
+                        "size": "sm",
+                        "flex": 0
+                      }
+                    ],
+                    "spacing": "lg",
+                    "justifyContent": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "公會",
+                    "color": "#ffffff",
+                    "weight": "bold"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "未加入(開發中)",
+                        "color": "#ffffff",
+                        "size": "sm",
+                        "flex": 0
+                      }
+                    ],
+                    "spacing": "lg",
+                    "justifyContent": "center"
+                  }
+                ]
+              }
+            ],
+            "position": "absolute",
+            "offsetBottom": "0px",
+            "offsetStart": "0px",
+            "offsetEnd": "0px",
+            "paddingAll": "20px",
+            "paddingTop": "20px",
+            "height": "450px",
+            "borderWidth": "20px",
+            "backgroundColor": "#0d0d0d80"
+          }
+        ],
+        "paddingAll": "0px"
+      }
+    }
     ]
     }
     return json

@@ -342,11 +342,11 @@ class DataBase():
 
 if __name__ == "__main__":
     database = DataBase()
-    _id = 'Ufff9a87d16c9301ba6b3bb5c53d614b4'
+    _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     #database.checkUserPackMaxLoc(_id)
     loc = database.checkUserPackMaxLoc(_id)
-    database.addToUserWeapon(_id,5,loc,999,999,999,999)
-    database.addToUserBackPack(_id,"weapon",5,loc)
+    database.addToUserWeapon(_id,2,loc,0,0,0,0)
+    database.addToUserBackPack(_id,"weapon",2,loc)
     #database.checkUserPackMaxLoc(_id)
     #database.removeFromUserBackPack(_id,1)
     #database.checkUserPackMaxLoc(_id)
