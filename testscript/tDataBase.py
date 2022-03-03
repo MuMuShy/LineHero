@@ -166,12 +166,42 @@ class DataBase():
         sql ="""UPDATE users SET user_money = """+str(money)+"""WHERE user_id = """+str(user_line_id)
         self.cursor.execute(sql)
         self.conn.commit()
+        row = self.cursor.fetchone()
+        print(row)
         self.conn.close()
+
+
+    def checkUserPack(self,user_line_id):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        sql ="""select max(backpack_loc) from user_backpack where user_line_id =(%(line_id)s) """
+        params = {'line_id':user_line_id}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        num = row[0]
+        self.conn.close()
+        if num == None:
+            return 0
+        else:
+            return num+1
+    
+    def putToUserBackPack(self,user_line_id,item_type,item_id,quantity):
+        _nowpackindex = self.checkUserPack(user_line_id)
+        sql ="""INSERT INTO user_backpack (user_line_id, backpack_loc,item_type,item_id,quantity) VALUES (%(user_line_id)s, %(backpack_loc)s, %(item_type)s, %(item_id)s,%(quantity)s)"""
+        params = {'user_line_id':user_line_id,'backpack_loc':_nowpackindex,'item_type':item_type,'item_id':item_id,'quantity':quantity}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+        self.conn.close()
+            
 
 
 if __name__ == "__main__":
     database = DataBase()
-    database.SetUserMoneyByLineId(10,10000)
+    _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
+    database.checkUserPack(_id)
+    database.putToUserBackPack(_id,"weapon",4,1)
+    database.checkUserPack(_id)
 
 
 
