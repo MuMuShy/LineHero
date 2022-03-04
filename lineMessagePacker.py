@@ -1385,13 +1385,6 @@ def getBugReport():
                     "text": "python後端工程師",
                     "size": "sm",
                     "color": "#555555"
-                },
-                {
-                    "type": "text",
-                    "text": "缺",
-                    "size": "sm",
-                    "color": "#111111",
-                    "align": "end"
                 }
                 ]
             },
@@ -1404,13 +1397,6 @@ def getBugReport():
                     "text": "前端工程師",
                     "size": "sm",
                     "color": "#555555"
-                },
-                {
-                    "type": "text",
-                    "text": "缺",
-                    "size": "sm",
-                    "color": "#111111",
-                    "align": "end"
                 }
                 ]
             },
@@ -1423,13 +1409,6 @@ def getBugReport():
                     "text": "美術設計(2d)",
                     "size": "sm",
                     "color": "#555555"
-                },
-                {
-                    "type": "text",
-                    "text": "缺",
-                    "size": "sm",
-                    "color": "#111111",
-                    "align": "end"
                 }
                 ]
             },
@@ -1442,13 +1421,6 @@ def getBugReport():
                     "text": "遊戲企劃",
                     "size": "sm",
                     "color": "#555555"
-                },
-                {
-                    "type": "text",
-                    "text": "缺",
-                    "size": "sm",
-                    "color": "#111111",
-                    "align": "end"
                 }
                 ]
             }
@@ -1457,6 +1429,11 @@ def getBugReport():
         {
             "type": "separator",
             "margin": "xxl"
+        },
+        {
+            "type": "box",
+            "layout": "vertical",
+            "contents": []
         },
         {
             "type": "box",
