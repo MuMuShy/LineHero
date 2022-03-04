@@ -407,16 +407,27 @@ class DataBase():
             sql = """DELETE from user_backpack WHERE user_line_id = %s and backpack_loc = %s"""
             self.cursor.execute(sql,(_finalquantity,user_line_id,backpack_loc,))
             self.conn.commit()
+    
+    def giveAllPlayerUsefulItem(self,item_type,item_id,number):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT user_line_id,jobs FROM users_job"
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchall()
+        self.conn.commit()
+        for i in _result:
+            _id = i[0]
+            loc = self.checkUserPackMaxLoc(_id)
+            self.addToUserBackPack(_id,item_type,item_id,number,loc)
 
 if __name__ == "__main__":
     database = DataBase()
     _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
-    loc = database.checkUserPackMaxLoc(_id)
+    #loc = database.checkUserPackMaxLoc(_id)
     # database.addToUserBackPack(_id,"weapon",4,1,loc)
     # database.addToUserWeapon(_id,4,loc,0,0,0,0)
-
+    database.giveAllPlayerUsefulItem("reel",2,10)
     #loc = database.checkUserPackMaxLoc(_id)
-    database.addToUserBackPack(_id,"reel",5,20,loc)
+    #database.addToUserBackPack(_id,"reel",5,20,loc)
     # json = database.getUserReelList(_id)
     # print(json)
     #print(database.getUserPackReelInfo(_id,1))

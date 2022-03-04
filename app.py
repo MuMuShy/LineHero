@@ -1,7 +1,6 @@
 from cgitb import text
 from modulefinder import replacePackageMap
 import random
-from this import d
 from time import sleep
 from flask import Flask, request, abort
 from flask import render_template
@@ -408,6 +407,11 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage("你的卷軸數量不夠喔"))
             return
+    elif user_send == "@showusefullist":
+        line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("敬請期待..."))
+        return
     elif user_send.startswith("@goto"):
         
         try:
