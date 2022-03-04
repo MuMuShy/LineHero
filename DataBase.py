@@ -1,6 +1,5 @@
 import os
 import random
-from turtle import back
 import psycopg2
 from dotenv import load_dotenv
 import time
