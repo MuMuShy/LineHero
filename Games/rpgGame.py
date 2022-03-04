@@ -374,3 +374,114 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
 
     return _result
     
+def WeaponEnhancement(user_line_id,reel_id):
+    import random
+    #----------------------------------------------------------------------------------------------------------------#
+    #資料庫讀取#
+    usingWeaponData = dataBase.getUserUsingWeapon(user_line_id)
+    
+    reelData = dataBase.getUserUsingReel(reel_id)
+    
+    if usingWeaponData != {} and reelData != {}:
+        if usingWeaponData['available_reeltime'] <= 0:
+            return False,'強化次數不足，強化失敗!!'
+        usingWeaponData['available_reeltime'] = usingWeaponData['available_reeltime'] - 1
+        print(usingWeaponData['available_reeltime'])
+        #----------------------------------------------------------------------------------------------------------------#
+        #處理卷軸機率#
+        probability = reelData['probability']
+        if probability == 1.0:
+            checksucess = True
+        else:
+            deno = 1
+            mole = 1
+            while probability < 1.0:
+                mole*=10
+                probability*=10
+            deno = mole-int(probability)
+            check = [True,False]
+            checksucess = random.choices(check,weights=[mole-deno,deno])[0]
+            print(checksucess,deno,mole-deno)
+        
+        if checksucess:
+            str_add = usingWeaponData['str_add'] + reelData['plus_str']
+            int_add = usingWeaponData['int_add'] + reelData['plus_int']
+            dex_add = usingWeaponData['dex_add'] + reelData['plus_dex']
+            atk_add = usingWeaponData['atk_add'] + reelData['plus_atk']
+        #----------------------------------------------------------------------------------------------------------------#
+        #處理紀錄卷軸數
+            if usingWeaponData['uses_reel'] is None or usingWeaponData['uses_reel'] == "None":
+                usingWeaponData['uses_reel'] = ""
+                usingWeaponData['uses_reel'] = "{}".format(str(reelData['reel_id'])) + ":1"
+            else:
+                uses_reel = usingWeaponData['uses_reel'].split(',')
+                result = []
+                IS_HAVE = False
+                for s in uses_reel:
+                    if s.split(':')[0] == str(reelData['reel_id']):
+                        result.append(s.split(':')[0] + ':' + str(int(s.split(':')[1])+1))
+                        IS_HAVE = True
+                    else:
+                        result.append(s.split(':')[0] + ':' + s.split(':')[1])
+                if IS_HAVE != True:
+                    result.append(str(reelData['reel_id']) + ':' + '1')
+                usingWeaponData['uses_reel'] = ','.join(result)
+        
+        #----------------------------------------------------------------------------------------------------------------#
+        #處理description
+            if reelData['description'] is not None:
+                if usingWeaponData['description'] is None or usingWeaponData['description'] == ['None']:
+                    real_description = ""
+                    for i in reelData['description']:
+                        real_description = "{"+i.split(":")[0]+":"+i.split(":")[1]+"}"
+                    usingWeaponData['description'] = str(real_description).replace("'",'').replace(' ','')
+                else:
+                    real_description = reelData['description']
+                    temp_dict_real = {}
+                    temp_dict_weapon = {}
+                    for i in real_description:
+                        temp_dict_real[i.split(':')[0]] = i.split(':')[1]
+                    
+                    weapon_description = usingWeaponData['description']
+                    for i in weapon_description:
+                        temp_dict_weapon[i.split(':')[0]] = i.split(':')[1]
+                    
+                    for key in temp_dict_real.keys():
+                        if key in temp_dict_weapon.keys():
+                            #計算如果是%數
+                            if '%' in temp_dict_weapon[key]:
+                                temp_dict_weapon[key] = str(int(temp_dict_weapon[key].replace('%','')) + int(temp_dict_real[key].replace('%',''))) + '%'
+                            else:
+                                temp_dict_weapon[key] = str(int(temp_dict_weapon[key]) + int(temp_dict_real[key]))
+                        else:
+                            #如果沒衝過此屬性
+                            temp_dict_weapon[key] = temp_dict_real[key]
+                    result=[]
+                    for key in temp_dict_weapon.keys():
+                        result.append(key+':'+temp_dict_weapon[key])
+
+                    
+                    #usingWeaponData['description'] = '{'+','.join(result)+'}'
+                    usingWeaponData['description'] = str(temp_dict_weapon).replace("'", "").replace(" ","")
+            else:
+                usingWeaponData['description'] = "{" + str(usingWeaponData['description']).replace("'", "").replace(" ","").replace("[", "").replace("]","") + "}"
+                #print(usingWeaponData['description'])
+        #----------------------------------------------------------------------------------------------------------------#
+        #UPDATE DB
+            enhancedData = {'user_line_id':user_line_id,'equipment_weapon':usingWeaponData['equipment_weapon'],
+                            'str_add':str_add,'int_add':int_add,'dex_add':dex_add,'atk_add':atk_add,'uses_reel':usingWeaponData['uses_reel'],
+                            'description':usingWeaponData['description'],'available_reeltime':usingWeaponData['available_reeltime']}
+
+            dataBase.setEnhancedResult(enhancedData)
+            
+            return True,'強化成功!!'
+        else:
+            usingWeaponData['description'] = "{" + str(usingWeaponData['description']).replace("'", "").replace(" ","").replace("[", "").replace("]","") + "}"
+            enhancedData = {'user_line_id':user_line_id,'equipment_weapon':usingWeaponData['equipment_weapon'],
+                            'str_add':usingWeaponData['str_add'],'int_add':usingWeaponData['int_add'],'dex_add':usingWeaponData['dex_add'],'atk_add':usingWeaponData['atk_add'],
+                            'uses_reel':usingWeaponData['uses_reel'],'description':usingWeaponData['description'],'available_reeltime':usingWeaponData['available_reeltime']}
+
+            dataBase.setEnhancedResult(enhancedData)
+            return False,'機率強化失敗!!'
+    else:
+        return False,'沒有卷軸或沒有武器而強化失敗'

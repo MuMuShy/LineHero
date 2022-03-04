@@ -1,4 +1,5 @@
 
+from importlib.resources import contents
 import json
 from re import L
 from Games import rpgDictionary, rpgGame
@@ -2846,6 +2847,8 @@ def getEquipmentList(_weapon_json_list):
     index = 0 # 0的時候為裝備中道具
     bubble_contents=[]
     for weapon in _weapon_json_list:
+        print("要打包")
+        print(weapon)
         _buttontext = "@changeequipment "+str(weapon["backpack_loc"])
         if index == 0:
             _btnstyle = "secondary"
@@ -2855,7 +2858,9 @@ def getEquipmentList(_weapon_json_list):
             _btnstyle = "primary"
             _btnlabel = "裝備"
         
-        
+        _reel_time = ""
+        if weapon["success_time"] > 0:
+            _reel_time =" + "+str(weapon["success_time"])
         url = "https://mumu.tw/images/weapons/"+str(weapon["weapon_id"])+"."+weapon["img_type"]
         _start_list =["https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
         "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
@@ -2915,6 +2920,16 @@ def getEquipmentList(_weapon_json_list):
                             "flex": 5
                 }
             )
+        contents.append(
+            {
+                "type": "text",
+                "text": "可使用卷軸次數:"+str(weapon["available_reeltime"]),
+                "wrap": True,
+                "color": "#000000",
+                "size": "xs",
+                "flex": 5
+            }
+        )
         bubbble = {
         "type": "bubble",
         "size": "micro",
@@ -2931,7 +2946,7 @@ def getEquipmentList(_weapon_json_list):
             "contents": [
             {
                 "type": "text",
-                "text": weapon["weapon_name"],
+                "text": weapon["weapon_name"]+_reel_time,
                 "weight": "bold",
                 "size": "sm",
                 "wrap": True
@@ -3012,5 +3027,259 @@ def getEquipmentList(_weapon_json_list):
     json = {
     "type": "carousel",
     "contents":bubble_contents
+    }
+    return json
+
+def getUsefulItemMenu():
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "卷軸",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "武器/防具強化",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#27ACB2",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "打開",
+                "text": "@showreelList"
+                },
+                "style": "primary",
+                "offsetTop": "5px"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "消耗品",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "加成道具",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#FF6B6E",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "打開",
+                "text": "@showusefullist"
+                },
+                "style": "primary",
+                "offsetTop": "5px"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        }
+    ]
+    }
+    return json
+
+def getUserReelList(_reels_json):
+    _baseurl = "https://mumu.tw/images/reels/"
+    _bubbles = []
+    for reel in _reels_json:
+        _reelinfo = reel["reel_info_json"]
+        _reelid = _reelinfo["reel_id"]
+        _imgtype = _reelinfo["image_type"]
+        _quantity = reel["quantity"]
+        _4basicPowercontents = [] #四維屬性加乘
+        if _reelinfo["plus_str"] != 0:
+            _4basicPowercontents.append(
+                {
+                        "type": "text",
+                        "text": "STR + "+str(_reelinfo["plus_str"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                }
+            )
+        if _reelinfo["plus_int"] != 0:
+            _4basicPowercontents.append(
+                {
+                        "type": "text",
+                        "text": "INT + "+str(_reelinfo["plus_int"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                }
+            )
+        if _reelinfo["plus_dex"] != 0:
+            _4basicPowercontents.append(
+                {
+                        "type": "text",
+                        "text": "DEX + "+str(_reelinfo["plus_dex"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                }
+            )
+        if _reelinfo["plus_atk"] != 0:
+            _4basicPowercontents.append(
+                {
+                        "type": "text",
+                        "text": "ATK + "+str(_reelinfo["plus_atk"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                }
+            )
+        _otherDescription=[]
+        if _reelinfo["description"] is not None:
+            for des in _reelinfo["description"]:
+                _type = des.split(":")[0]
+                _value = des.split(":")[1]
+                _typechinese = rpgDictionary.getChineseEffectName(_type)
+                _otherDescription.append(
+                        {
+                        "type": "text",
+                        "text": _typechinese+" + "+str(_value),
+                        "size": "xs"
+                    }
+                )
+        _bubble = {
+            "type": "bubble",
+            "size": "micro",
+            "hero": {
+                "type": "image",
+                "url": _baseurl+str(_reelid)+"."+_imgtype,
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "320:213"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": _reelinfo["reel_name"],
+                    "weight": "bold",
+                    "size": "sm",
+                    "wrap": True
+                },
+                {
+                    "type": "text",
+                    "text": "持有 : "+str(_quantity),
+                    "size": "xxs",
+                    "weight": "bold"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "sm",
+                        "contents":_4basicPowercontents
+                        
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": _otherDescription
+                }
+                ],
+                "spacing": "sm",
+                "paddingAll": "13px"
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "使用",
+                    "text": "@useReel "+str(_reelid)
+                    },
+                    "style": "primary"
+                }
+                ]
+            }
+            }
+        _bubbles.append(_bubble)
+    json = {
+         "type": "carousel",
+         "contents":_bubbles
     }
     return json

@@ -1,6 +1,9 @@
 from ast import parse
+from cgitb import reset
 import os
 from re import S
+import re
+from select import select
 import psycopg2
 from dotenv import load_dotenv
 import random
@@ -237,8 +240,35 @@ class DataBase():
         print(_result)
         _json ={"user_line_id":_result[0],"backpack_loc":_result[1],"item_type":_result[2],"item_id":_result[3],"quantity":_result[4]}
         return _json
-        
     
+    def getReelInfo(self,reel_id):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT reel_id,plus_str,plus_int,plus_dex,plus_atk,description,probability,image_type,reel_name FROM reel_list WHERE reel_id = '" + str(reel_id) + "'"
+        self.cursor.execute(sql)
+        rows = self.cursor.fetchone()
+        if rows is not None:
+            reelData = {'reel_id':rows[0],'plus_str':rows[1],'plus_int':rows[2],'plus_dex':rows[3],
+                        'plus_atk':rows[4],'description':rows[5],'probability':rows[6],'image_type':rows[7],'reel_name':rows[8]}
+            return reelData
+        return {}
+    
+    def getUserReelList(self,user_line_id):
+        self.cursor = self.conn.cursor()
+        sql = """SELECT user_line_id,backpack_loc,item_type,item_id,quantity from user_backpack where user_line_id = %s and item_type = 'reel'"""
+        self.cursor.execute(sql,(user_line_id,))
+        _result = self.cursor.fetchall()
+        self.conn.commit()
+        if _result is not None:
+            print(_result)
+            _result_json = []
+            for reel in _result:
+                _id = reel[3]
+                _reelbasic_info = self.getReelInfo(_id)
+                _json={"reel_info_json":_reelbasic_info,"quantity":reel[4]}
+                _result_json.append(_json)
+            return _result_json
+        else:
+            return None
     
     def addToUserWeapon(self,user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add):
         self.cursor = self.conn.cursor()
@@ -339,21 +369,65 @@ class DataBase():
         _weaponlist.insert(0,_now_weapon)
         print(_weaponlist)
         return _weaponlist
+    
+    def getUserPackReelInfo(self,user_line_id,reel_id):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT backpack_loc,item_id,quantity FROM user_backpack WHERE user_line_id = %s and item_type = 'reel' and item_id = %s"
+        self.cursor.execute(sql,(user_line_id,reel_id,))
+        rows = self.cursor.fetchone()
+        self.conn.commit()
+        if len(rows) == 0:
+            return None
+        else:
+            return {"backpack_loc":rows[0],"item_id":rows[1],"quantity":rows[2]}
+    
+    #確定某格欄位有多少個物品
+    def checkItemNumFromLoc(self,user_line_id,backpack_loc):
+        self.cursor = self.conn.cursor()
+        sql = """SELECT quantity FROM user_backpack WHERE user_line_id = %s and backpack_loc = %s"""
+        self.cursor.execute(sql,(user_line_id,backpack_loc,))
+        try:
+            num = int(self.cursor.fetchone()[0])
+        except:
+            num = -999
+        self.conn.commit()
+        return num
+    
+    #消耗品會在同一格 所以要修改他的quantity
+    def removeUsefulItemFromPack(self,user_line_id,backpack_loc,quantity):
+        _numorigin = self.checkUsefulItemNum(user_line_id,backpack_loc)
+        #消耗品同種類還有庫存 只要修改他的quantity
+        if _numorigin - quantity > 0:
+            _finalquantity = _numorigin - quantity
+            sql = """UPDATE user_backpack SET quantity = %s WHERE user_line_id = %s and backpack_loc = %s"""
+            self.cursor.execute(sql,(_finalquantity,user_line_id,backpack_loc,))
+            self.conn.commit()
+        else:
+            print("這個物品用光了 把她拔掉")
+            sql = """DELETE from user_backpack WHERE user_line_id = %s and backpack_loc = %s"""
+            self.cursor.execute(sql,(_finalquantity,user_line_id,backpack_loc,))
+            self.conn.commit()
 
 if __name__ == "__main__":
     database = DataBase()
     _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
-    #database.checkUserPackMaxLoc(_id)
+    loc = database.checkUserPackMaxLoc(_id)
+    # database.addToUserBackPack(_id,"weapon",4,1,loc)
+    # database.addToUserWeapon(_id,4,loc,0,0,0,0)
+
     #loc = database.checkUserPackMaxLoc(_id)
-    #database.addToUserWeapon(_id,2,loc,0,0,0,0)
-    #database.addToUserBackPack(_id,"weapon",2,loc)
+    database.addToUserBackPack(_id,"reel",5,20,loc)
+    # json = database.getUserReelList(_id)
+    # print(json)
+    #print(database.getUserPackReelInfo(_id,1))
+    #print(database.checkItemNumFromLoc(_id,100))
     #database.checkUserPackMaxLoc(_id)
     #database.removeFromUserBackPack(_id,1)
     #database.checkUserPackMaxLoc(_id)
     #print(database.getItemFromUserBackPack(_id,0))
     #database.removeUserWeapon(_id,999)
     #print(database.getUserEquipmentWeapon(_id))
-    database.updateall()
+    #database.updateall()
     #database.changeEquipmentWeapon(_id,0)
     #database.getUserEquipmentList(_id)
 

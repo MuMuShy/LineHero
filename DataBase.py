@@ -1,4 +1,6 @@
 import os
+import random
+from turtle import back
 import psycopg2
 from dotenv import load_dotenv
 import time
@@ -421,6 +423,7 @@ class DataBase():
         row = self.cursor.fetchone()
         _json = {}
         _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7],"weapon":row[8],"pet":row[9]}
+        print("玩家職業資料")
         print(_json)
         return _json
     
@@ -450,6 +453,8 @@ class DataBase():
         print(row)
         _json = {}
         _weapon_other_effect={}
+        # print(row[8])
+        # print(type(row[8]))
         for _line in row[8]:
             _type = _line.split(":")[0]
             _value = _line.split(":")[1]
@@ -657,6 +662,34 @@ class DataBase():
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         self.conn.commit()
     
+    #確定某格欄位有多少個物品
+    def checkItemNumFromLoc(self,user_line_id,backpack_loc):
+        self.cursor = self.conn.cursor()
+        sql = """SELECT quantity FROM user_backpack WHERE user_line_id = %s and backpack_loc = %s"""
+        self.cursor.execute(sql,(user_line_id,backpack_loc,))
+        try:
+            num = int(self.cursor.fetchone()[0])
+        except:
+            num = -999
+        self.conn.commit()
+        return num
+    
+    #消耗品會在同一格 所以要修改他的quantity
+    def removeUsefulItemFromPack(self,user_line_id,backpack_loc,quantity):
+        _numorigin = self.checkItemNumFromLoc(user_line_id,backpack_loc)
+        #消耗品同種類還有庫存 只要修改他的quantity
+        if _numorigin - quantity > 0:
+            _finalquantity = _numorigin - quantity
+            sql = """UPDATE user_backpack SET quantity = %s WHERE user_line_id = %s and backpack_loc = %s"""
+            self.cursor.execute(sql,(_finalquantity,user_line_id,backpack_loc,))
+            self.conn.commit()
+        else:
+            print("這個物品用光了 把她拔掉")
+            sql = """DELETE from user_backpack WHERE user_line_id = %s and backpack_loc = %s"""
+            self.cursor.execute(sql,(user_line_id,backpack_loc,))
+            self.conn.commit()
+
+    
     def getItemFromUserBackPack(self,user_line_id,backpack_loc):
         self.cursor = self.conn.cursor()
         sql = """SELECT * FROM user_backpack where user_line_id = %s and backpack_loc = %s"""
@@ -670,7 +703,8 @@ class DataBase():
             print(_result)
             _json ={"user_line_id":_result[0],"backpack_loc":_result[1],"item_type":_result[2],"item_id":_result[3],"quantity":_result[4]}
             return _json
-        
+    
+
     
     
     def addToUserWeapon(self,user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add):
@@ -682,12 +716,14 @@ class DataBase():
     
     def getValueFromUserWeapon(self,user_line_id,backpack_loc):
         self.cursor = self.conn.cursor()
-        sql = """SELECT * FROM user_weapon where user_line_id = %s and backpack_loc = %s"""
-        self.cursor.execute(sql,(user_line_id,backpack_loc))
+        print("back pac loc:"+str(backpack_loc))
+        sql = """SELECT user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add,uses_reel,available_reeltime,success_time FROM user_weapon where user_line_id = %s and backpack_loc = %s"""
+        self.cursor.execute(sql,(user_line_id,backpack_loc,))
         _result = self.cursor.fetchone()
         self.conn.commit()
+        print("東西在這")
         print(_result)
-        _json ={"user_line_id":_result[0],"weapon_id":_result[1],"backpack_loc":_result[2],"str_add":_result[3],"int_add":_result[4],"dex_add":_result[5],"atk_add":_result[6]}
+        _json ={"user_line_id":_result[0],"weapon_id":_result[1],"backpack_loc":_result[2],"str_add":_result[3],"int_add":_result[4],"dex_add":_result[5],"atk_add":_result[6],"uses_reel":_result[7],"available_reeltime":_result[8],"success_time":_result[9]}
         return _json
 
     def removeUserWeapon(self,user_line_id,backpack_loc):
@@ -708,11 +744,17 @@ class DataBase():
         _basic_weapon_info = self.getWeaponInfo(_id)
         #取得玩家對這個武器的加乘資料
         _weapon_add_info = self.getValueFromUserWeapon(user_line_id,equipment_back_loc)
+        print("加成資料")
+        print(_weapon_add_info)
         #_json={"weapon_id":row[0],"str_add":row[1],"int_add":row[2],"dex_add":row[3],"atk_add":row[4],"rare":row[5],"weapon_name":row[6],"img_type":row[7],"other_effect":_weapon_other_effect}
         _basic_weapon_info["str_add"]+=_weapon_add_info["str_add"]
         _basic_weapon_info["int_add"]+=_weapon_add_info["int_add"]
         _basic_weapon_info["dex_add"]+=_weapon_add_info["dex_add"]
         _basic_weapon_info["atk_add"]+=_weapon_add_info["atk_add"]
+        _basic_weapon_info["uses_reel"] = _weapon_add_info["uses_reel"]
+        _basic_weapon_info["available_reeltime"] = _weapon_add_info["available_reeltime"]
+        _basic_weapon_info["backpack_loc"] = _weapon_add_info["backpack_loc"]
+        _basic_weapon_info["success_time"] = _weapon_add_info["success_time"]
         return _basic_weapon_info
     
     def changeEquipmentWeapon(self,user_line_id,backpack_loc):
@@ -745,12 +787,105 @@ class DataBase():
             _basic_weapon_info["int_add"]+=_weapon_add_info["int_add"]
             _basic_weapon_info["dex_add"]+=_weapon_add_info["dex_add"]
             _basic_weapon_info["atk_add"]+=_weapon_add_info["atk_add"]
+            _basic_weapon_info["uses_reel"] = _weapon_add_info["uses_reel"]
+            _basic_weapon_info["available_reeltime"] = _weapon_add_info["available_reeltime"]
             _basic_weapon_info["backpack_loc"] = loc
+            _basic_weapon_info["success_time"] = _weapon_add_info["success_time"]
             print("位置:"+str(loc)+" 編號:"+str(id))
+            print(_basic_weapon_info)
             if loc == equipment_back_loc:
+                print("位置依樣")
                 _now_weapon = _basic_weapon_info
             else:
+                print("list 增加")
+                print(_basic_weapon_info)
                 _weaponlist.append(_basic_weapon_info)
-        _weaponlist.insert(0,_now_weapon)
+        if len(_weaponlist) > 1:
+            _weaponlist.insert(0,_now_weapon)
         print(_weaponlist)
         return _weaponlist
+    
+    #給卷軸id 判斷玩家有沒有這個卷軸
+    def getUserPackReelInfo(self,user_line_id,reel_id):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT backpack_loc,item_id,quantity FROM user_backpack WHERE user_line_id = %s and item_type = 'reel' and item_id = %s"
+        self.cursor.execute(sql,(user_line_id,reel_id,))
+        rows = self.cursor.fetchone()
+        self.conn.commit()
+        if rows == None:
+            return None
+        else:
+            return {"backpack_loc":rows[0],"item_id":rows[1],"quantity":rows[2]}
+    
+    def getUserUsingWeapon(self,user_line_id):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT equipment_weapon FROM users_job WHERE user_line_id = '" + user_line_id + "'"
+        self.cursor.execute(sql)
+        rows = self.cursor.fetchone()
+        self.conn.commit()
+        if rows is not None:
+            equipment_weapon = rows[0]
+            #
+            sql = "SELECT str_add,int_add,dex_add,atk_add,uses_reel,description,available_reeltime FROM user_weapon WHERE user_line_id = '" + user_line_id + "' and backpack_loc = '" + equipment_weapon + "'"
+            self.cursor.execute(sql)
+            rows = self.cursor.fetchone()
+            if rows is not None:
+                usingWeaponData = {'equipment_weapon':equipment_weapon,'str_add':rows[0],'int_add':rows[1],'dex_add':rows[2],
+                                   'atk_add':rows[3],'uses_reel':rows[4],'description':rows[5],'available_reeltime':rows[6]}
+                return usingWeaponData
+        return {}
+    
+    def addWeaponReelSuccessTime(self,user_line_id,backpack_loc):
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE user_weapon SET success_time = success_time+1 WHERE user_line_id = %s and backpack_loc = %s"""
+        self.cursor.execute(sql,(user_line_id,backpack_loc))
+        self.conn.commit()
+    
+    def getUserUsingReel(self,reel_id):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT reel_id,plus_str,plus_int,plus_dex,plus_atk,description,probability,image_type,reel_name FROM reel_list WHERE reel_id = '" + str(reel_id) + "'"
+        self.cursor.execute(sql)
+        rows = self.cursor.fetchone()
+        self.conn.commit()
+        if rows is not None:
+            reelData = {'reel_id':rows[0],'plus_str':rows[1],'plus_int':rows[2],'plus_dex':rows[3],
+                        'plus_atk':rows[4],'description':rows[5],'probability':rows[6],'image_type':rows[7],'reel_name':rows[8]}
+            return reelData
+        return {}
+    
+
+    
+    def getUserReelList(self,user_line_id):
+        self.cursor = self.conn.cursor()
+        sql = """SELECT user_line_id,backpack_loc,item_type,item_id,quantity from user_backpack where user_line_id = %s and item_type = 'reel'"""
+        self.cursor.execute(sql,(user_line_id,))
+        _result = self.cursor.fetchall()
+        self.conn.commit()
+        if _result is not None:
+            print(_result)
+            _result_json = []
+            for reel in _result:
+                _id = reel[3]
+                _reelbasic_info = self.getUserUsingReel(_id)
+                _json={"reel_info_json":_reelbasic_info,"quantity":reel[4]}
+                _result_json.append(_json)
+            return _result_json
+        else:
+            return None
+    
+    def setEnhancedResult(self,enhancedData):
+        self.cursor = self.conn.cursor()
+        if enhancedData['description'] is not None:
+            sql = """UPDATE user_weapon SET str_add = '{0}',int_add = '{1}',dex_add = '{2}',atk_add = '{3}',uses_reel = '{4}',description = '{5}',available_reeltime = '{6}'
+                     WHERE user_line_id = '{7}' and backpack_loc = '{8}'
+            """.format(enhancedData['str_add'],enhancedData['int_add'],enhancedData['dex_add'],enhancedData['atk_add'],
+            enhancedData['uses_reel'],enhancedData['description'],enhancedData['available_reeltime'],enhancedData['user_line_id'],enhancedData['equipment_weapon'])
+        else:
+            sql = """UPDATE user_weapon SET str_add = '{0}',int_add = '{1}',dex_add = '{2}',atk_add = '{3}',uses_reel = '{4}',available_reeltime = '{5}'
+                     WHERE user_line_id = '{6}' and backpack_loc = '{7}'
+            """.format(enhancedData['str_add'],enhancedData['int_add'],enhancedData['dex_add'],enhancedData['atk_add'],
+            enhancedData['uses_reel'],enhancedData['available_reeltime'],enhancedData['user_line_id'],enhancedData['equipment_weapon'])
+        self.cursor.execute(sql)
+        self.conn.commit()
+
+    

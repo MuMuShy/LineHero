@@ -1,3 +1,4 @@
+from cgitb import text
 from modulefinder import replacePackageMap
 import random
 from this import d
@@ -339,11 +340,74 @@ def handle_message(event):
             FlexSendMessage("玩家技能",contents=_skillflex))
         return
     elif user_send =="@bag":
-        #先未開放
+        _bag_flex = lineMessagePackerRpg.getUsefulItemMenu()
+
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="敬請期待..."))
+            FlexSendMessage("背包類別",contents=_bag_flex))
         return
+    elif user_send =="@showreelList":
+        _user_reel_lists = database.getUserReelList(event.source.user_id)
+        if _user_reel_lists == None or len(_user_reel_lists) ==0:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你一張卷軸都沒有喔~"))
+            return
+        else:
+            _flex = lineMessagePackerRpg.getUserReelList(_user_reel_lists)
+            _nowweaponname = database.getUserEquipmentWeapon(event.source.user_id)["weapon_name"]
+            line_bot_api.reply_message(
+                event.reply_token,[
+                TextSendMessage("注意 使用卷軸會直接使用在目前裝備武器上 目前裝備武器為:"+_nowweaponname),
+                FlexSendMessage("背包卷軸",contents=_flex)])
+            return
+    elif user_send.startswith("@useReel"):
+        try:
+            _reel_id = user_send.split(" ")[1]
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("卷軸id好像有問題 請使用背包裏面的按鈕進行互動~"))
+            return
+        _reelinfo = database.getUserPackReelInfo(event.source.user_id,_reel_id)
+        if _reelinfo == None:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你沒有此卷軸喔"))
+            return
+        else:
+            _loc = _reelinfo["backpack_loc"]
+        _has_reel_num = database.checkItemNumFromLoc(event.source.user_id,_loc)
+        #移除一張 此卷軸 開始強化
+        if _has_reel_num > 0:
+            database.removeUsefulItemFromPack(event.source.user_id,_loc,1)
+            _result,_description = rpgGame.WeaponEnhancement(event.source.user_id,_reel_id)
+            _weapon = database.getUserEquipmentWeapon(event.source.user_id)
+            _user_reel_lists = database.getUserReelList(event.source.user_id)
+            _flex = lineMessagePackerRpg.getUserReelList(_user_reel_lists)
+            if _result == True:
+                database.addWeaponReelSuccessTime(event.source.user_id,_weapon["backpack_loc"])
+                _weapon = database.getUserEquipmentWeapon(event.source.user_id)
+                _weaponflex = lineMessagePackerRpg.getEquipmentList([_weapon])
+                line_bot_api.reply_message(
+                event.reply_token,[
+                TextSendMessage(_description),
+                FlexSendMessage("強化結果",contents=_weaponflex),
+                FlexSendMessage("強化結果",contents=_flex)])
+                return
+            else:
+                _weaponflex = lineMessagePackerRpg.getEquipmentList([_weapon])
+                line_bot_api.reply_message(
+                event.reply_token,[
+                TextSendMessage(_description),
+                FlexSendMessage("強化結果",contents=_weaponflex),
+                FlexSendMessage("強化結果",contents=_flex)])
+                return
+        else:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你的卷軸數量不夠喔"))
+            return
     elif user_send.startswith("@goto"):
         
         try:
