@@ -422,10 +422,10 @@ class DataBase():
 if __name__ == "__main__":
     database = DataBase()
     _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
-    #loc = database.checkUserPackMaxLoc(_id)
-    # database.addToUserBackPack(_id,"weapon",4,1,loc)
-    # database.addToUserWeapon(_id,4,loc,0,0,0,0)
-    database.giveAllPlayerUsefulItem("reel",2,10)
+    loc = database.checkUserPackMaxLoc(_id)
+    database.addToUserBackPack(_id,"weapon",4,1,loc)
+    database.addToUserWeapon(_id,4,loc,0,0,0,0)
+
     #loc = database.checkUserPackMaxLoc(_id)
     #database.addToUserBackPack(_id,"reel",5,20,loc)
     # json = database.getUserReelList(_id)

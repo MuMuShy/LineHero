@@ -792,17 +792,21 @@ class DataBase():
             _basic_weapon_info["success_time"] = _weapon_add_info["success_time"]
             print("位置:"+str(loc)+" 編號:"+str(id))
             print(_basic_weapon_info)
-            if loc == equipment_back_loc:
-                print("位置依樣")
-                _now_weapon = _basic_weapon_info
+            _weaponlist.append(_basic_weapon_info)
+        index = 0
+        for _weapon in _weaponlist:
+            if _weapon["backpack_loc"] == equipment_back_loc:
+                break
             else:
-                print("list 增加")
-                print(_basic_weapon_info)
-                _weaponlist.append(_basic_weapon_info)
-        if len(_weaponlist) > 1:
-            _weaponlist.insert(0,_now_weapon)
+                index+=1
+        _weaponlist = self.swapPositions(_weaponlist,index,0)
         print(_weaponlist)
         return _weaponlist
+
+    # Swap function
+    def swapPositions(self,list, pos1, pos2):
+        list[pos1], list[pos2] = list[pos2], list[pos1]
+        return list
     
     #給卷軸id 判斷玩家有沒有這個卷軸
     def getUserPackReelInfo(self,user_line_id,reel_id):

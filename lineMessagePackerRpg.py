@@ -1,6 +1,7 @@
 
 from importlib.resources import contents
 import json
+import math
 from re import L
 from Games import rpgDictionary, rpgGame
 
@@ -18,7 +19,7 @@ def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
         jobrul = "https://mumu.tw/images/game_icons/icon_itemicon_sword.png"
         _jobtext="戰士一轉"
         _weponatk = 1+(equipment_weapon_info["atk_add"]/100)*equipment_weapon_info["atk_add"]*1.3
-        _atk = user_job_info["str"]*1.3*_weponatk
+        _atk = ((user_job_info["str"]+equipment_weapon_info["str_add"])*1.3*6)+_weponatk
         _matk = 0
     elif user_job_info['job'] == "majic":
         maxhp = rpgGame.getMaxHp("majic",user_job_info["level"])     
@@ -26,14 +27,16 @@ def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
         _jobtext="法師一轉"
         _weponatk = 1+(equipment_weapon_info["atk_add"]/100)*equipment_weapon_info["atk_add"]*1.7
         _atk = 0
-        _matk = user_job_info["int"]*1.6*_weponatk
+        _matk = ((user_job_info["int"]+equipment_weapon_info["int_add"])*1.6*5)+_weponatk
     else:
         maxhp = rpgGame.getMaxHp("rog",user_job_info["level"])   
         jobrul = "https://mumu.tw/images/game_icons/icon_itemicon_arrow.png"
         _jobtext="盜賊一轉"
         _matk = 0
         _weponatk = 1+(equipment_weapon_info["dex_add"]/100)*equipment_weapon_info["dex_add"]*1.5
-        _atk = user_job_info["dex"]*1.7*_weponatk
+        _atk = ((user_job_info["dex"]+equipment_weapon_info["dex_add"])*1.7*6)+_weponatk
+    _atk = math.ceil(_atk)
+    _matk = math.ceil(_matk)
     if user_job_info["hp"] !=0:
         _hppersent = int((user_job_info["hp"]/maxhp)*100)
     else:

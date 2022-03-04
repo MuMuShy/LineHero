@@ -250,6 +250,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     _user_job_temp["str"]+=_weapon_info["str_add"]
     _user_job_temp["int"]+=_weapon_info["int_add"]
     _user_job_temp["dex"]+=_weapon_info["dex_add"]
+    #依照四維的基礎傷害
     baseAttack = getJobAttackByjson(_user_job_temp)
     if _playerjob == "majic":
         _skill_active = random.randrange(0,100)
