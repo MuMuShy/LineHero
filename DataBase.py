@@ -663,10 +663,13 @@ class DataBase():
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         _result = self.cursor.fetchone()
         self.conn.commit()
-        print("result 在這")
-        print(_result)
-        _json ={"user_line_id":_result[0],"backpack_loc":_result[1],"item_type":_result[2],"item_id":_result[3],"quantity":_result[4]}
-        return _json
+        if _result == None or len(_result) ==0:
+            return None
+        else:
+            print("result 在這")
+            print(_result)
+            _json ={"user_line_id":_result[0],"backpack_loc":_result[1],"item_type":_result[2],"item_id":_result[3],"quantity":_result[4]}
+            return _json
         
     
     

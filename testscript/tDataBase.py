@@ -298,14 +298,14 @@ class DataBase():
             _job = i[1]
             loc = self.checkUserPackMaxLoc(_id)
             if _job == 'warrior':
-                self.addToUserBackPack(_id,"weapon",1,1,loc)
-                self.addToUserWeapon(_id,1,loc,0,0,0,0)
+                self.addToUserBackPack(_id,"weapon",7,1,loc)
+                self.addToUserWeapon(_id,7,loc,0,0,0,0)
             elif _job == 'rog':
-                self.addToUserBackPack(_id,"weapon",2,1,loc)
-                self.addToUserWeapon(_id,2,loc,0,0,0,0)
+                self.addToUserBackPack(_id,"weapon",6,1,loc)
+                self.addToUserWeapon(_id,6,loc,0,0,0,0)
             else:
-                self.addToUserBackPack(_id,"weapon",3,1,loc)
-                self.addToUserWeapon(_id,3,loc,0,0,0,0)
+                self.addToUserBackPack(_id,"weapon",5,1,loc)
+                self.addToUserWeapon(_id,5,loc,0,0,0,0)
 
     def getUserEquipmentList(self,user_line_id):
         user_job = self.getUserJob(user_line_id)
@@ -344,16 +344,16 @@ if __name__ == "__main__":
     database = DataBase()
     _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     #database.checkUserPackMaxLoc(_id)
-    loc = database.checkUserPackMaxLoc(_id)
-    database.addToUserWeapon(_id,2,loc,0,0,0,0)
-    database.addToUserBackPack(_id,"weapon",2,loc)
+    #loc = database.checkUserPackMaxLoc(_id)
+    #database.addToUserWeapon(_id,2,loc,0,0,0,0)
+    #database.addToUserBackPack(_id,"weapon",2,loc)
     #database.checkUserPackMaxLoc(_id)
     #database.removeFromUserBackPack(_id,1)
     #database.checkUserPackMaxLoc(_id)
     #print(database.getItemFromUserBackPack(_id,0))
     #database.removeUserWeapon(_id,999)
     #print(database.getUserEquipmentWeapon(_id))
-    #database.updateall()
+    database.updateall()
     #database.changeEquipmentWeapon(_id,0)
     #database.getUserEquipmentList(_id)
 

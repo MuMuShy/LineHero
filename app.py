@@ -312,6 +312,17 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text="裝備編號好像有問題呢.."))
             return
+        _checkitem = database.getItemFromUserBackPack(event.source.user_id,loc)
+        if _checkitem == None:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="您並沒有這個裝備喔"))
+            return
+        elif _checkitem["item_type"] != "weapon":
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="這個編號不是可裝備武器 請在確認!"))
+            return
         database.changeEquipmentWeapon(event.source.user_id,loc)
         _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
         _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list)
