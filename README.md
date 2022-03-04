@@ -1,40 +1,28 @@
-# CryptoLineBot
+# LINE-Hero
 
-**串接bybitapi的line機器人**
-
-
-![markdown](https://mumu.tw/images/bybitbotimage.jpg "bybitbot")
+**LINE-Hero 無盡冒險 是一款透過文字對化進行的線上RPG遊戲**
 
 
-加密貨幣機器人是一個使用python撰寫的Line bot,使用message api還有bybit api進行功能上的串接,目前提供了實時價格,訂閱表,等功能.
-
-新增好友: @765llgvq
+![LINE-Hero](https://mumu.tw/images/github/githubimg.jpg)
 
 
-## 如何開發
+LINE-Hero 是一款透過文字對化進行的線上RPG遊戲,利用LINE BOT的機制進行遊戲,透過後端的SERVER實現多人互動
+部屬在Heroku上 屬於python flask APP
 
-*如果需要進行開發需要:
-1.申請LINE DEVELOPER帳號,並且創建MESSAGE API機器人.
-詳情可查詢官方文件: https://developers.line.biz/zh-hant/services/messaging-api/*
-2.申請BYBIT帳號並啟用API.
-可查詢: https://bybit-exchange.github.io/docs/spot/#t-introduction
+## 冒險者之路
 
-> 此專案單純為開發學習使用,無任何商業用途。
+*透過快速選單,我們可以在不輸入指令的狀況下進行多種遊戲內容。冒險者之路中有各種練等打怪的要素,還可以進行裝備強化*
 
 
-### 配置開發環境
 
-#### 安裝依賴項目
+![LINE-Hero exper](https://mumu.tw/images/github/5.jpg) ![LINE-Hero exper](https://mumu.tw/images/github/S__1028768032.jpg) 
 
 
-`pip install -r requirements.txt`
-####創建.env檔案 並配置:
-LINE_BOT_API_DEV = 你的linebot api key
-LINE_BOT_SECRET_DEV = 你的linebot Channel secret
-BY_BIT_API_KEY = 你的bybit api key
-BY_BIT_API_SECRET = 你的bybit api secret
-ENVIRONMENT=DEV`
+## 冒險者酒館
+*冒險者酒館中有一些小型的博奕遊戲,像是骰子,拉霸,獎池都會累積進大獎中,就拚誰的運氣好把他贏回家!
+也可以把機器人邀請到群組中與朋友一起同樂*
 
-#### 運行app.py
-
-> 本地端需使用ngrok進行倒轉並填入line bot的webhook url
+![LINE-Hero](https://mumu.tw/images/github/S__1028768033.jpg) ![LINE-Hero](https://mumu.tw/images/github/4.jpg) 
+# 現在就加入體驗吧!
+[好友連結](https://lin.ee/fedmBPm "好友連結")
+![LINE-Hero](https://mumu.tw/images/github/messageImage_1646423579337.jpg)
