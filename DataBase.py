@@ -473,6 +473,17 @@ class DataBase():
         print(_json)
         return _json
     
+    def getSkillInfo(self,skill_id,job):
+        self.cursor = self.conn.cursor()
+        _tablename = "skill_list_"+job
+        sql = """SELECT skill_id,skill_name,skill_description,skill_effect_description,max_level,max_book_time,leveladd_one_book,skill_type,own_level,own_job_level FROM %s where skill_id = %s"""
+        self.cursor.execute(sql,(_tablename,skill_id,))
+        _result = self.cursor.fetchone()
+        self.conn.commit()
+        print(_result)
+        
+
+    
     def setUserJobStatus(self,user_line_id,user_job_json):
         self.cursor = self.conn.cursor()
         sql = """UPDATE users_job SET str = %s , dex = %s ,intelligence = %s , hp = %s,level = %s,exp = %s Where user_line_id = %s"""
@@ -829,7 +840,6 @@ class DataBase():
         _now_weapon = {}
         for i in _result:
             loc = i[0]
-            
             id = i[1]
             #取得武器基本資料
             _basic_weapon_info = self.getWeaponInfo(id)

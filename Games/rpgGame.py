@@ -367,11 +367,12 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
         #掉落金錢 先隨機
         if _user_job_json["job"] == "warrior":
             _maxhp = getMaxHp(_user_job_json["job"],_user_job_json["level"])+hp_add
+            print("max: "+str(_maxhp))
             _health = _maxhp*0.1
             if _user_job_json["hp"] + _health <= _maxhp:
                 _user_job_json["hp"] +=_health
             else:
-                _user_job_json["hp"] = _maxhp+hp_add
+                _user_job_json["hp"] = _maxhp
             _end_job_result ="觸發戰士被動效果 戰士精神 回復血量:"+str(int(_health))
         _money = random.randrange(500,2000)
         _money+=_user_job_json["level"]*30

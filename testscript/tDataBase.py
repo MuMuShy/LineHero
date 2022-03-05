@@ -418,27 +418,45 @@ class DataBase():
             _id = i[0]
             loc = self.checkUserPackMaxLoc(_id)
             self.addToUserBackPack(_id,item_type,item_id,number,loc)
+    
+    def getSkillInfo(self,skill_id,job):
+        self.cursor = self.conn.cursor()
+        table_name = "skill_list_"+job
+        sql = "SELECT skill_id,skill_name,skill_description,skill_effect_description,max_level,max_book_time,leveladd_one_book,skill_type,own_level,own_job_level,skill_effect_addlv_description FROM {table_name} where skill_id = {skill_id}".format(table_name = table_name,skill_id = skill_id)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchone()
+        self.conn.commit()
+        
+        if _result is not None:
+            return {"skill_id":_result[0],"skill_name":_result[1],"skill_description":_result[2],"skill_effect_description":_result[3],"max_level":_result[4],"max_book_time":_result[5],"leveladd_one_book":_result[6],
+            "skill_type":_result[7],"own_level":_result[8],"skill_effect_addlv_description":_result[9]}
+        else:
+            return None
+    
+    def getSkillFromUser(self,user_line_id,skill_id,job):
+        _skillbasic = self.getSkillInfo(skill_id,job)
+        self.cursor = self.conn.cursor()
+        sql = "SELECT skill_id,skill_level,used_book_time FROM user_skill where user_line_id = '{user_line_id}' and skill_id = {skill_id} and skill_job = '{skill_job}'".format(user_line_id = user_line_id,skill_id = skill_id,skill_job=job)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchone()
+        self.conn.commit()
+        #確認技能等級
+
+        if _result is not None:
+            return {"skill_id":_result[0],"skill_level":_result[1],"used_book_time":_result[2]}
+        else:
+            return None
 
 if __name__ == "__main__":
     database = DataBase()
-    _id = 'Ufff9a87d16c9301ba6b3bb5c53d614b4'
-    loc = database.checkUserPackMaxLoc(_id)
+    _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
+    # loc = database.checkUserPackMaxLoc(_id)
     #database.addToUserBackPack(_id,"weapon",5,1,loc)
     #database.addToUserWeapon(_id,5,loc,0,0,0,0)
 
     #loc = database.checkUserPackMaxLoc(_id)
-    database.addToUserBackPack(_id,"reel",2,10,loc)
     # json = database.getUserReelList(_id)
     # print(json)
-    #print(database.getUserPackReelInfo(_id,1))
-    #print(database.checkItemNumFromLoc(_id,100))
-    #database.checkUserPackMaxLoc(_id)
-    #database.removeFromUserBackPack(_id,1)
-    #database.checkUserPackMaxLoc(_id)
-    #print(database.getItemFromUserBackPack(_id,0))
-    #database.removeUserWeapon(_id,999)
-    #print(database.getUserEquipmentWeapon(_id))
-    #database.updateall()
-    #database.changeEquipmentWeapon(_id,0)
-    #database.getUserEquipmentList(_id)
+    print(database.getSkillInfo(0,'rog'))
+    print(database.getSkillFromUser(_id,0,'rog'))
 
