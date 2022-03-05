@@ -48,6 +48,17 @@ class DataBase():
             json["locked_money"] = str(row[5])
             json["user_type"] = str(row[8])
             return json
+    
+    def getUserById(self,user_id):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT user_line_id from users WHERE user_id = '"+str(user_id)+"'"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        json={}
+        if row is not None:
+            id = row[0]
+            return id
 
     
     def getUserMoney(self,user_line_id):
@@ -708,6 +719,7 @@ class DataBase():
     
     def addToUserWeapon(self,user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add):
         self.cursor = self.conn.cursor()
+        #empty='{}'
         sql ="""INSERT INTO user_weapon (user_line_id, weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add) VALUES (%(user_line_id)s, %(weapon_id)s, %(backpack_loc)s, %(str_add)s, %(int_add)s,%(dex_add)s,%(atk_add)s)"""
         params = {'user_line_id':user_line_id,'weapon_id':weapon_id,'backpack_loc':backpack_loc,'str_add':str_add,'int_add':int_add,'dex_add':dex_add,'atk_add':atk_add}
         self.cursor.execute(sql,params)
@@ -716,20 +728,32 @@ class DataBase():
     def getValueFromUserWeapon(self,user_line_id,backpack_loc):
         self.cursor = self.conn.cursor()
         print("back pac loc:"+str(backpack_loc))
-        sql = """SELECT user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add,uses_reel,available_reeltime,success_time FROM user_weapon where user_line_id = %s and backpack_loc = %s"""
+        sql = """SELECT user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add,uses_reel,available_reeltime,success_time,description FROM user_weapon where user_line_id = %s and backpack_loc = %s"""
         self.cursor.execute(sql,(user_line_id,backpack_loc,))
         _result = self.cursor.fetchone()
         self.conn.commit()
-        print("東西在這")
+        print("武器加乘東西在這")
         print(_result)
-        _json ={"user_line_id":_result[0],"weapon_id":_result[1],"backpack_loc":_result[2],"str_add":_result[3],"int_add":_result[4],"dex_add":_result[5],"atk_add":_result[6],"uses_reel":_result[7],"available_reeltime":_result[8],"success_time":_result[9]}
+        if _result[10] == ['None']:
+            _otherdescription = None
+        else:
+            _otherdescription = _result[10]
+        _json ={"user_line_id":_result[0],"weapon_id":_result[1],"backpack_loc":_result[2],"str_add":_result[3],"int_add":_result[4],"dex_add":_result[5],"atk_add":_result[6],"uses_reel":_result[7],"available_reeltime":_result[8],"success_time":_result[9],"description":_otherdescription}
         return _json
 
     def removeUserWeapon(self,user_line_id,backpack_loc):
         self.cursor = self.conn.cursor()
         sql ="""DELETE FROM user_weapon where user_line_id = %s and backpack_loc = %s """
         self.cursor.execute(sql,(user_line_id,backpack_loc))
-        self.conn.commit()    
+        self.conn.commit()
+
+    #gm 用
+    def givePlayerItem(self,user_lind_id,item_type,item_id,quantity=1):
+        loc = self.checkUserPackMaxLoc(user_lind_id)    
+        if item_type == "weapon":
+            quantity = 1
+            self.addToUserWeapon(user_lind_id,item_id,loc,0,0,0,0)
+        self.addToUserBackPack(user_lind_id,item_type,item_id,quantity,loc)
     
     def getUserEquipmentWeapon(self,user_line_id):
         user_job = self.getUserJob(user_line_id)
@@ -754,6 +778,36 @@ class DataBase():
         _basic_weapon_info["available_reeltime"] = _weapon_add_info["available_reeltime"]
         _basic_weapon_info["backpack_loc"] = _weapon_add_info["backpack_loc"]
         _basic_weapon_info["success_time"] = _weapon_add_info["success_time"]
+        #基本武器沒有任何加乘 直接套用addinfo
+        if _basic_weapon_info["other_effect"] is None or _basic_weapon_info['other_effect'] == "None":
+            _basic_weapon_info["other_effect"] = _weapon_add_info["description"]
+        #基本武器有加乘 看weapon_add有沒有特殊加乘 要拿來加
+        else:
+            #weapon_add 沒有特殊加乘 照舊
+            if _weapon_add_info["description"] is None or _weapon_add_info["description"] == "None":
+                _basic_weapon_info["other_effect"] = _basic_weapon_info["other_effect"]
+            else:
+                for _effect in _weapon_add_info["description"]:
+                    print(_effect)
+                    _effect_type = _effect.split(":")[0]
+                    _value = _effect.split(":")[1]
+                    if _effect_type in _basic_weapon_info["other_effect"].keys():
+                        _originvalue = _basic_weapon_info["other_effect"][_effect_type]
+                        if "%" in _originvalue:
+                            _ogvalue = int(_originvalue.split("%")[0])
+                            if "%" in _value == False:
+                                print("數值怪怪的 一個有%一個沒有")
+                            else:
+                                temp = int(_value.split("%")[0])
+                                _ogvalue+=temp
+                            _basic_weapon_info["other_effect"][_effect_type] = str(_ogvalue)+"%"
+                        else:
+                            _originvalue = int(_originvalue)
+                            _value = int(_value)
+                            _originvalue+=_value
+                            _basic_weapon_info["other_effect"][_effect_type]=str(_originvalue)
+                    else:
+                        _basic_weapon_info["other_effect"][_effect_type] = str(_value)
         return _basic_weapon_info
     
     def changeEquipmentWeapon(self,user_line_id,backpack_loc):
@@ -790,8 +844,41 @@ class DataBase():
             _basic_weapon_info["available_reeltime"] = _weapon_add_info["available_reeltime"]
             _basic_weapon_info["backpack_loc"] = loc
             _basic_weapon_info["success_time"] = _weapon_add_info["success_time"]
+            #基本武器沒有任何加乘 直接套用addinfo
+            if _basic_weapon_info["other_effect"] is None or _basic_weapon_info['other_effect'] == "None":
+                _basic_weapon_info["other_effect"] = _weapon_add_info["description"]
+            #基本武器有加乘 看weapon_add有沒有特殊加乘 要拿來加
+            else:
+                #weapon_add 沒有特殊加乘 照舊
+                if _weapon_add_info["description"] is None or _weapon_add_info["description"] == "None":
+                    _basic_weapon_info["other_effect"] = _basic_weapon_info["other_effect"]
+                else:
+                    for _effect in _weapon_add_info["description"]:
+                        print(_effect)
+                        _effect_type = _effect.split(":")[0]
+                        _value = _effect.split(":")[1]
+                        if _effect_type in _basic_weapon_info["other_effect"].keys():
+                            _originvalue = _basic_weapon_info["other_effect"][_effect_type]
+                            if "%" in _originvalue:
+                                _ogvalue = int(_originvalue.split("%")[0])
+                                if "%" in _value == False:
+                                    print("數值怪怪的 一個有%一個沒有")
+                                else:
+                                    temp = int(_value.split("%")[0])
+                                    _ogvalue+=temp
+                                _basic_weapon_info["other_effect"][_effect_type] = str(_ogvalue)+"%"
+                            else:
+                                _originvalue = int(_originvalue)
+                                _value = int(_value)
+                                _originvalue+=_value
+                                _basic_weapon_info["other_effect"][_effect_type]=str(_originvalue)
+                        else:
+                            _basic_weapon_info["other_effect"][_effect_type] = str(_value)
+                            
             print("位置:"+str(loc)+" 編號:"+str(id))
             print(_basic_weapon_info)
+            print("加成資料")
+            print(_weapon_add_info)
             _weaponlist.append(_basic_weapon_info)
         index = 0
         for _weapon in _weaponlist:

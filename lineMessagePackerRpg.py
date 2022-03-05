@@ -35,6 +35,18 @@ def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
         _matk = 0
         _weponatk = 1+(equipment_weapon_info["dex_add"]/100)*equipment_weapon_info["dex_add"]*1.5
         _atk = ((user_job_info["dex"]+equipment_weapon_info["dex_add"])*1.7*6)+_weponatk
+    #血量增加確認
+    try:
+        hp_add = equipment_weapon_info["other_effect"]["hp_add"]
+        if "%" in hp_add:
+            hp_add = int(hp_add.split("%")[0])
+            hp_add/=100
+            maxhp = maxhp+maxhp*hp_add
+        else:
+            hp_add = int(hp_add)
+            maxhp+=maxhp
+    except:
+        None 
     _atk = math.ceil(_atk)
     _matk = math.ceil(_matk)
     if user_job_info["hp"] !=0:

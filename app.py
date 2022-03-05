@@ -324,6 +324,25 @@ def handle_message(event):
             TextSendMessage(text="這個編號不是可裝備武器 請在確認!"))
             return
         database.changeEquipmentWeapon(event.source.user_id,loc)
+        _user_job = database.getUserJob(event.source.user_id)
+        _noweapon = database.getUserEquipmentWeapon(event.source.user_id)
+        _maxhp = rpgGame.getMaxHp(_user_job["job"],_user_job["level"])
+        #確認武器加乘血量
+        try:
+            hp_add = _noweapon["other_effect"]["hp_add"]
+            if "%" in hp_add:
+                hp_add = int(hp_add.split("%")[0])
+                hp_add/=100
+                hp_add = _maxhp*hp_add
+            else:
+                hp_add = int(hp_add)
+                hp_add = hp_add
+        except:
+            hp_add = 0
+        _maxhp+=hp_add
+        if _user_job["hp"] >= _maxhp:
+            _user_job["hp"] = _maxhp
+        database.setUserJobStatus(event.source.user_id,_user_job)
         _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
         _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list)
         line_bot_api.reply_message(
@@ -502,7 +521,20 @@ def handle_message(event):
             return
         _money-=1500
         _user_job = database.getUserJob(event.source.user_id)
-        _maxhp = rpgGame.getMaxHp(_user_job["job"],_user_job["level"])
+        _noweapon = database.getUserEquipmentWeapon(event.source.user_id)
+        #確認武器加乘血量
+        try:
+            hp_add = _noweapon["other_effect"]["hp_add"]
+            if "%" in hp_add:
+                hp_add = int(hp_add.split("%")[0])
+                hp_add/=100
+                hp_add = rpgGame.getMaxHp(_user_job["job"],_user_job["level"])*hp_add
+            else:
+                hp_add = int(hp_add)
+                hp_add = hp_add
+        except:
+            hp_add = 0 
+        _maxhp = rpgGame.getMaxHp(_user_job["job"],_user_job["level"])+hp_add
         database.setUserMaxHp(event.source.user_id,_maxhp)
         database.SetUserMoneyByLineId(event.source.user_id,_money)
         line_bot_api.reply_message(
@@ -542,7 +574,7 @@ def handle_message(event):
                     FlexSendMessage("怪物存活" ,contents= _lastFlex),])
             elif _game_result_json["Result"] =="win":
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
-                _strtext ="戰鬥勝利! 獲得 exp:"+str(_game_result_json["monster_result_json"]["exp"])+ "金幣:" + str(_game_result_json["get_money"])+"\n"+"剩餘血量:"+str(_game_result_json["player_result_json"]["hp"])+"/"+str(rpgGame.getMaxHp(_game_result_json["player_result_json"]["job"],_game_result_json["player_result_json"]["level"]))
+                _strtext =_game_result_json["win_txt"]
                 if _palyer_job_info["job"] == "warrior":
                     _strtext +=_game_result_json["end_job_result"]
                 if _game_result_json["is_level_up"] == True:
@@ -577,6 +609,28 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage(text="錯誤 請確認id等資料"))
             return
+    elif user_send.startswith("@giveitem"):
+        if event.source.user_id != os.getenv("GM_LINE_ID"):
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="無權限執行此指令"))
+            return
+        #try:
+        _user_id = user_send.split(" ")[1]
+        _item_type = user_send.split(" ")[2]
+        _item_id = user_send.split(" ")[3]
+        _quantity = user_send.split(" ")[4]
+        _user_line_id = database.getUserById(_user_id)
+        database.givePlayerItem(_user_line_id,_item_type,_item_id,_quantity)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="成功給予!"))
+        return
+        # except:
+        #     line_bot_api.reply_message(
+        #         event.reply_token,
+        #         TextSendMessage(text="錯誤 請確認id等資料"))
+        #     return
     elif user_send.startswith("!wset"):
         if event.source.user_id != os.getenv("GM_LINE_ID"):
             line_bot_api.reply_message(

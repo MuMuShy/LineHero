@@ -250,6 +250,18 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     _user_job_temp["str"]+=_weapon_info["str_add"]
     _user_job_temp["int"]+=_weapon_info["int_add"]
     _user_job_temp["dex"]+=_weapon_info["dex_add"]
+    #確認武器加乘血量
+    try:
+        hp_add = _weapon_info["other_effect"]["hp_add"]
+        if "%" in hp_add:
+            hp_add = int(hp_add.split("%")[0])
+            hp_add/=100
+            hp_add = getMaxHp(_playerjob,_user_job_json["level"])*hp_add
+        else:
+            hp_add = int(hp_add)
+            hp_add = hp_add
+    except:
+        hp_add = 0 
     #依照四維的基礎傷害
     baseAttack = getJobAttackByjson(_user_job_temp)
     if _playerjob == "majic":
@@ -301,11 +313,12 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
             _avoid_str="\n盜賊觸發閃避!(30%) 免疫此輪傷害"
             _monsterAttack = 0
 
+
     _playerhp = _user_job_json["hp"] - _monsterAttack
     if _playerjob =="rog":
         _playerhp+=int(_attack_result*0.1)
-        if _playerhp > getMaxHp(_playerjob,_user_job_json["level"]):
-            _playerhp = getMaxHp(_playerjob,_user_job_json["level"])
+        if _playerhp > getMaxHp(_playerjob,_user_job_json["level"])+hp_add:
+            _playerhp = getMaxHp(_playerjob,_user_job_json["level"])+hp_add
         skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))+_avoid_str
         
 
@@ -346,19 +359,19 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
         if _playerjob =="rog":
             _temp = _user_job_json["hp"]
             _temp+=int(_attack_result*0.1)
-            if _temp > getMaxHp(_playerjob,_user_job_json["level"]):
-                _temp = getMaxHp(_playerjob,_user_job_json["level"])
+            if _temp > getMaxHp(_playerjob,_user_job_json["level"])+hp_add:
+                _temp = getMaxHp(_playerjob,_user_job_json["level"])+hp_add
             _user_job_json["hp"] = _temp
         #統計職業效果觸發
         _end_job_result = ""
         #掉落金錢 先隨機
         if _user_job_json["job"] == "warrior":
-            _maxhp = getMaxHp(_user_job_json["job"],_user_job_json["level"])
+            _maxhp = getMaxHp(_user_job_json["job"],_user_job_json["level"])+hp_add
             _health = _maxhp*0.1
             if _user_job_json["hp"] + _health <= _maxhp:
                 _user_job_json["hp"] +=_health
             else:
-                _user_job_json["hp"] = _maxhp
+                _user_job_json["hp"] = _maxhp+hp_add
             _end_job_result ="觸發戰士被動效果 戰士精神 回復血量:"+str(int(_health))
         _money = random.randrange(500,2000)
         _money+=_user_job_json["level"]*30
@@ -371,7 +384,8 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
         if _user_job_json["level"] > _origlevel:
             _islevelup = True
         dataBase.setUserJobStatus(_user_line_id,_user_job_json)
-        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec,"is_credit":_isCredit,"weapon_info":_weapon_info}
+        _strtext ="戰鬥勝利! 獲得 exp:"+str(_monster_base_info["exp"])+ "金幣:" + str(_money)+"\n"+"剩餘血量:"+str(_user_job_json["hp"])+"/"+str(getMaxHp(_user_job_json["job"],_user_job_json["level"])+hp_add)
+        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec,"is_credit":_isCredit,"weapon_info":_weapon_info,"win_txt":_strtext}
 
     return _result
     
@@ -419,6 +433,8 @@ def WeaponEnhancement(user_line_id,reel_id):
                 result = []
                 IS_HAVE = False
                 for s in uses_reel:
+                    print("s 內容")
+                    print(s)
                     if s.split(':')[0] == str(reelData['reel_id']):
                         result.append(s.split(':')[0] + ':' + str(int(s.split(':')[1])+1))
                         IS_HAVE = True
