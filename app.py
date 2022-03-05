@@ -396,6 +396,12 @@ def handle_message(event):
         else:
             _loc = _reelinfo["backpack_loc"]
         _has_reel_num = database.checkItemNumFromLoc(event.source.user_id,_loc)
+        _noweapon = database.getUserEquipmentWeapon(event.source.user_id)
+        if _noweapon["available_reeltime"] <= 0:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("強化次數已經用完了ㄛ"))
+            return
         #移除一張 此卷軸 開始強化
         if _has_reel_num > 0:
             database.removeUsefulItemFromPack(event.source.user_id,_loc,1)
