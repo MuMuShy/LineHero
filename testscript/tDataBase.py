@@ -7,6 +7,8 @@ from select import select
 import psycopg2
 from dotenv import load_dotenv
 import random
+
+import rpgDictionary
 load_dotenv()
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -319,23 +321,31 @@ class DataBase():
 
     def updateall(self):
         self.cursor = self.conn.cursor()
-        sql = "SELECT user_line_id,jobs FROM users_job"
+        sql = "SELECT user_line_id,jobs,level FROM users_job"
         self.cursor.execute(sql)
         _result = self.cursor.fetchall()
         self.conn.commit()
         for i in _result:
             _id = i[0]
             _job = i[1]
-            loc = self.checkUserPackMaxLoc(_id)
+            _level = i[2]
             if _job == 'warrior':
-                self.addToUserBackPack(_id,"weapon",7,1,loc)
-                self.addToUserWeapon(_id,7,loc,0,0,0,0)
+                self.addSkillToUser(_id,0,'warrior',1,0)
+                self.addSkillToUser(_id,1,'warrior',1,0)
+                if _level >= 30:
+                    self.addSkillToUser(_id,2,'warrior',1,0)
             elif _job == 'rog':
-                self.addToUserBackPack(_id,"weapon",6,1,loc)
-                self.addToUserWeapon(_id,6,loc,0,0,0,0)
+                self.addSkillToUser(_id,0,'rog',1,0)
+                self.addSkillToUser(_id,1,'rog',1,0)
+                if _level >= 30:
+                    self.addSkillToUser(_id,2,'rog',1,0)
             else:
-                self.addToUserBackPack(_id,"weapon",5,1,loc)
-                self.addToUserWeapon(_id,5,loc,0,0,0,0)
+                self.addSkillToUser(_id,0,'majic',1,0)
+                self.addSkillToUser(_id,1,'majic',1,0)
+                if _level >= 30:
+                    self.addSkillToUser(_id,2,'majic',1,0)
+            print("done")
+                
 
     def getUserEquipmentList(self,user_line_id):
         user_job = self.getUserJob(user_line_id)
@@ -422,16 +432,35 @@ class DataBase():
     def getSkillInfo(self,skill_id,job):
         self.cursor = self.conn.cursor()
         table_name = "skill_list_"+job
-        sql = "SELECT skill_id,skill_name,skill_description,skill_effect_description,max_level,max_book_time,leveladd_one_book,skill_type,own_level,own_job_level,skill_effect_addlv_description FROM {table_name} where skill_id = {skill_id}".format(table_name = table_name,skill_id = skill_id)
+        sql = "SELECT skill_id,skill_name,skill_description,skill_effect_description,max_level,max_book_time,leveladd_one_book,skill_type,own_level,own_job_level,skill_effect_addlv_description,image_type FROM {table_name} where skill_id = {skill_id}".format(table_name = table_name,skill_id = skill_id)
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
         self.conn.commit()
         
         if _result is not None:
             return {"skill_id":_result[0],"skill_name":_result[1],"skill_description":_result[2],"skill_effect_description":_result[3],"max_level":_result[4],"max_book_time":_result[5],"leveladd_one_book":_result[6],
-            "skill_type":_result[7],"own_level":_result[8],"skill_effect_addlv_description":_result[9]}
+            "skill_type":_result[7],"own_level":_result[8],"own_job_level":_result[9],"skill_effect_addlv_description":_result[10],"image_type":_result[11]}
         else:
             return None
+    
+    def getUserSkillList(self,user_line_id):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT skill_id,skill_job FROM user_skill where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchall()
+        _skills = {}
+        _userskill_list = []
+        for _id in _result:
+            _skillid = int(_id[0])
+            _skilljob = _id[1]
+            _skills[_skillid] = _skilljob
+        for skill in _skills:
+            _job = _skills[skill]
+            _id = skill
+            skilljson = self.getSkillFromUser(user_line_id,_id,_job)
+            _userskill_list.append(skilljson)
+        return _userskill_list
+        
     
     def getSkillFromUser(self,user_line_id,skill_id,job):
         _skillbasic = self.getSkillInfo(skill_id,job)
@@ -440,12 +469,97 @@ class DataBase():
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
         self.conn.commit()
+        _skillfromUser =  {"skill_id":_result[0],"skill_level":_result[1],"used_book_time":_result[2]}
         #確認技能等級
-
+        _skilllevel = _skillfromUser["skill_level"]
+        _used_book_time = _skillfromUser["used_book_time"]
+        _max_book_time = _skillbasic["max_book_time"]
+        _one_book_addlv = _skillbasic["leveladd_one_book"]
+        _max_level = _skillbasic["max_level"]
+        _skillbasic["_skilllevel"] = _skilllevel
+        _skillbasic["job"] = job
+        if _used_book_time > _max_book_time or _skilllevel > _max_level+_used_book_time*_one_book_addlv:
+            print("三小 有問題 這人技能書吃的比最大還多本 外掛")
+            return
+        #依照skill的基本資料 透過技能等級 把狀態附加上去
+        if _skillbasic["skill_effect_addlv_description"] != [] and len(_skillbasic["skill_effect_addlv_description"]) > 0:
+            for _effect_addlv in _skillbasic["skill_effect_addlv_description"]:
+                _type = _effect_addlv.split(":")[0]
+                _value = _effect_addlv.split(":")[1]
+                _ispesent = False
+                if "%" in _value:
+                    _value = int(_value.split("%")[0])
+                else:
+                    _value = int(_value)
+                _index = 0
+                for _basiceffect in _skillbasic["skill_effect_description"]:
+                    _otype = _basiceffect.split(":")[0]
+                    _ovalue = _basiceffect.split(":")[1]
+                    #找到那筆資料ㄌ
+                    if _otype == _type:
+                        _origin_value = _ovalue
+                        if "%" in _origin_value:
+                            _ispesent = True
+                            _origin_value_num = int(_origin_value.split("%")[0])
+                        else:
+                            _origin_value_num = int(_origin_value_num)
+                        _origin_value_num+=_value*_skilllevel
+                        if _ispesent:
+                            _origin_value_num = str(_origin_value_num)+"%"
+                        else:
+                            _origin_value_num = str(_origin_value_num)
+                        _skillbasic["skill_effect_description"][_index] = _otype+":"+_origin_value_num
+                    else:
+                        _index+=1
+               
+        if "*" in _skillbasic["skill_description"]:
+            _sym = '*'
+            lst = []
+            for pos,char in enumerate(_skillbasic["skill_description"]):
+                if(char == _sym):
+                    lst.append(pos)
+            index = 0
+            for _effect in _skillbasic["skill_effect_description"]:
+                _type = _effect.split(":")[0]
+                _value = _effect.split(":")[1]
+                _type = rpgDictionary.getChineseEffectName(_type)
+                _skillbasic["skill_description"] = _skillbasic["skill_description"][0:lst[index]] + _type + _value +_skillbasic["skill_description"][lst[index]+1:]
+                index +=1
+        
+        return _skillbasic
+    
+    def checkUserHasSkill(self,user_line_id,skill_id,skill_job):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT skill_id FROM user_skill where user_line_id = '{user_line_id}' and skill_id = {skill_id} and skill_job = '{skill_job}'".format(user_line_id = user_line_id,skill_id = skill_id,skill_job=skill_job)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchone()
         if _result is not None:
-            return {"skill_id":_result[0],"skill_level":_result[1],"used_book_time":_result[2]}
+            return True
         else:
-            return None
+            return False
+    
+    def addUserSkillLevel(self,user_line_id,skill_id,skill_job):
+        self.cursor = self.conn.cursor()
+        sql = "UPDATE user_skill SET skill_level = skill_level+1 where skill_id = {skill_id} and skill_job ='{skill_job}' and user_line_id = '{user_line_id}'".format(skill_id=skill_id,skill_job=skill_job,user_line_id=user_line_id)
+        self.cursor.execute(sql)
+        self.conn.commit()
+    
+    def decUserSkillPoint(self,user_line_id):
+        self.cursor = self.conn.cursor()
+        sql = "UPDATE users_job SET skill_point = skill_point-1 where user_line_id = '{user_line_id}'".format(user_line_id=user_line_id)
+        self.cursor.execute(sql)
+        self.conn.commit()
+    
+    def addSkillToUser(self,user_line_id,skill_id,skill_job,skill_level,used_book_time):
+        if self.checkUserHasSkill(user_line_id,skill_id,skill_job):
+            print("已有此技能")
+            return
+        self.cursor = self.conn.cursor()
+        sql = """INSERT INTO public.user_skill(user_line_id, skill_id, skill_job, skill_level, used_book_time) VALUES ( %(user_line_id)s,%(skill_id)s,%(skill_job)s,%(skill_level)s,%(used_book_time)s)"""
+        params = {'user_line_id':user_line_id, 'skill_id':skill_id,'skill_job':skill_job,'skill_level':skill_level,'used_book_time':used_book_time}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+
 
 if __name__ == "__main__":
     database = DataBase()
@@ -457,6 +571,10 @@ if __name__ == "__main__":
     #loc = database.checkUserPackMaxLoc(_id)
     # json = database.getUserReelList(_id)
     # print(json)
-    print(database.getSkillInfo(0,'rog'))
-    print(database.getSkillFromUser(_id,0,'rog'))
+    #print(database.getSkillInfo(2,'rog'))
+    # database.addUserSkillLevel(_id,2,'rog')
+    # database.decUserSkillPoint(_id)
+    # print(database.checkUserHasSkill(_id,2,"rog"))
+    # database.addSkillToUser(_id,0,"majic",1,0)
+    database.updateall()
 

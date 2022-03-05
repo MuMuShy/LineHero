@@ -221,6 +221,7 @@ def addPlayerExp(_user_job_json,_exp):
     while _user_job_json["exp"] >= _now_max_exp:
         _user_job_json["exp"] -= _now_max_exp
         _user_job_json["level"]+=1
+        _user_job_json["skill_point"]+=1
         if _user_job_json["job"] == "warrior":
             _user_job_json["str"]+=4
             _user_job_json["dex"]+=2
@@ -240,7 +241,7 @@ def addPlayerExp(_user_job_json,_exp):
 
 
 
-def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
+def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill=None):
     _isCredit = False
     _playerjob = _user_job_json["job"]
     print("職業:"+_playerjob)
@@ -301,6 +302,24 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
     _random = random.randrange(85,120)
     _attack_result*=_random/100
     _attack_result = int(_attack_result)
+    #查看技能
+    _skilldes = ""
+    if skill is not None:
+        _effects = skill["skill_effect_description"][0]
+        _type = _effects.split(":")[0]
+        _value = _effects.split(":")[1]
+        #傷害性技能
+        if _type == "damage":
+            if "%" in _value:
+                _value = int(_value.split("%")[0])
+                _value = _value/100
+            else:
+                _value = int(_value)
+            _skilldamage = int(baseAttack*attackpow)*_value*_credit
+            _skilldamage = math.ceil(_skilldamage)
+            print("技能傷害:"+str(_skilldamage))
+            _skilldes = "\n使用技能 "+skill["skill_name"]+" 傷害: "+str(_skilldamage)
+            _attack_result = _skilldamage
     _monster_base_info = dataBase.getMonsterInfo(_target_monster_id)
     _monster_hp = monster_hp-_attack_result
     _monsterAttack = int(random.randrange(int(_monster_base_info["attack"]*0.7),int(_monster_base_info["attack"])))
@@ -315,13 +334,13 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp):
 
 
     _playerhp = _user_job_json["hp"] - _monsterAttack
-    if _playerjob =="rog":
+    if _playerjob =="rog" and skill is None:
         _playerhp+=int(_attack_result*0.1)
         if _playerhp > getMaxHp(_playerjob,_user_job_json["level"])+hp_add:
             _playerhp = getMaxHp(_playerjob,_user_job_json["level"])+hp_add
         skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))+_avoid_str
         
-
+    skill_effec+=_skilldes
     _result={}
     if _playerhp <= 0:
         _playerhp = 0

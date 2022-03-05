@@ -2200,93 +2200,129 @@ def getRpgTop5Rank(top5rankarr):
     }
     return json
 
-def getSkillList(_player_job_json):
-    _description = "戰鬥勝利後 回復10%最大生命值"
-    _skillname = "戰士精神"
-    skill = "1.png"
-    if _player_job_json["job"] == "majic":
-        skill = "2.jpg"
-        _description = "每回合戰鬥 30%機率增加自身INT30%"
-        _skillname = "賢者之力"
-    elif _player_job_json["job"] == "rog":
-        skill = "3.png"
-        _description = "攻擊附帶10%傷害吸血"
-        _skillname = "嗜血如命"
-    json = {
-    "type": "carousel",
-    "contents": [
-        {
-        "type": "bubble",
-        "size": "micro",
-        "hero": {
-            "type": "image",
-            "size": "full",
-            "aspectMode": "cover",
-            "aspectRatio": "320:213",
-            "url": "https://mumu.tw/images/skill/"+skill
-        },
-        "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-            {
-                "type": "text",
-                "text": _skillname,
-                "weight": "bold",
-                "color": "#ffffff",
-                "size": "sm",
-                "wrap": True,
-                "align": "center"
-            },
-            {
-                "type": "box",
-                "layout": "baseline",
-                "contents": [
-                {
-                    "type": "text",
-                    "text": "被動 不可升級",
-                    "size": "xs",
-                    "color": "#ffffff",
-                    "margin": "md",
-                    "flex": 0
-                }
-                ]
-            },
-            {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                {
+def getSkillList(_player_skill_list):
+    bubbles = []
+    for skill in _player_skill_list:
+        _url = "https://mumu.tw/images/skill/"+skill["job"]+"/"+str(skill["skill_id"])+"."+skill["image_type"]
+        _level = str(skill["_skilllevel"])
+        _nowmaxlevel = skill["used_book_time"]*skill["leveladd_one_book"]+skill["max_level"]
+        _name = skill["skill_name"]
+        _canlevelup = ""
+        _levelupbtn = ""
+        if skill["max_level"] == 1 and skill["max_book_time"] == 0:
+            _canlevelup = "不可升級"
+            _levelupbtn = " "
+        else:
+            _levelupbtn = "@skilllevelup "+skill["job"]+":"+str(skill["skill_id"])
+        type = "被動技能"
+        if skill["skill_type"] == "active":
+            type = "主動技能"
+        type+=_canlevelup
+        #每等提升資料
+        _levelupinfo = " "
+        if skill["skill_effect_addlv_description"] != []:
+            _levelupinfo = "每等級提升:\n"
+            for skilllvupdes in skill["skill_effect_addlv_description"]:
+                type = skilllvupdes.split(":")[0]
+                _value =  skilllvupdes.split(":")[1]
+                type = rpgDictionary.getChineseEffectName(type)
+                _levelupinfo+= type+" "+_value
+        bubble = {
+                "type": "bubble",
+                "size": "micro",
+                "hero": {
+                    "type": "image",
+                    "url": _url,
+                    "size": "full",
+                    "aspectMode": "cover",
+                    "aspectRatio": "320:213"
+                },
+                "body": {
                     "type": "box",
                     "layout": "vertical",
-                    "spacing": "sm",
                     "contents": [
                     {
                         "type": "text",
-                        "text": _description,
-                        "wrap": True,
-                        "color": "#ffffff",
-                        "size": "xs",
-                        "flex": 5
+                        "text": _name+" LV "+_level+" 最大:"+str(_nowmaxlevel)+"\n可用技能書:"+str(skill["max_book_time"]),
+                        "weight": "bold",
+                        "size": "sm",
+                        "wrap": True
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": type,
+                            "size": "xs",
+                            "color": "#8c8c8c",
+                            "margin": "md",
+                            "flex": 0
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "box",
+                            "layout": "baseline",
+                            "spacing": "sm",
+                            "contents": [
+                            {
+                                "type": "text",
+                                "text": skill["skill_description"],
+                                "wrap": True,
+                                "size": "xs",
+                                "flex": 5,
+                                "weight": "bold"
+                            }
+                            ],
+                            "height": "100px"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "separator",
+                                "margin": "sm"
+                            },
+                            {
+                                "type": "text",
+                                "text": _levelupinfo,
+                                "size": "xxs"
+                            }
+                            ]
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                            {
+                                "type": "button",
+                                "action": {
+                                "type": "message",
+                                "label": "升級",
+                                "text": _levelupbtn
+                                },
+                                "style": "primary"
+                            }
+                            ]
+                        }
+                        ]
                     }
-                    ]
-                }
-                ]
+                ],
+                "spacing": "sm",
+                "paddingAll": "13px"
             }
-            ],
-            "spacing": "sm",
-            "paddingAll": "13px"
-        },
-        "styles": {
-            "hero": {
-            "backgroundColor": "#142952"
-            },
-            "body": {
-            "backgroundColor": "#142952"
             }
-        }
-        }
-    ]
+        bubbles.append(bubble)
+    json = {
+    "type": "carousel",
+    "contents": bubbles
     }
     return json
 
@@ -3296,5 +3332,69 @@ def getUserReelList(_reels_json):
     json = {
          "type": "carousel",
          "contents":_bubbles
+    }
+    return json
+
+def getUserActiveSkills(skill_list):
+    bubbles = []
+    for skill in skill_list:
+        _url = "https://mumu.tw/images/skill/"+skill["job"]+"/"+str(skill["skill_id"])+"."+skill["image_type"]
+        _name = skill["skill_name"]
+        bubble = {
+      "type": "bubble",
+      "size": "nano",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "image",
+            "url": _url,
+            "size": "full"
+          }
+        ]
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "text",
+                "text": _name,
+                "size": "sm",
+                "wrap": True,
+                "weight": "bold",
+                "align": "center"
+              }
+            ],
+            "flex": 1
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "message",
+              "label": "使用",
+              "text": "@useskill "+skill["job"]+" "+str(skill["skill_id"])
+            },
+            "style": "primary"
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px"
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    }
+    bubbles.append(bubble)
+    json =  {
+    "type": "carousel",
+    "contents": bubbles
     }
     return json

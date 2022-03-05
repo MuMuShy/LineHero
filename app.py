@@ -350,13 +350,51 @@ def handle_message(event):
             TextSendMessage(text="切換裝備成功"),
             FlexSendMessage("切換裝備",contents=_flex_equipment)])
     elif user_send =="@skill":
-        _status = database.getUserJob(event.source.user_id)
-        _skillflex = lineMessagePackerRpg.getSkillList(_status)
-        #先未開放
+        _skillpoint = database.getUserJob(event.source.user_id)["skill_point"]
+        _skilllist = database.getUserSkillList(event.source.user_id)
+        _skillflex = lineMessagePackerRpg.getSkillList(_skilllist)
         line_bot_api.reply_message(
-            event.reply_token,
-            FlexSendMessage("玩家技能",contents=_skillflex))
+            event.reply_token,[
+            TextSendMessage(text="可用技能點數:"+str(_skillpoint)),
+            FlexSendMessage("玩家技能",contents=_skillflex)])
         return
+    elif user_send.startswith("@skilllevelup"):
+        try:
+            _info = user_send.split(" ")[1]
+            _skilljob = _info.split(":")[0]
+            _skillid = _info.split(":")[1]
+            print("skill job:"+_skilljob+"     id:"+str(_skillid))
+        except:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="格式好像有問題ㄛ"))
+            return
+        if database.checkUserHasSkill(event.source.user_id,_skillid,_skilljob) == True:
+            _skillnow = database.getSkillFromUser(event.source.user_id,_skillid,_skilljob)
+            _nowlevel = _skillnow["_skilllevel"]
+            _skillpoint = database.getUserJob(event.source.user_id)["skill_point"]
+            #可以升級
+            if _nowlevel < _skillnow["max_level"]+_skillnow["used_book_time"]*_skillnow["leveladd_one_book"] and _skillpoint > 1:
+                database.addUserSkillLevel(event.source.user_id,_skillid,_skilljob)
+                database.decUserSkillPoint(event.source.user_id)
+                _skilllist = database.getUserSkillList(event.source.user_id)
+                _skillflex = lineMessagePackerRpg.getSkillList(_skilllist)
+                line_bot_api.reply_message(
+                    event.reply_token,[
+                    TextSendMessage(text="升級成功 目前可用技能點數:"+str(_skillpoint-1)),
+                    FlexSendMessage("玩家技能",contents=_skillflex)])
+            else:
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="這個技能好像無法升級... 有些技能可以使用技能書 使用後可以突破上限")
+                    )
+        else:
+            line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="是不是點到別人的技能去了 你沒這招")
+                    )
+
+
     elif user_send =="@bag":
         _bag_flex = lineMessagePackerRpg.getUsefulItemMenu()
 
@@ -472,10 +510,13 @@ def handle_message(event):
         else:
             _monster_json = _result["_monster"]
             _flex = lineMessagePackerRpg.getMonsterPacker(_monster_json,_monster_json["hp"]) 
+            _activeskills = database.getUserActiveSkillList(event.source.user_id)
+            _skillflex = lineMessagePackerRpg.getUserActiveSkills(_activeskills)
             line_bot_api.reply_message(
                     event.reply_token,
                     [TextSendMessage(text=_result["reply_text"]),
-                    FlexSendMessage("遭遇怪物!",contents=_flex)
+                    FlexSendMessage("遭遇怪物!",contents=_flex),
+                    FlexSendMessage("遭遇怪物!",contents=_skillflex)
                     ])
     elif user_send =="@run":
         if database.UserIsInCombat(event.source.user_id) == False:
@@ -571,12 +612,77 @@ def handle_message(event):
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
                 _monsterFlex = lineMessagePackerRpg.getMonsterPacker(_monsterbase,_game_result_json["monster_result_json"]["hp"])
                 _lastFlex = lineMessagePackerRpg.getRoundMonsterAliveButton(_game_result_json)
+                _activeskills = database.getUserActiveSkillList(event.source.user_id)
+                _skillflex = lineMessagePackerRpg.getUserActiveSkills(_activeskills)
                 _strtext = "遭到怪物攻擊:"+ str(_game_result_json["mosnter_damage"]) +" 玩家剩餘血量:"+ str(_game_result_json["player_result_json"]["hp"])
                 line_bot_api.reply_message(
                     event.reply_token,[
                     FlexSendMessage("攻擊!",contents=_attackbtnFlex),
                     TextSendMessage(text = _str_skill_text),
                     FlexSendMessage("怪物存活!",contents=_monsterFlex),
+                    FlexSendMessage("怪物存活!",contents=_skillflex),
+                    FlexSendMessage("怪物存活" ,contents= _lastFlex),])
+            elif _game_result_json["Result"] =="win":
+                _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
+                _strtext =_game_result_json["win_txt"]
+                if _palyer_job_info["job"] == "warrior":
+                    _strtext +=_game_result_json["end_job_result"]
+                if _game_result_json["is_level_up"] == True:
+                    _strtext+="\n恭喜升等!!"
+                line_bot_api.reply_message(
+                    event.reply_token,[
+                    FlexSendMessage("最終一擊",contents=_attackbtnFlex),
+                    TextSendMessage(text = _str_skill_text),
+                    FlexSendMessage("戰鬥結束!",contents=lineMessagePackerRpg.getBattleEnd(_game_result_json)),
+                    TextSendMessage(text = _strtext),])
+            elif _game_result_json["Result"] == "loose":
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage("戰鬥結束! 很可惜你承受不住怪物的傷害 已死亡 -百分之10 exp 復活指令: @health"),
+                    )
+            return
+    elif user_send.startswith("@useskill"):
+        if database.checkUserHasJob(event.source.user_id) == False:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你還沒有創建冒險者喔\n請先使用 !info 裡面的冒險者之旅按鈕開始旅程"))
+            return
+        if database.UserIsInCombat(event.source.user_id) == False:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="你還沒有進入戰鬥喔"))
+            return
+        try:
+            _skilljob = user_send.split(" ")[1]
+            _skillid = user_send.split(" ")[2]
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="指令好像有問題ㄛ 請盡量用按鈕謝謝"))
+            return
+        if database.checkUserHasSkill(event.source.user_id,_skillid,_skilljob) == True:
+            _skillinfo = database.getSkillFromUser(event.source.user_id,_skillid,_skilljob)
+            _round_info = database.getUserRoundInfo(event.source.user_id)
+            _palyer_job_info = database.getUserJob(event.source.user_id)
+            _monsterbase = database.getMonsterInfo(_round_info["target_monster_id"])
+            _game_result_json = rpgGame.attackround(event.source.user_id,_palyer_job_info,_monsterbase["monster_id"],_round_info["monster_hp"],_skillinfo)
+            try:
+                _str_skill_text = _game_result_json["skill_efect"]
+            except:
+                print("no skill text")
+            if _game_result_json["Result"] == "monster_alive":
+                _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
+                _monsterFlex = lineMessagePackerRpg.getMonsterPacker(_monsterbase,_game_result_json["monster_result_json"]["hp"])
+                _activeskills = database.getUserActiveSkillList(event.source.user_id)
+                _skillflex = lineMessagePackerRpg.getUserActiveSkills(_activeskills)
+                _lastFlex = lineMessagePackerRpg.getRoundMonsterAliveButton(_game_result_json)
+                _strtext = "遭到怪物攻擊:"+ str(_game_result_json["mosnter_damage"]) +" 玩家剩餘血量:"+ str(_game_result_json["player_result_json"]["hp"])
+                line_bot_api.reply_message(
+                    event.reply_token,[
+                    FlexSendMessage("攻擊!",contents=_attackbtnFlex),
+                    TextSendMessage(text = _str_skill_text),
+                    FlexSendMessage("怪物存活!",contents=_monsterFlex),
+                    FlexSendMessage("怪物存活!",contents=_skillflex),
                     FlexSendMessage("怪物存活" ,contents= _lastFlex),])
             elif _game_result_json["Result"] =="win":
                 _attackbtnFlex = lineMessagePackerRpg.getAttackButton(_game_result_json["player_damage"],_game_result_json)
