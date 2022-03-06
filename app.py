@@ -1,6 +1,3 @@
-from cgitb import text
-import imp
-from modulefinder import replacePackageMap
 import random
 from time import sleep, time
 from flask import Flask, request, abort
@@ -1061,7 +1058,6 @@ if __name__ == "__main__":
     apiThread = bybitApi.BybitApi("apithread")
     apiThread.start()
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
     if environment =="DEV":
         app.run(host='0.0.0.0', port=port,debug=True)
     else:
