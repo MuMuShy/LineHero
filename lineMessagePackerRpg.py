@@ -1237,6 +1237,134 @@ def getExperList():
             "separator": False
             }
         }
+        },{
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "江戶幕府",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "推薦LV: 50-70",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            },
+            {
+                "type": "text",
+                "text": "危險指數",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "xs"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "width": "90%",
+                    "backgroundColor": "#ff0000",
+                    "height": "6px"
+                }
+                ],
+                "backgroundColor": "#9FD8E36E",
+                "height": "6px",
+                "margin": "sm"
+            }
+            ],
+            "backgroundColor": "#27ACB2",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "桃桃子",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                },
+                {
+                    "type": "text",
+                    "text": "吹雪",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                },
+                {
+                    "type": "text",
+                    "text": "三尾狐狸",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                },
+                {
+                    "type": "text",
+                    "text": "隱藏腳色",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                }
+                ],
+                "flex": 1
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "出發",
+                "text": "@goto shogunate"
+                },
+                "margin": "xs",
+                "style": "primary",
+                "offsetBottom": "10px",
+                "height": "sm"
+            }
+            ],
+            "spacing": "sm",
+            "height": "50px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
         }
     ]
     }

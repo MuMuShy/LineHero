@@ -48,7 +48,7 @@ def checkstrjobLegal(job):
     else:
         return False
 def checkstrMapLegal(map_command):
-    _maps = ["forest","elfforest","barbarian","ghostroad"]
+    _maps = ["forest","elfforest","barbarian","ghostroad","shogunate"]
     if map_command in _maps:
         return True
     else:
@@ -314,13 +314,15 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
             _skilldamage = int(baseAttack*attackpow)*_value*_credit
             _skilldamage = math.ceil(_skilldamage)
             print("技能傷害:"+str(_skilldamage))
-            _skilldes = "\n使用技能 "+skill["skill_name"]+" 傷害: "+str(_skilldamage)
+            
             _attack_result = _skilldamage
 
     #浮動率 85~120%
     _random = random.randrange(85,120)
     _attack_result*=_random/100
     _attack_result = int(_attack_result)
+    if skill is not None:
+        _skilldes = "\n使用技能 "+skill["skill_name"]+" 傷害: "+str(_skilldamage)
 
     _monster_base_info = dataBase.getMonsterInfo(_target_monster_id)
     _monster_hp = monster_hp-_attack_result
