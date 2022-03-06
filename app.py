@@ -84,6 +84,7 @@ def handle_message(event):
             TextSendMessage(text="成功驗證 可進續進行遊戲 獎勵經驗值: 4000"))
             return
         else:
+            print("玩家測謊失敗")
             line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="由於大量請求 請輸入下列訊息驗證:\n"+limite_user[event.source.user_id]))
@@ -502,6 +503,7 @@ def handle_message(event):
         if (event.source.user_id in limite_user.keys()) is False:
             _random = random.randrange(1,100)
             if _random <=5:
+                print("玩家: 進入測謊")
                 from Games import questions
                 _question = random.choice(questions.question)
                 #del local_storage[event.source.user_id]
