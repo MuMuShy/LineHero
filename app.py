@@ -982,6 +982,18 @@ def handle_message(event):
         event.reply_token,
         FlexSendMessage("目前彩金!",contents=lineMessagePacker.getJackPotFlex(_jackpotjson)))
     elif _command_check.startswith("!spin"):
+        if (event.source.user_id in limite_user.keys()) is False:
+            _random = random.randrange(1,100)
+            if _random <=5:
+                print("玩家: 進入測謊")
+                from Games import questions
+                _question = random.choice(questions.question)
+                #del local_storage[event.source.user_id]
+                limite_user[event.source.user_id] = _question
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"+_question))
+                return   
         try:
             _times = int(_command_check.split(" ")[1])
         except:
