@@ -1,5 +1,6 @@
 from ast import parse
 from cgitb import reset
+from dataclasses import dataclass
 import os
 from re import S
 import re
@@ -574,15 +575,39 @@ class DataBase():
         params = {'user_line_id':user_line_id, 'skill_id':skill_id,'skill_job':skill_job,'skill_level':skill_level,'used_book_time':used_book_time}
         self.cursor.execute(sql,params)
         self.conn.commit()
+    
+    def addExpForPlayer(self,user_line_id,exp):
+        self.cursor = self.conn.cursor()
+        sql = "UPDATE users_job SET exp = exp+{exp} where user_line_id = '{user_line_id}'".format(exp=exp,user_line_id=user_line_id)
+        self.cursor.execute(sql)
+        self.conn.commit()
+    
 
 
 if __name__ == "__main__":
+    _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     database = DataBase()
+    database.addExpForPlayer(_id,1000)
     #_id = 'U0b37a9d05272a9e82d0ee60ba10bdd72'
     # loc = database.checkUserPackMaxLoc(_id)
     #database.addToUserBackPack(_id,"weapon",5,1,loc)
     #database.addToUserWeapon(_id,5,loc,0,0,0,0)
-
+    # local = {}
+    # id1 = '123'
+    # id2 = '2344'
+    # print(id1 in local.keys())
+    # if (id1 in local.keys()) is False:
+    #     local[id1] = 1
+    # else:
+    #     _time = local[id1]
+    #     _time+=1
+    # if (id1 in local.keys()) is False:
+    #     local[id1] = 1
+    # else:
+    #     _time = local[id1]
+    #     _time+=1
+    #     local[id1] = _time
+    # print(local[id1])
     #loc = database.checkUserPackMaxLoc(_id)
     # json = database.getUserReelList(_id)
     # print(json)

@@ -1,0 +1,1 @@
+question = ['aa','bd','dog','ban','ok','test','fine','js','te','qq','ef','hyo']

@@ -477,6 +477,11 @@ class DataBase():
         print(_json)
         return _json        
 
+    def addExpForPlayer(self,user_line_id,exp):
+        self.cursor = self.conn.cursor()
+        sql = "UPDATE users_job SET exp = exp+{exp} where user_line_id = '{user_line_id}'".format(exp=exp,user_line_id=user_line_id)
+        self.cursor.execute(sql)
+        self.conn.commit()
     
     def setUserJobStatus(self,user_line_id,user_job_json):
         self.cursor = self.conn.cursor()
