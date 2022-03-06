@@ -345,7 +345,22 @@ class DataBase():
                 if _level >= 30:
                     self.addSkillToUser(_id,2,'majic',1,0)
             print("done")
-                
+    
+    def getLevelSkillList(self,level,job):
+        self.cursor = self.conn.cursor()
+        table_name = "skill_list_"+job
+        sql = "SELECT skill_id FROM {table_name} where own_level >= {level}".format(table_name = table_name,level = level)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchall()
+        self.conn.commit()
+        list = []
+        if _result is not None:
+            for id in _result:
+                list.append(int(id[0]))
+            print(list)
+            return list
+        else:
+            return None
 
     def getUserEquipmentList(self,user_line_id):
         user_job = self.getUserJob(user_line_id)
@@ -575,6 +590,6 @@ if __name__ == "__main__":
     # database.addUserSkillLevel(_id,2,'rog')
     # database.decUserSkillPoint(_id)
     # print(database.checkUserHasSkill(_id,2,"rog"))
-    # database.addSkillToUser(_id,0,"majic",1,0)
-    database.updateall()
+    database.addSkillToUser(_id,0,"rog",1,0)
+    #database.getLevelSkillList(1,"rog")
 

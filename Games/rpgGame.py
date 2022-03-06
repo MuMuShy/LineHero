@@ -236,7 +236,7 @@ def addPlayerExp(_user_job_json,_exp):
             _user_job_json["int"]+=2
         _user_job_json["hp"] = getMaxHp(_user_job_json["job"], _user_job_json["level"])
         _now_max_exp = getMaxExp(_user_job_json["level"])
-        
+    
     return _user_job_json
 
 
@@ -401,8 +401,17 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
         _origlevel = _user_job_json["level"]
         _user_job_json = addPlayerExp(_user_job_json,_monster_base_info["exp"])
         _islevelup = False
+        print( _user_job_json["level"])
+        print(_origlevel)
         if _user_job_json["level"] > _origlevel:
             _islevelup = True
+            skilllist = dataBase.getLevelSkillList(_user_job_json["level"],_user_job_json["job"])
+            print("現在等級應該要有的id:")
+            print(skilllist)
+            for skillid in skilllist:
+                if dataBase.checkUserHasSkill(_user_line_id,skillid,_user_job_json["job"]) == False:
+                    print("玩家沒有這招:"+str(skillid))
+                    dataBase.addSkillToUser(_user_line_id,skillid,_user_job_json["job"],1,0)
         dataBase.setUserJobStatus(_user_line_id,_user_job_json)
         _strtext ="戰鬥勝利! 獲得 exp:"+str(_monster_base_info["exp"])+ "金幣:" + str(_money)+"\n"+"剩餘血量:"+str(_user_job_json["hp"])+"/"+str(getMaxHp(_user_job_json["job"],_user_job_json["level"])+hp_add)
         _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec,"is_credit":_isCredit,"weapon_info":_weapon_info,"win_txt":_strtext}

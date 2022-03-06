@@ -355,6 +355,8 @@ class DataBase():
         self.conn.commit()
         print("增加jp:"+str(grand)+","+str(major)+","+str(minor)+","+str(mini))
     
+    
+
 
     def checkUserDaily(self,user_line_id):
         self.cursor = self.conn.cursor()
@@ -989,6 +991,32 @@ class DataBase():
         if _result is not None:
             return {"skill_id":_result[0],"skill_name":_result[1],"skill_description":_result[2],"skill_effect_description":_result[3],"max_level":_result[4],"max_book_time":_result[5],"leveladd_one_book":_result[6],
             "skill_type":_result[7],"own_level":_result[8],"own_job_level":_result[9],"skill_effect_addlv_description":_result[10],"image_type":_result[11]}
+        else:
+            return None
+
+    def addSkillToUser(self,user_line_id,skill_id,skill_job,skill_level,used_book_time):
+        if self.checkUserHasSkill(user_line_id,skill_id,skill_job):
+            print("已有此技能")
+            return
+        self.cursor = self.conn.cursor()
+        sql = """INSERT INTO public.user_skill(user_line_id, skill_id, skill_job, skill_level, used_book_time) VALUES ( %(user_line_id)s,%(skill_id)s,%(skill_job)s,%(skill_level)s,%(used_book_time)s)"""
+        params = {'user_line_id':user_line_id, 'skill_id':skill_id,'skill_job':skill_job,'skill_level':skill_level,'used_book_time':used_book_time}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+
+    def getLevelSkillList(self,level,job):
+        self.cursor = self.conn.cursor()
+        table_name = "skill_list_"+job
+        sql = "SELECT skill_id FROM {table_name} where own_level <= {level}".format(table_name = table_name,level = level)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchall()
+        self.conn.commit()
+        list = []
+        if _result is not None:
+            for id in _result:
+                list.append(int(id[0]))
+            print(list)
+            return list
         else:
             return None
     
