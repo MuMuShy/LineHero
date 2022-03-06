@@ -73,11 +73,11 @@ def createrJob(user_line_id,jobs):
 def getMaxHp(job,level):
     level = int(level)
     if job == "warrior":
-        return level*150
+        return level*150+4*level*10
     elif job =="majic":
-        return level*100+level*10*2.5
+        return level*100+level*10*2.5+1*level*10
     elif job =="rog":
-        return level*70+level*10*1.5
+        return level*70+level*10*1.5+2*level*10
 
 def getMaxExp(level):
     level = int(level)
