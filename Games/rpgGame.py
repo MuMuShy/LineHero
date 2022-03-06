@@ -298,10 +298,6 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
 
     print("武器傷害:"+str(_weaponpow))
     _attack_result = int(int(baseAttack*attackpow)+int(_weaponpow)*_credit)
-    #浮動率 85~120%
-    _random = random.randrange(85,120)
-    _attack_result*=_random/100
-    _attack_result = int(_attack_result)
     #查看技能
     _skilldes = ""
     if skill is not None:
@@ -320,6 +316,12 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
             print("技能傷害:"+str(_skilldamage))
             _skilldes = "\n使用技能 "+skill["skill_name"]+" 傷害: "+str(_skilldamage)
             _attack_result = _skilldamage
+
+    #浮動率 85~120%
+    _random = random.randrange(85,120)
+    _attack_result*=_random/100
+    _attack_result = int(_attack_result)
+
     _monster_base_info = dataBase.getMonsterInfo(_target_monster_id)
     _monster_hp = monster_hp-_attack_result
     _monsterAttack = int(random.randrange(int(_monster_base_info["attack"]*0.7),int(_monster_base_info["attack"])))
@@ -531,3 +533,18 @@ def WeaponEnhancement(user_line_id,reel_id):
             return False,'機率強化失敗!!'
     else:
         return False,'沒有卷軸或沒有武器而強化失敗'
+
+def GashaponPlay(user_line_id,gashapon_num):
+    import random
+    
+    prizeList = dataBase.getGashaponPrizeList(gashapon_num)
+    prizeWeights = []
+    for i in prizeList:
+        prizeWeights.append(i[-1])
+        
+    winPrize = random.choices(prizeList,weights=prizeWeights)[0]
+    
+    print(winPrize)
+    
+    dataBase.givePlayerItem(user_line_id,winPrize[1],winPrize[0],winPrize[2])
+    return winPrize

@@ -730,8 +730,8 @@ def handle_message(event):
         #try:
         _user_id = user_send.split(" ")[1]
         _item_type = user_send.split(" ")[2]
-        _item_id = user_send.split(" ")[3]
-        _quantity = user_send.split(" ")[4]
+        _item_id = int(user_send.split(" ")[3])
+        _quantity = int(user_send.split(" ")[4])
         _user_line_id = database.getUserById(_user_id)
         database.givePlayerItem(_user_line_id,_item_type,_item_id,_quantity)
         line_bot_api.reply_message(
@@ -760,7 +760,36 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage(text="錯誤 請確認等資料"))
             return
-
+    elif user_send == "@gashtest":
+        if event.source.user_id != os.getenv("GM_LINE_ID"):
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="無權限執行此指令"))
+            return
+        _win = rpgGame.GashaponPlay(event.source.user_id,1)
+        _id = _win[0]
+        _type = _win[1]
+        _num = _win[2]
+        if _type == "weapon":
+            _weaponinfo = database.getWeaponInfo(_id)
+            _pricename = _weaponinfo["weapon_name"]
+            url = "https://mumu.tw/images/weapons/"+str(_weaponinfo["weapon_id"])+"."+_weaponinfo["img_type"]
+        elif _type == "reel":
+            _reelinfo = database.getUserUsingReel(_id)
+            _pricename = _reelinfo["reel_name"]
+            url = "https://mumu.tw/images/reels/"+str(_reelinfo["reel_id"])+"."+_reelinfo["image_type"]
+        else:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="獎蛋機台好像怪怪的 抽到沒有的類型 請通知管理員"))
+            return
+        _flex = lineMessagePackerRpg.getGashsopResult(url,_pricename)
+        line_bot_api.reply_message(
+                event.reply_token,[
+                TextSendMessage(text="恭喜抽中!: "),
+                FlexSendMessage(_pricename,contents=_flex)
+                ])
+        return
     elif _command_check =="!create" or _command_check =="!c":
         if diceGame.checkGroupHasGame(group_id) is True:
             _inGamingRoom = diceGame.getGroupPlayingGame(group_id)

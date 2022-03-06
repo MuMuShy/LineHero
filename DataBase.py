@@ -410,15 +410,17 @@ class DataBase():
             _pet = 1
         elif jobs =="majic":
             _pet = 3
-        loc = self.checkUserPackMaxLoc(user_line_id)
         if jobs == 'warrior':
-            self.addToUserBackPack(user_line_id,"weapon",1,1,loc)
+            hassame,loc = self.checkUserPackMaxLoc(user_line_id,"weapon",1)
+            self.addToUserBackPack(user_line_id,"weapon",1,1,hassame,loc)
             self.addToUserWeapon(user_line_id,1,loc,0,0,0,0)
         elif jobs == 'rog':
-            self.addToUserBackPack(user_line_id,"weapon",2,1,loc)
+            hassame,loc = self.checkUserPackMaxLoc(user_line_id,"weapon",2)
+            self.addToUserBackPack(user_line_id,"weapon",2,1,hassame,loc)
             self.addToUserWeapon(user_line_id,2,loc,0,0,0,0)
         else:
-            self.addToUserBackPack(user_line_id,"weapon",3,1,loc)
+            hassame,loc = self.checkUserPackMaxLoc(user_line_id,"weapon",3)
+            self.addToUserBackPack(user_line_id,"weapon",3,1,hassame,loc)
             self.addToUserWeapon(user_line_id,3,loc,0,0,0,0)
 
         sql ="""INSERT INTO users_job (user_line_id, jobs, str, dex, intelligence, level, hp, exp, equipment_weapon,equipment_pet) VALUES (%(user_line_id)s, %(jobs)s,10,10,10,1,%(maxhp)s,0,%(weapon)s,%(pet)s)"""
@@ -644,7 +646,7 @@ class DataBase():
         self.conn.commit()
         print("0.00 DAILY CLEAR REQUEST DONE")
     
-    def checkUserPackMaxLoc(self,user_line_id):
+    def checkUserPackMaxLoc(self,user_line_id,item_type,item_id):###有修改###
         self.cursor = self.conn.cursor()
         sql ="""select max(backpack_loc) from user_backpack where user_line_id =(%(line_id)s) """
         params = {'line_id':user_line_id}
@@ -653,21 +655,45 @@ class DataBase():
         row = self.cursor.fetchone()
         num = row[0]
         print("目前玩家背包序列index到達:"+str(num))
-        if num == None:
-            return 0
+        if item_type == 'weapon':
+            if num == None:
+                return False,0
+            else:
+                return False,num+1
         else:
-            return num+1
+            print("item id:")
+            print(item_id)
+            sql ="""select max(backpack_loc) from user_backpack where user_line_id = '{line_id}' and item_type = '{item_type}' and item_id = {item_id} """.format(line_id = user_line_id,item_type=item_type,item_id=item_id)
+            self.cursor.execute(sql)
+            self.conn.commit()
+            row = self.cursor.fetchone()[0]
+            if row == None:
+                if num == None:
+                    return False,0
+                else:
+                    return False,num+1
+            else:
+                return True,row
     
-    def addToUserBackPack(self,user_line_id,item_type,item_id,quantity,loc=-1):
-        if loc ==-1:
-            _nowpackindex = self.checkUserPackMaxLoc(user_line_id)
-        else:
-            _nowpackindex = loc
+    def addToUserBackPack(self,user_line_id,item_type,item_id,quantity,IS_EXIST,loc=-1):
         self.cursor = self.conn.cursor()
-        sql ="""INSERT INTO user_backpack (user_line_id, backpack_loc,item_type,item_id,quantity) VALUES (%(user_line_id)s, %(backpack_loc)s, %(item_type)s, %(item_id)s,%(quantity)s)"""
-        params = {'user_line_id':user_line_id,'backpack_loc':_nowpackindex,'item_type':item_type,'item_id':item_id,'quantity':quantity}
-        self.cursor.execute(sql,params)
-        self.conn.commit()
+        if IS_EXIST == False:
+            if loc ==-1:
+                hassame,_nowpackindex = self.checkUserPackMaxLoc(user_line_id,item_type,item_id)
+            else:
+                _nowpackindex = loc
+            sql ="""INSERT INTO user_backpack (user_line_id, backpack_loc,item_type,item_id,quantity) VALUES (%(user_line_id)s, %(backpack_loc)s, %(item_type)s, %(item_id)s,%(quantity)s)"""
+            params = {'user_line_id':user_line_id,'backpack_loc':_nowpackindex,'item_type':item_type,'item_id':item_id,'quantity':quantity}
+            self.cursor.execute(sql,params)
+            self.conn.commit()
+        else:
+            sql ="""SELECT quantity FROM user_backpack WHERE user_line_id = '{user_line_id}' and item_type = '{item_type}' and item_id = {item_id}""".format(user_line_id=user_line_id,item_type=item_type,item_id=item_id)
+            self.cursor.execute(sql)
+            self.conn.commit()
+            row_quantity = self.cursor.fetchone()[0]
+            sql = """UPDATE user_backpack SET quantity={quantity} WHERE user_line_id = '{user_line_id}' and item_type = '{item_type}' and item_id = {item_id}""".format(quantity=quantity+row_quantity,user_line_id=user_line_id,item_type=item_type,item_id=item_id)
+            self.cursor.execute(sql)
+            self.conn.commit()
     
     def removeFromUserBackPack(self,user_line_id,backpack_loc):
         self.cursor = self.conn.cursor()
@@ -752,11 +778,11 @@ class DataBase():
 
     #gm 用
     def givePlayerItem(self,user_lind_id,item_type,item_id,quantity=1):
-        loc = self.checkUserPackMaxLoc(user_lind_id)    
+        hassame,loc = self.checkUserPackMaxLoc(user_lind_id,item_type,item_id)    
         if item_type == "weapon":
             quantity = 1
             self.addToUserWeapon(user_lind_id,item_id,loc,0,0,0,0)
-        self.addToUserBackPack(user_lind_id,item_type,item_id,quantity,loc)
+        self.addToUserBackPack(user_lind_id,item_type,item_id,quantity,hassame,loc)
     
     def getUserEquipmentWeapon(self,user_line_id):
         user_job = self.getUserJob(user_line_id)
@@ -1147,3 +1173,17 @@ class DataBase():
         sql = "UPDATE users_job SET skill_point = skill_point-1 where user_line_id = '{user_line_id}'".format(user_line_id=user_line_id)
         self.cursor.execute(sql)
         self.conn.commit()
+    
+    #轉蛋
+    def getGashaponPrizeList(self,gashapon_num):
+        
+        _NumTable = ['zero','one','two','three']#數字英文表
+        
+        self.cursor = self.conn.cursor()
+        gashapon_tableName = _NumTable[gashapon_num]
+        sql = "SELECT * FROM gashapon_list_{gashapon_tableName}".format(gashapon_tableName=gashapon_tableName)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        prizeList=[]
+        prizeList = self.cursor.fetchall()
+        return prizeList
