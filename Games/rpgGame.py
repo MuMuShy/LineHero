@@ -1,3 +1,4 @@
+from ctypes.wintypes import INT
 import decimal
 from attr import dataclass
 import psycopg2
@@ -317,8 +318,17 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
             
             _attack_result = _skilldamage
 
+    
+    #取得stability屬性 3號技能固定式精準之x的技能
+    _stability = dataBase.getSkillFromUser(_user_line_id,3,_playerjob)
+    _stabilityValue = _stability["skill_effect_description"][0].split(":")[1]
+    _stabilityValue = int(_stabilityValue.split("%")[0])
+    _stabilityValueBasic = 85 # 基礎浮動率下限
+    _stabilityValueBasic = _stabilityValueBasic + int(_stabilityValueBasic*(_stabilityValue/100))
+    print("穩定度最終下限結果:"+str(_stabilityValueBasic))
     #浮動率 85~120%
-    _random = random.randrange(85,120)
+    _random = random.randrange(_stabilityValueBasic,120)
+
     _attack_result*=_random/100
     _attack_result = int(_attack_result)
     if skill is not None:

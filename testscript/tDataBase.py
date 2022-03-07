@@ -331,18 +331,18 @@ class DataBase():
             _job = i[1]
             _level = i[2]
             if _job == 'warrior':
-                self.addSkillToUser(_id,0,'warrior',1,0)
-                self.addSkillToUser(_id,1,'warrior',1,0)
+                # self.addSkillToUser(_id,0,'warrior',1,0)
+                # self.addSkillToUser(_id,1,'warrior',1,0)
                 if _level >= 30:
                     self.addSkillToUser(_id,2,'warrior',1,0)
             elif _job == 'rog':
-                self.addSkillToUser(_id,0,'rog',1,0)
-                self.addSkillToUser(_id,1,'rog',1,0)
+                # self.addSkillToUser(_id,0,'rog',1,0)
+                # self.addSkillToUser(_id,1,'rog',1,0)
                 if _level >= 30:
                     self.addSkillToUser(_id,2,'rog',1,0)
             else:
-                self.addSkillToUser(_id,0,'majic',1,0)
-                self.addSkillToUser(_id,1,'majic',1,0)
+                # self.addSkillToUser(_id,0,'majic',1,0)
+                # self.addSkillToUser(_id,1,'majic',1,0)
                 if _level >= 30:
                     self.addSkillToUser(_id,2,'majic',1,0)
             print("done")
@@ -588,7 +588,7 @@ if __name__ == "__main__":
     _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     database = DataBase()
     #database.addExpForPlayer(_id,1000)
-    database.addSkillToUser(_id,2,"rog",20,0)
+    #database.addSkillToUser(_id,3,"rog",1,0)
     #_id = 'U0b37a9d05272a9e82d0ee60ba10bdd72'
     # loc = database.checkUserPackMaxLoc(_id)
     #database.addToUserBackPack(_id,"weapon",5,1,loc)

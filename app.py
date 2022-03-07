@@ -1074,11 +1074,11 @@ def handle_message(event):
 
 
 if __name__ == "__main__":
-    apiThread = bybitApi.BybitApi("apithread")
-    apiThread.start()
+    #apiThread = bybitApi.BybitApi("apithread")
+    #apiThread.start()
     port = int(os.environ.get('PORT', 5000))
     if environment =="DEV":
-        app.run(host='0.0.0.0', port=port,debug=True)
+        app.run(host='0.0.0.0', port=port)
     else:
         app.run(host='0.0.0.0', port=port)
     
