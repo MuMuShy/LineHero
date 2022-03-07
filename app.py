@@ -377,6 +377,7 @@ def handle_message(event):
             _info = user_send.split(" ")[1]
             _skilljob = _info.split(":")[0]
             _skillid = _info.split(":")[1]
+            _skillid = int(_skillid)
             print("skill job:"+_skilljob+"     id:"+str(_skillid))
         except:
             line_bot_api.reply_message(
