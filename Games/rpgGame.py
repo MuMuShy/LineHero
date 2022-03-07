@@ -328,7 +328,10 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
         _stabilityValueBasic = _stabilityValueBasic + int(_stabilityValueBasic*(_stabilityValue/100))
         print("穩定度最終下限結果:"+str(_stabilityValueBasic))
     #浮動率 85~120%
-    _random = random.randrange(_stabilityValueBasic,120)
+    if _stabilityValueBasic > 120:
+        _random = random.randrange(120,_stabilityValueBasic)
+    else:
+         _random = random.randrange(_stabilityValueBasic,120)
 
     _attack_result*=_random/100
     _attack_result = int(_attack_result)
