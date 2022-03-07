@@ -352,11 +352,14 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
 
 
     _playerhp = _user_job_json["hp"] - _monsterAttack
-    if _playerjob =="rog" and skill is None:
-        _playerhp+=int(_attack_result*0.1)
-        if _playerhp > getMaxHp(_playerjob,_user_job_json["level"])+hp_add:
-            _playerhp = getMaxHp(_playerjob,_user_job_json["level"])+hp_add
-        skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))+_avoid_str
+    if _playerjob =="rog":
+        if skill is None:
+            _playerhp+=int(_attack_result*0.1)
+            if _playerhp > getMaxHp(_playerjob,_user_job_json["level"])+hp_add:
+                _playerhp = getMaxHp(_playerjob,_user_job_json["level"])+hp_add
+            skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))+_avoid_str
+        else:
+            skill_effec=_avoid_str
         
     skill_effec+=_skilldes
     _result={}
