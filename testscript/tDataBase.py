@@ -478,71 +478,6 @@ class DataBase():
         return _userskill_list
         
     
-    def getSkillFromUser(self,user_line_id,skill_id,job):
-        _skillbasic = self.getSkillInfo(skill_id,job)
-        self.cursor = self.conn.cursor()
-        sql = "SELECT skill_id,skill_level,used_book_time FROM user_skill where user_line_id = '{user_line_id}' and skill_id = {skill_id} and skill_job = '{skill_job}'".format(user_line_id = user_line_id,skill_id = skill_id,skill_job=job)
-        self.cursor.execute(sql)
-        _result = self.cursor.fetchone()
-        self.conn.commit()
-        _skillfromUser =  {"skill_id":_result[0],"skill_level":_result[1],"used_book_time":_result[2]}
-        #確認技能等級
-        _skilllevel = _skillfromUser["skill_level"]
-        _used_book_time = _skillfromUser["used_book_time"]
-        _max_book_time = _skillbasic["max_book_time"]
-        _one_book_addlv = _skillbasic["leveladd_one_book"]
-        _max_level = _skillbasic["max_level"]
-        _skillbasic["_skilllevel"] = _skilllevel
-        _skillbasic["job"] = job
-        if _used_book_time > _max_book_time or _skilllevel > _max_level+_used_book_time*_one_book_addlv:
-            print("三小 有問題 這人技能書吃的比最大還多本 外掛")
-            return
-        #依照skill的基本資料 透過技能等級 把狀態附加上去
-        if _skillbasic["skill_effect_addlv_description"] != [] and len(_skillbasic["skill_effect_addlv_description"]) > 0:
-            for _effect_addlv in _skillbasic["skill_effect_addlv_description"]:
-                _type = _effect_addlv.split(":")[0]
-                _value = _effect_addlv.split(":")[1]
-                _ispesent = False
-                if "%" in _value:
-                    _value = int(_value.split("%")[0])
-                else:
-                    _value = int(_value)
-                _index = 0
-                for _basiceffect in _skillbasic["skill_effect_description"]:
-                    _otype = _basiceffect.split(":")[0]
-                    _ovalue = _basiceffect.split(":")[1]
-                    #找到那筆資料ㄌ
-                    if _otype == _type:
-                        _origin_value = _ovalue
-                        if "%" in _origin_value:
-                            _ispesent = True
-                            _origin_value_num = int(_origin_value.split("%")[0])
-                        else:
-                            _origin_value_num = int(_origin_value_num)
-                        _origin_value_num+=_value*_skilllevel
-                        if _ispesent:
-                            _origin_value_num = str(_origin_value_num)+"%"
-                        else:
-                            _origin_value_num = str(_origin_value_num)
-                        _skillbasic["skill_effect_description"][_index] = _otype+":"+_origin_value_num
-                    else:
-                        _index+=1
-               
-        if "*" in _skillbasic["skill_description"]:
-            _sym = '*'
-            lst = []
-            for pos,char in enumerate(_skillbasic["skill_description"]):
-                if(char == _sym):
-                    lst.append(pos)
-            index = 0
-            for _effect in _skillbasic["skill_effect_description"]:
-                _type = _effect.split(":")[0]
-                _value = _effect.split(":")[1]
-                _type = rpgDictionary.getChineseEffectName(_type)
-                _skillbasic["skill_description"] = _skillbasic["skill_description"][0:lst[index]] + _type + _value +_skillbasic["skill_description"][lst[index]+1:]
-                index +=1
-        
-        return _skillbasic
     
     def checkUserHasSkill(self,user_line_id,skill_id,skill_job):
         self.cursor = self.conn.cursor()
@@ -582,11 +517,80 @@ class DataBase():
         self.cursor.execute(sql)
         self.conn.commit()
     
+    def getSkillFromUser(self,user_line_id,skill_id,job):
+            _skillbasic = self.getSkillInfo(skill_id,job)
+            self.cursor = self.conn.cursor()
+            sql = "SELECT skill_id,skill_level,used_book_time FROM user_skill where user_line_id = '{user_line_id}' and skill_id = {skill_id} and skill_job = '{skill_job}'".format(user_line_id = user_line_id,skill_id = skill_id,skill_job=job)
+            self.cursor.execute(sql)
+            _result = self.cursor.fetchone()
+            self.conn.commit()
+            if _result == None:
+                return None
+            _skillfromUser =  {"skill_id":_result[0],"skill_level":_result[1],"used_book_time":_result[2]}
+            #確認技能等級
+            _skilllevel = _skillfromUser["skill_level"]
+            _used_book_time = _skillfromUser["used_book_time"]
+            _max_book_time = _skillbasic["max_book_time"]
+            _one_book_addlv = _skillbasic["leveladd_one_book"]
+            _max_level = _skillbasic["max_level"]
+            _skillbasic["_skilllevel"] = _skilllevel
+            _skillbasic["job"] = job
+            _skillbasic["used_book_time"] = _used_book_time
 
+            if _used_book_time > _max_book_time or _skilllevel > _max_level+_used_book_time*_one_book_addlv:
+                print("三小 有問題 這人技能書吃的比最大還多本 外掛")
+                return
+            #依照skill的基本資料 透過技能等級 把狀態附加上去
+            if _skillbasic["skill_effect_addlv_description"] != [] and len(_skillbasic["skill_effect_addlv_description"]) > 0:
+                for _effect_addlv in _skillbasic["skill_effect_addlv_description"]:
+                    _type = _effect_addlv.split(":")[0]
+                    _value = _effect_addlv.split(":")[1]
+                    _ispesent = False
+                    if "%" in _value:
+                        _value = int(_value.split("%")[0])
+                    else:
+                        _value = int(_value)
+                    _index = 0
+                    for _basiceffect in _skillbasic["skill_effect_description"]:
+                        _otype = _basiceffect.split(":")[0]
+                        _ovalue = _basiceffect.split(":")[1]
+                        #找到那筆資料ㄌ
+                        if _otype == _type:
+                            _origin_value = _ovalue
+                            if "%" in _origin_value:
+                                _ispesent = True
+                                _origin_value_num = int(_origin_value.split("%")[0])
+                            else:
+                                _origin_value_num = int(_origin_value_num)
+                            _origin_value_num+=_value*_skilllevel
+                            if _ispesent:
+                                _origin_value_num = str(_origin_value_num)+"%"
+                            else:
+                                _origin_value_num = str(_origin_value_num)
+                            _skillbasic["skill_effect_description"][_index] = _otype+":"+_origin_value_num
+                        else:
+                            _index+=1
+                
+            if "*" in _skillbasic["skill_description"]:
+                _sym = '*'
+                lst = []
+                for pos,char in enumerate(_skillbasic["skill_description"]):
+                    if(char == _sym):
+                        lst.append(pos)
+                index = 0
+                for _effect in _skillbasic["skill_effect_description"]:
+                    _type = _effect.split(":")[0]
+                    _value = _effect.split(":")[1]
+                    _type = rpgDictionary.getChineseEffectName(_type)
+                    _skillbasic["skill_description"] = _skillbasic["skill_description"][0:lst[index]] + _type + _value +_skillbasic["skill_description"][lst[index]+1:]
+                    index +=1
+            
+            return _skillbasic
 
 if __name__ == "__main__":
     _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     database = DataBase()
+    print(database.getSkillFromUser(_id,4,'rog'))
     #database.addExpForPlayer(_id,1000)
     #database.addSkillToUser(_id,3,"rog",1,0)
     #_id = 'U0b37a9d05272a9e82d0ee60ba10bdd72'

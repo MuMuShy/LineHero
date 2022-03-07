@@ -1117,6 +1117,8 @@ class DataBase():
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
         self.conn.commit()
+        if _result == None:
+            return None
         _skillfromUser =  {"skill_id":_result[0],"skill_level":_result[1],"used_book_time":_result[2]}
         #確認技能等級
         _skilllevel = _skillfromUser["skill_level"]
