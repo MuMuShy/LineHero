@@ -410,18 +410,26 @@ class DataBase():
             _pet = 1
         elif jobs =="majic":
             _pet = 3
+
         if jobs == 'warrior':
             hassame,loc = self.checkUserPackMaxLoc(user_line_id,"weapon",1)
             self.addToUserBackPack(user_line_id,"weapon",1,1,hassame,loc)
             self.addToUserWeapon(user_line_id,1,loc,0,0,0,0)
+            self.addSkillToUser(user_line_id,0,"warrior",1,0)
+            self.addSkillToUser(user_line_id,1,"warrior",1,0)
         elif jobs == 'rog':
             hassame,loc = self.checkUserPackMaxLoc(user_line_id,"weapon",2)
             self.addToUserBackPack(user_line_id,"weapon",2,1,hassame,loc)
             self.addToUserWeapon(user_line_id,2,loc,0,0,0,0)
+            self.addSkillToUser(user_line_id,0,"rog",1,0)
+            self.addSkillToUser(user_line_id,1,"rog",1,0)
         else:
             hassame,loc = self.checkUserPackMaxLoc(user_line_id,"weapon",3)
             self.addToUserBackPack(user_line_id,"weapon",3,1,hassame,loc)
             self.addToUserWeapon(user_line_id,3,loc,0,0,0,0)
+            self.addSkillToUser(user_line_id,0,"majic",1,0)
+            self.addSkillToUser(user_line_id,1,"majic",1,0)
+
 
         sql ="""INSERT INTO users_job (user_line_id, jobs, str, dex, intelligence, level, hp, exp, equipment_weapon,equipment_pet) VALUES (%(user_line_id)s, %(jobs)s,10,10,10,1,%(maxhp)s,0,%(weapon)s,%(pet)s)"""
         params = {'user_line_id':user_line_id, 'jobs':jobs,'maxhp':maxhp,'weapon':loc,'pet':_pet}
@@ -1096,6 +1104,9 @@ class DataBase():
             skilljson = self.getSkillFromUser(user_line_id,_id,_job)
             if skilljson["skill_type"] == "active":
                 _userskill_list.append(skilljson)
+        #print("skill list")
+        #這樣就是沒技能
+        #print(_userskill_list == [] and len(_userskill_list) == 0)
         return _userskill_list
         
     

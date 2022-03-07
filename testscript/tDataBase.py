@@ -587,7 +587,8 @@ class DataBase():
 if __name__ == "__main__":
     _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     database = DataBase()
-    database.addExpForPlayer(_id,1000)
+    #database.addExpForPlayer(_id,1000)
+    database.addSkillToUser(_id,2,"rog",20,0)
     #_id = 'U0b37a9d05272a9e82d0ee60ba10bdd72'
     # loc = database.checkUserPackMaxLoc(_id)
     #database.addToUserBackPack(_id,"weapon",5,1,loc)
