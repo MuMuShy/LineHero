@@ -389,7 +389,7 @@ def handle_message(event):
             _nowlevel = _skillnow["_skilllevel"]
             _skillpoint = database.getUserJob(event.source.user_id)["skill_point"]
             #可以升級
-            if _nowlevel < _skillnow["max_level"]+_skillnow["used_book_time"]*_skillnow["leveladd_one_book"] and _skillpoint > 1:
+            if _nowlevel < _skillnow["max_level"]+_skillnow["used_book_time"]*_skillnow["leveladd_one_book"] and _skillpoint > 0:
                 database.addUserSkillLevel(event.source.user_id,_skillid,_skilljob)
                 database.decUserSkillPoint(event.source.user_id)
                 _skilllist = database.getUserSkillList(event.source.user_id)
