@@ -1905,7 +1905,7 @@ def getBattleEnd(game_result_json):
                 "contents": [
                 {
                     "type": "text",
-                    "text": "道具系統開發中...敬請期待",
+                    "text": game_result_json["drop_result"],
                     "color": "#8C8C8C",
                     "size": "sm",
                     "wrap": True

@@ -341,13 +341,15 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
     _monster_base_info = dataBase.getMonsterInfo(_target_monster_id)
     _monster_hp = monster_hp-_attack_result
     _monsterAttack = int(random.randrange(int(_monster_base_info["attack"]*0.7),int(_monster_base_info["attack"])))
-
+    _monster_drop = _monster_base_info["drop_item"]
+    print("掉落物:")
+    print(_monster_drop)
     #盜賊閃避機制
     if _playerjob =="rog":
         _avoid_str=""
         _avoid_damage = random.randrange(0,100)
         if _avoid_damage >= 70:
-            _avoid_str="\n盜賊觸發閃避!(30%) 免疫此輪傷害"
+            _avoid_str="盜賊觸發閃避!(30%) 免疫此輪傷害"
             _monsterAttack = 0
 
 
@@ -414,6 +416,45 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
             else:
                 _user_job_json["hp"] = _maxhp
             _end_job_result ="觸發戰士被動效果 戰士精神 回復血量:"+str(int(_health))
+
+        #掉落物
+        _dropthing = []
+        _dropWeight = []
+        _dropresulttx = ""
+        _dropresult = "無掉落"
+        try:
+            if _monster_drop is not None:
+                for dropitem in _monster_drop:
+                    _type = dropitem.split(":")[0]
+                    _idandChance = dropitem.split(":")[1]
+                    _id = int(_idandChance.split("-")[0])
+                    _chance =  int(_idandChance.split("-")[1])
+                    _dropthing.append(_type+":"+str(_id))
+                    _dropWeight.append(_chance)
+                _dropthing.append("nothing")
+                _dropWeight.append(100)
+                _dropresult = random.choices(_dropthing,weights=_dropWeight)[0]
+                print("掉落結果")
+                print(_dropresult)
+                if _dropresult != "nothing":
+                    _type = _dropresult.split(":")[0]
+                    _id = _dropresult.split(":")[1]
+                    _id = int(_id)
+                    if _type == "weapon":
+                        _userWeaponNum = dataBase.getUserBackItemNum(_user_line_id,"weapon")
+                        if _userWeaponNum > 59:
+                            _dropresulttx = "你的裝備已經要超過60個了 將不會獲得掉落物喔 請去橘子村莊把武器賣掉吧!"
+                        else:
+                            dataBase.givePlayerItem(_user_line_id,"weapon",_id)
+                            _dropresulttx = "恭喜獲得怪物掉落裝備!"
+                    else:
+                        dataBase.givePlayerItem(_user_line_id,"reel",_id)
+                        _dropresulttx = "恭喜獲得怪物掉落卷軸!"
+                else:
+                    _dropresult = "無掉落"
+        except:
+            _dropresult = "無掉落"
+
         _money = random.randrange(500,2000)
         _money+=_user_job_json["level"]*30
         _originmoney = int(dataBase.getUserMoney(_user_line_id))+_money
@@ -434,8 +475,8 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
                     print("玩家沒有這招:"+str(skillid))
                     dataBase.addSkillToUser(_user_line_id,skillid,_user_job_json["job"],1,0)
         dataBase.setUserJobStatus(_user_line_id,_user_job_json)
-        _strtext ="戰鬥勝利! 獲得 exp:"+str(_monster_base_info["exp"])+ "金幣:" + str(_money)+"\n"+"剩餘血量:"+str(_user_job_json["hp"])+"/"+str(getMaxHp(_user_job_json["job"],_user_job_json["level"])+hp_add)
-        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec,"is_credit":_isCredit,"weapon_info":_weapon_info,"win_txt":_strtext}
+        _strtext ="戰鬥勝利! 獲得 exp:"+str(_monster_base_info["exp"])+ "金幣:" + str(_money)+"\n"+"剩餘血量:"+str(_user_job_json["hp"])+"/"+str(getMaxHp(_user_job_json["job"],_user_job_json["level"])+hp_add)+"\n"+_dropresulttx
+        _result={"Result":"win","dice_result":attackpow,"player_damage":_attack_result,"monster_result_json":_monster_base_info,"player_result_json":_user_job_json,"is_level_up":_islevelup,"get_money":_money,"end_job_result":_end_job_result,"skill_efect":skill_effec,"is_credit":_isCredit,"weapon_info":_weapon_info,"win_txt":_strtext,"drop_result":_dropresult}
 
     return _result
     
