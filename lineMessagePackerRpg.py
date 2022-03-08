@@ -3867,48 +3867,14 @@ def getUserActiveSkills(skill_list):
         bubble = {
       "type": "bubble",
       "size": "nano",
-      "header": {
-        "type": "box",
-        "layout": "vertical",
-        "contents": [
-          {
-            "type": "image",
-            "url": _url,
-            "size": "full"
-          }
-        ]
-      },
-      "body": {
-        "type": "box",
-        "layout": "vertical",
-        "contents": [
-          {
-            "type": "box",
-            "layout": "horizontal",
-            "contents": [
-              {
-                "type": "text",
-                "text": _name,
-                "size": "sm",
-                "wrap": True,
-                "weight": "bold",
-                "align": "center"
-              }
-            ],
-            "flex": 1
-          },
-          {
-            "type": "button",
-            "action": {
-              "type": "message",
-              "label": "使用",
-              "text": "@useskill "+skill["job"]+" "+str(skill["skill_id"])
-            },
-            "style": "primary"
-          }
-        ],
-        "spacing": "md",
-        "paddingAll": "12px"
+      "hero": {
+        "type": "image",
+        "url": _url,
+        "action": {
+          "type": "message",
+          "label": "action",
+          "text": "@useskill "+skill["job"]+" "+str(skill["skill_id"])
+        }
       },
       "styles": {
         "footer": {
