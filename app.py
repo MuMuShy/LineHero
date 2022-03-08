@@ -440,11 +440,159 @@ def handle_message(event):
                     event.reply_token,
                     TextSendMessage(text="是不是點到別人的技能去了 你沒這招")
                     )
-
+    elif user_send == "@govillage":
+        _flex = lineMessagePackerRpg.getVillageMenu()
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("橘子村莊",contents=_flex))
+        return
+    elif user_send =="@viewshop":
+        _shopflex = lineMessagePackerRpg.getShopingMan()
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("商人",contents=_shopflex))
+        return
+    elif user_send =="@sellweapon":
+        _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
+        _sendlist = []
+        _first = True
+        if len(_weapon_json_list)>12:
+            _temp = []
+            for _weapon in _weapon_json_list:
+                _temp.append(_weapon)
+                if len(_temp) == 12:
+                    _flex =  lineMessagePackerRpg.getEquipmentSellList(_temp,_first)
+                    _first = False
+                    _sendlist.append(FlexSendMessage("裝備列表",contents=_flex))
+                    _temp = []
+            _lastflex = lineMessagePackerRpg.getEquipmentSellList(_temp,_first)
+            _sendlist.append(FlexSendMessage("裝備列表",contents=_lastflex))
+        else:
+            _flex_equipment = lineMessagePackerRpg.getEquipmentSellList(_weapon_json_list,_first)
+            _sendlist.append(FlexSendMessage("裝備列表",contents=_flex_equipment))
+        line_bot_api.reply_message(
+            event.reply_token,_sendlist)
+        return
+    elif user_send =="@selluseful":
+        _user_reel_lists = database.getUserReelList(event.source.user_id)
+        if _user_reel_lists == None or len(_user_reel_lists) ==0:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("你一張卷軸都沒有喔~"))
+            return
+        else:
+            _flex = lineMessagePackerRpg.getReelSellList(_user_reel_lists)
+            _nowweaponname = database.getUserEquipmentWeapon(event.source.user_id)["weapon_name"]
+            line_bot_api.reply_message(
+                event.reply_token,[
+                TextSendMessage("有什麼想要賣我的卷軸呢~"),
+                FlexSendMessage("背包卷軸",contents=_flex)])
+            return
+    elif user_send.startswith("@buyshop"):
+        try:
+            _buyitem = user_send.split("@buyshop")[1]
+            _itemtype = _buyitem.split(" ")[0]
+            _itemid = _buyitem.split(" ")[1]
+            _item_id = int(_itemid)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("輸入好像有問題 請使用介面的按鈕進行互動~"))
+            return
+        _legalweapon = [1,2,3]
+        _legalreel = [1,3,5]
+        if _itemtype == "weapon":
+            _spentmoney = 19999
+            if _item_id not in _legalweapon:
+                line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("額 這東西我們沒有上架 請點架上物品喔"))
+                return
+        else:
+            if _item_id not in _legalreel:
+                line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("額 這東西我們沒有上架 請點架上物品喔"))
+                return
+            _spentmoney = 10000
+        #check user has enough money
+        _usermoney = int(database.getUserMoney(event.source.user_id))
+        if _usermoney < _spentmoney:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("臭小子 錢不夠還想晃點我啊~"))
+            return
+        #check player item is enough
+        if _itemtype == "weapon":
+            _userWeaponNum = database.getUserBackItemNum(event.source.user_id,"weapon")
+            if _userWeaponNum > 59:
+                line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("看來你的武器數量已經要超過60個了 先把不要的賣掉再來找我吧"))
+                return
+            _usermoney -= _spentmoney
+            database.SetUserMoneyByLineId(event.source.user_id,_usermoney)
+            database.givePlayerItem(event.source.user_id,"weapon",_item_id)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("購買武器成功~ 謝謝大爺"))
+            return
+        else:
+            _usermoney -= _spentmoney
+            database.SetUserMoneyByLineId(event.source.user_id,_usermoney)
+            database.givePlayerItem(event.source.user_id,"reel",_item_id)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("購買卷軸成功~ 謝謝大爺"))
+            return
+    elif user_send.startswith("@sell"):
+        try:
+            _sellthing = user_send.split("@sell")[1]
+            _selltype = _sellthing.split(" ")[0]
+            _sellid = _sellthing.split(" ")[1] #武器的化會是backpack locate
+            _sellid = int(_sellid)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("資料格式好像有問題ㄛ..."))
+            return
+        if _selltype == "weapon":
+            _weaponnum = database.checkItemNumFromLoc(event.source.user_id,_sellid)
+            if _weaponnum > 0:
+                database.removeUserBackPack(event.source.user_id,_sellid)
+                _usermoney = int(database.getUserMoney(event.source.user_id))
+                _usermoney+= 5000 #先暫定賣這架錢
+                database.SetUserMoneyByLineId(event.source.user_id,_usermoney)
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage("感謝大爺~ 我$5000收下啦"))
+                return
+            else:
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage("是不是想晃點我 沒看到你有這裝備啊! 請用按鈕列表的按鈕販賣"))
+                return
+        else:
+            _reelid = _sellid
+            _reelinfo = database.getUserPackReelInfo(event.source.user_id,_reelid)
+            if _reelinfo == None or int(_reelinfo['quantity']) < 1:
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage("是不是想晃點我 沒看到你有這個卷軸啊! 請用按鈕列表的按鈕販賣"))
+                return
+            _originquantity = int(_reelinfo['quantity'])
+            _originquantity-=1
+            database.setUserPackReelNum(event.source.user_id,_reelid,_originquantity)
+            _usermoney = int(database.getUserMoney(event.source.user_id))
+            _usermoney+= 5000 #先暫定賣這架錢
+            database.SetUserMoneyByLineId(event.source.user_id,_usermoney)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("感謝大爺~ 我$5000收下啦"))
+            return
 
     elif user_send =="@bag":
         _bag_flex = lineMessagePackerRpg.getUsefulItemMenu()
-
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage("背包類別",contents=_bag_flex))

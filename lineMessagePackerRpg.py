@@ -2187,6 +2187,68 @@ def getJobInfoSubMenu():
             "separator": False
             }
         }
+        },{
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "橘子村莊(NEW!)",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "商人&NPC",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#A17DF5",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "逛逛",
+                    "text": "@govillage"
+                    },
+                    "style": "primary",
+                    "margin": "md",
+                    "height": "sm"
+                }
+                ],
+                "borderWidth": "2px",
+                "height": "55px"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
         }
     ]
     }
@@ -3213,6 +3275,198 @@ def getEquipmentList(_weapon_json_list,isFirst = True):
     }
     return json
 
+def getEquipmentSellList(_weapon_json_list,isFirst = True):
+    from Games import rpgDictionary
+    index = 0 # 0的時候為裝備中道具
+    bubble_contents=[]
+    for weapon in _weapon_json_list:
+        #print("要打包")
+        #print(weapon)
+        _buttontext = "@sellweapon "+str(weapon["backpack_loc"])
+        if isFirst:
+            if index == 0:
+                _btnstyle = "secondary"
+                _btnlabel = "裝備中"
+                _buttontext = " "
+            else:
+                _btnstyle = "primary"
+                _btnlabel = "販賣"
+        else:
+            _btnstyle = "primary"
+            _btnlabel = "販賣"
+        
+        _reel_time = ""
+        if weapon["success_time"] > 0:
+            _reel_time =" + "+str(weapon["success_time"])
+        url = "https://mumu.tw/images/weapons/"+str(weapon["weapon_id"])+"."+weapon["img_type"]
+        _start_list =["https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"]
+        _rare = int(weapon["rare"])-1
+        _star = 0
+        for i in range(0,_rare):
+            _start_list[i] = "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+            _star+=1
+            contents = [
+                            {
+                                "type": "text",
+                                "text": "STR + "+str(weapon["str_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "DEX + "+str(weapon["dex_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "INT + "+str(weapon["int_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "攻擊力 + "+str(weapon["atk_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+
+            ]
+        for i in weapon["other_effect"]:
+            _effectchinese = rpgDictionary.getChineseEffectName(i)
+            print (weapon["other_effect"])
+            contents.append(
+                {
+                            "type": "text",
+                            "text": _effectchinese+" : +"+str(weapon["other_effect"][i]),
+                            "wrap": True,
+                            "color": "#ff0000",
+                            "size": "xs",
+                            "flex": 5
+                }
+            )
+        contents.append(
+            {
+                "type": "text",
+                "text": "可使用卷軸次數:"+str(weapon["available_reeltime"]),
+                "wrap": True,
+                "color": "#000000",
+                "size": "xs",
+                "flex": 5
+            }
+        )
+        bubbble = {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213",
+            "url": url
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": weapon["weapon_name"]+_reel_time,
+                "weight": "bold",
+                "size": "sm",
+                "wrap": True
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[0]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[1]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[2]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[3]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[4]
+                },
+                {
+                    "type": "text",
+                    "text": str(_star)+".0",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": contents
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                 "type": "button",
+                "action": {
+                "type": "message",
+                "label": _btnlabel,
+                "text": _buttontext
+                },
+                "style": _btnstyle
+            }
+            ]
+        }
+        }
+        index+=1
+        bubble_contents.append(bubbble)
+    json = {
+    "type": "carousel",
+    "contents":bubble_contents
+    }
+    return json
+
 def getUsefulItemMenu():
     json = {
     "type": "carousel",
@@ -3467,6 +3721,144 @@ def getUserReelList(_reels_json):
     }
     return json
 
+def getReelSellList(_reels_json):
+    _baseurl = "https://mumu.tw/images/reels/"
+    _bubbles = []
+    for reel in _reels_json:
+        _reelinfo = reel["reel_info_json"]
+        _reelid = _reelinfo["reel_id"]
+        _imgtype = _reelinfo["image_type"]
+        _quantity = reel["quantity"]
+        _4basicPowercontents = [] #四維屬性加乘
+        if _reelinfo["plus_str"] != 0:
+            _4basicPowercontents.append(
+                {
+                        "type": "text",
+                        "text": "STR + "+str(_reelinfo["plus_str"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                }
+            )
+        if _reelinfo["plus_int"] != 0:
+            _4basicPowercontents.append(
+                {
+                        "type": "text",
+                        "text": "INT + "+str(_reelinfo["plus_int"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                }
+            )
+        if _reelinfo["plus_dex"] != 0:
+            _4basicPowercontents.append(
+                {
+                        "type": "text",
+                        "text": "DEX + "+str(_reelinfo["plus_dex"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                }
+            )
+        if _reelinfo["plus_atk"] != 0:
+            _4basicPowercontents.append(
+                {
+                        "type": "text",
+                        "text": "ATK + "+str(_reelinfo["plus_atk"]),
+                        "wrap": True,
+                        "color": "#8c8c8c",
+                        "size": "xs",
+                        "flex": 5
+                }
+            )
+        _otherDescription=[]
+        if _reelinfo["description"] is not None:
+            for des in _reelinfo["description"]:
+                _type = des.split(":")[0]
+                _value = des.split(":")[1]
+                _typechinese = rpgDictionary.getChineseEffectName(_type)
+                _otherDescription.append(
+                        {
+                        "type": "text",
+                        "text": _typechinese+" + "+str(_value),
+                        "size": "xs"
+                    }
+                )
+        _bubble = {
+            "type": "bubble",
+            "size": "micro",
+            "hero": {
+                "type": "image",
+                "url": _baseurl+str(_reelid)+"."+_imgtype,
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "320:213"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": _reelinfo["reel_name"],
+                    "weight": "bold",
+                    "size": "sm",
+                    "wrap": True
+                },
+                {
+                    "type": "text",
+                    "text": "持有 : "+str(_quantity),
+                    "size": "xxs",
+                    "weight": "bold"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "sm",
+                        "contents":_4basicPowercontents
+                        
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": _otherDescription
+                }
+                ],
+                "spacing": "sm",
+                "paddingAll": "13px"
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "販賣",
+                    "text": "@sellReel "+str(_reelid)
+                    },
+                    "style": "primary"
+                }
+                ]
+            }
+            }
+        _bubbles.append(_bubble)
+    json = {
+         "type": "carousel",
+         "contents":_bubbles
+    }
+    return json
+
 def getUserActiveSkills(skill_list):
     bubbles = []
     for skill in skill_list:
@@ -3597,5 +3989,725 @@ def getGashsopResult(url,text):
         ],
         "paddingAll": "0px"
     }
+    }
+    return json
+
+def getVillageMenu():
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "村莊商店",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "不二價",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#27ACB2",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "提供基礎的裝備,消耗品等資源",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                }
+                ],
+                "flex": 1
+            },
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "逛逛",
+                "text": "@viewshop"
+                },
+                "style": "primary",
+                "margin": "none"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        },
+        {
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "鑽石商城",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "機率公開公正",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#FF6B6E",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "轉蛋機",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                }
+                ],
+                "flex": 1
+            },
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "準備中",
+                "text": " "
+                },
+                "style": "secondary",
+                "margin": "none"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        }
+    ]
+    }
+    return json
+
+
+
+def getShopingMan():
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/game_ui/shopmen.jpg",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "遊蕩商人 - 碩寶寶",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "基本武器,卷軸販賣,往右滑可以逛逛喔~",
+                        "color": "#ffffffcc",
+                        "gravity": "bottom",
+                        "flex": 0,
+                        "size": "sm"
+                    }
+                    ],
+                    "spacing": "lg"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "icon",
+                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip14.png"
+                        },
+                        {
+                            "type": "text",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px",
+                            "text": "販賣裝備"
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm",
+                        "action": {
+                        "type": "message",
+                        "text": "@sellweapon",
+                        "label": " "
+                        }
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "icon",
+                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip14.png"
+                        },
+                        {
+                            "type": "text",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px",
+                            "text": "販賣消耗品"
+                        },
+                        {
+                            "type": "filler",
+                        }
+                        ],
+                        "spacing": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "action",
+                        "text": "@selluseful"
+                        }
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px"
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "NPC",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#ff334b",
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "53px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        },
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/game_ui/shopbg.jpg",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "武器專區",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold",
+                        "align": "center"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "image",
+                            "url": "https://mumu.tw/images/weapons/1.png",
+                            "size": "xxs",
+                            "align": "start"
+                        },
+                        {
+                            "type": "text",
+                            "text": "$ 19999",
+                            "offsetTop": "10px",
+                            "color": "#ffffff"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                            "type": "message",
+                            "label": "購買",
+                            "text": "@buyshopweapon 1"
+                            },
+                            "margin": "none",
+                            "style": "primary",
+                            "height": "sm"
+                        }
+                        ],
+                        "spacing": "10px",
+                        "margin": "0px"
+                    },
+                    {
+                        "type": "text",
+                        "text": "劍士裝備 勇者之劍",
+                        "color": "#ffffff"
+                    }
+                    ],
+                    "margin": "30px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "image",
+                            "url": "https://mumu.tw/images/weapons/2.png",
+                            "size": "xxs",
+                            "align": "start"
+                        },
+                        {
+                            "type": "text",
+                            "text": "$ 19999",
+                            "offsetTop": "10px",
+                            "color": "#ffffff"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                            "type": "message",
+                            "label": "購買",
+                            "text": "@buyshopweapon 2"
+                            },
+                            "margin": "none",
+                            "style": "primary",
+                            "height": "sm"
+                        }
+                        ],
+                        "spacing": "10px",
+                        "margin": "0px"
+                    },
+                    {
+                        "type": "text",
+                        "text": "盜賊裝備 勇者匕首",
+                        "color": "#ffffff"
+                    }
+                    ],
+                    "margin": "30px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "image",
+                            "url": "https://mumu.tw/images/weapons/3.jpg",
+                            "size": "xxs",
+                            "align": "start"
+                        },
+                        {
+                            "type": "text",
+                            "text": "$ 19999",
+                            "offsetTop": "10px",
+                            "color": "#ffffff"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                            "type": "message",
+                            "label": "購買",
+                            "text": "@buyshopweapon 3"
+                            },
+                            "margin": "none",
+                            "style": "primary",
+                            "height": "sm"
+                        }
+                        ],
+                        "spacing": "10px",
+                        "margin": "0px"
+                    },
+                    {
+                        "type": "text",
+                        "text": "法師裝備 勇者之書",
+                        "color": "#ffffff"
+                    }
+                    ],
+                    "margin": "30px"
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#13060680",
+                "paddingAll": "20px",
+                "paddingTop": "18px",
+                "offsetTop": "-5px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "SALE",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#ff334b",
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "53px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        },
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/game_ui/shopbg.jpg",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "卷軸專區",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold",
+                        "align": "center"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "image",
+                            "url": "https://mumu.tw/images/reels/1.jpg",
+                            "size": "xxs",
+                            "align": "start"
+                        },
+                        {
+                            "type": "text",
+                            "text": "$ 10000",
+                            "offsetTop": "10px",
+                            "color": "#ffffff"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                            "type": "message",
+                            "label": "購買",
+                            "text": "@buyshopreel 1"
+                            },
+                            "margin": "none",
+                            "style": "primary",
+                            "height": "sm"
+                        }
+                        ],
+                        "spacing": "10px",
+                        "margin": "0px"
+                    },
+                    {
+                        "type": "text",
+                        "text": "100% 攻擊力卷軸",
+                        "color": "#ffffff"
+                    }
+                    ],
+                    "margin": "30px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "image",
+                            "url": "https://mumu.tw/images/reels/3.jpg",
+                            "size": "xxs",
+                            "align": "start"
+                        },
+                        {
+                            "type": "text",
+                            "text": "$ 10000",
+                            "offsetTop": "10px",
+                            "color": "#ffffff"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                            "type": "message",
+                            "label": "購買",
+                            "text": "@buyshopreel 3"
+                            },
+                            "margin": "none",
+                            "style": "primary",
+                            "height": "sm"
+                        }
+                        ],
+                        "spacing": "10px",
+                        "margin": "0px"
+                    },
+                    {
+                        "type": "text",
+                        "text": "100% 屬性卷軸",
+                        "color": "#ffffff"
+                    }
+                    ],
+                    "margin": "30px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                        {
+                            "type": "image",
+                            "url": "https://mumu.tw/images/reels/5.jpg",
+                            "size": "xxs",
+                            "align": "start"
+                        },
+                        {
+                            "type": "text",
+                            "text": "$ 10000",
+                            "offsetTop": "10px",
+                            "color": "#ffffff"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                            "type": "message",
+                            "label": "購買",
+                            "text": "@buyshopreel 5"
+                            },
+                            "margin": "none",
+                            "style": "primary",
+                            "height": "sm"
+                        }
+                        ],
+                        "spacing": "10px",
+                        "margin": "0px"
+                    },
+                    {
+                        "type": "text",
+                        "text": "100% 爆擊卷軸",
+                        "color": "#ffffff"
+                    }
+                    ],
+                    "margin": "30px"
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#13060680",
+                "paddingAll": "20px",
+                "paddingTop": "18px",
+                "offsetTop": "-5px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "SALE",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#ff334b",
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "53px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        }
+    ]
     }
     return json

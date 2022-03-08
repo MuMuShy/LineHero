@@ -708,6 +708,28 @@ class DataBase():
             self.cursor.execute(sql)
             self.conn.commit()
     
+    #會移除玩家背包某個位置的東西 如果是武器會再幫她清除user_Weapon
+    def removeUserBackPack(self,user_line_id,backpack_loc,quantity = 1):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT item_type,item_id,quantity FROM user_backpack where user_line_id = '{user_line_id}' and backpack_loc = {backpack_loc}".format(user_line_id = user_line_id,backpack_loc = backpack_loc)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchone()
+        self.conn.commit()
+        if _result is None:
+            print("玩家此格背包沒有東西")
+            return
+        else:
+            itemtype = _result[0]
+            itemid = _result[1]
+            quantity = _result[2]
+            print("準備移除:"+itemtype+"物品位置:"+str(backpack_loc)+" 物品編號:"+str(itemid)+" 數量:"+str(quantity))
+            #武器因為沒有堆疊 還有user_Weapon表需要去刪除
+            if itemtype == "weapon":
+                self.removeUserWeapon(user_line_id,backpack_loc)
+                self.removeFromUserBackPack(user_line_id,backpack_loc)
+            else:
+                self.removeUsefulItemFromPack(user_line_id,backpack_loc,quantity)
+    
     def removeFromUserBackPack(self,user_line_id,backpack_loc):
         self.cursor = self.conn.cursor()
         sql ="""DELETE FROM user_backpack where user_line_id = %s and backpack_loc = %s """
@@ -947,6 +969,14 @@ class DataBase():
             return None
         else:
             return {"backpack_loc":rows[0],"item_id":rows[1],"quantity":rows[2]}
+    
+    #使用時勿必先判斷玩家有沒有該卷軸
+    def setUserPackReelNum(self,user_line_id,reel_id,quantity):
+        self.cursor = self.conn.cursor()
+        sql = """UPDATE user_backpack SET quantity={quantity} WHERE user_line_id = '{user_line_id}' and item_type = 'reel' and item_id = {reel_id}""".format(quantity=quantity,user_line_id=user_line_id,reel_id=reel_id)
+        self.cursor.execute(sql)
+        self.conn.commit()
+
     
     def getUserUsingWeapon(self,user_line_id):
         self.cursor = self.conn.cursor()
@@ -1205,3 +1235,16 @@ class DataBase():
         prizeList=[]
         prizeList = self.cursor.fetchall()
         return prizeList
+    
+    #查詢玩家有的類型 type不傳就是所有的背包疊加數量 (卷軸等消耗道具會疊加,佔一格) type 可船 weapon reel
+    def getUserBackItemNum(self,user_line_id,item_type="all"):
+        self.cursor = self.conn.cursor()
+        if item_type == "all":
+            sql = "SELECT count(*) FROM user_backpack where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
+        else:
+            sql = "SELECT count(*) FROM user_backpack where user_line_id = '{user_line_id}' and item_type = '{item_type}'".format(user_line_id = user_line_id,item_type = item_type)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchone()[0]
+        self.conn.commit()
+        print(int(_result))
+        return int(_result)

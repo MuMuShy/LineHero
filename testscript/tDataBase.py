@@ -431,8 +431,14 @@ class DataBase():
         else:
             print("這個物品用光了 把她拔掉")
             sql = """DELETE from user_backpack WHERE user_line_id = %s and backpack_loc = %s"""
-            self.cursor.execute(sql,(_finalquantity,user_line_id,backpack_loc,))
+            self.cursor.execute(sql,(user_line_id,backpack_loc,))
             self.conn.commit()
+
+    #會刪除某個特定位置的東西 不管是不適武器 供內部調用的function
+    def removeUserBackpackItem(self,user_line_id,backpack_loc):
+        sql = """DELETE from user_backpack WHERE user_line_id = %s and backpack_loc = %s"""
+        self.cursor.execute(sql,(user_line_id,backpack_loc,))
+        self.conn.commit()
     
     def giveAllPlayerUsefulItem(self,item_type,item_id,number):
         self.cursor = self.conn.cursor()
@@ -586,11 +592,47 @@ class DataBase():
                     index +=1
             
             return _skillbasic
+    
+    #會移除玩家背包某個位置的東西 如果是武器會再幫她清除user_Weapon
+    def removeUserBackPack(self,user_line_id,backpack_loc,quantity = 1):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT item_type,item_id,quantity FROM user_backpack where user_line_id = '{user_line_id}' and backpack_loc = {backpack_loc}".format(user_line_id = user_line_id,backpack_loc = backpack_loc)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchone()
+        self.conn.commit()
+        if _result is None:
+            print("玩家此格背包沒有東西")
+            return
+        else:
+            itemtype = _result[0]
+            itemid = _result[1]
+            quantity = _result[2]
+            print("準備移除:"+itemtype+"物品位置:"+str(backpack_loc)+" 物品編號:"+str(itemid)+" 數量:"+str(quantity))
+            #武器因為沒有堆疊 還有user_Weapon表需要去刪除
+            if itemtype == "weapon":
+                self.removeUserWeapon(user_line_id,backpack_loc)
+                self.removeFromUserBackPack(user_line_id,backpack_loc)
+            else:
+                self.removeUsefulItemFromPack(user_line_id,backpack_loc,quantity)
+    
+    def getUserBackItemNum(self,user_line_id,item_type="all"):
+        self.cursor = self.conn.cursor()
+        if item_type == "all":
+            sql = "SELECT count(*) FROM user_backpack where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
+        else:
+            sql = "SELECT count(*) FROM user_backpack where user_line_id = '{user_line_id}' and item_type = '{item_type}'".format(user_line_id = user_line_id,item_type = item_type)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchone()[0]
+        self.conn.commit()
+        print(int(_result))
+        return int(_result)
 
 if __name__ == "__main__":
     _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
-    database = DataBase()
-
+    a="@sellReel 1"
+    print(a.split("@sell"))
+    #database = DataBase()
+    #database.getUserBackItemNum(_id,"fsdafs")
     #database.updateall()
     #print(database.getSkillFromUser(_id,4,'rog'))
     #database.addExpForPlayer(_id,1000)
