@@ -590,7 +590,8 @@ class DataBase():
 if __name__ == "__main__":
     _id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     database = DataBase()
-    database.updateall()
+
+    #database.updateall()
     #print(database.getSkillFromUser(_id,4,'rog'))
     #database.addExpForPlayer(_id,1000)
     #database.addSkillToUser(_id,3,"rog",1,0)
