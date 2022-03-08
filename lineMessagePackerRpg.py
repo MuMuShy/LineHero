@@ -3021,18 +3021,22 @@ def getAdventureNowStatus(pet_info_json,adventure_info_json):
     }
     return json
 
-def getEquipmentList(_weapon_json_list):
+def getEquipmentList(_weapon_json_list,isFirst = True):
     from Games import rpgDictionary
     index = 0 # 0的時候為裝備中道具
     bubble_contents=[]
     for weapon in _weapon_json_list:
-        print("要打包")
-        print(weapon)
+        #print("要打包")
+        #print(weapon)
         _buttontext = "@changeequipment "+str(weapon["backpack_loc"])
-        if index == 0:
-            _btnstyle = "secondary"
-            _btnlabel = "裝備中"
-            _buttontext = " "
+        if isFirst:
+            if index == 0:
+                _btnstyle = "secondary"
+                _btnlabel = "裝備中"
+                _buttontext = " "
+            else:
+                _btnstyle = "primary"
+                _btnlabel = "裝備"
         else:
             _btnstyle = "primary"
             _btnlabel = "裝備"

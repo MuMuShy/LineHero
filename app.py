@@ -313,10 +313,26 @@ def handle_message(event):
             FlexSendMessage("冒險列表",contents=_reply))
     elif user_send == "@equipment":
         _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
-        _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list)
+        _sendlist = []
+        _first = True
+        if len(_weapon_json_list)>12:
+            _temp = []
+            for _weapon in _weapon_json_list:
+                _temp.append(_weapon)
+                if len(_temp) == 12:
+                    print("超過12把 送一次")
+                    print(_temp)
+                    _flex =  lineMessagePackerRpg.getEquipmentList(_temp,_first)
+                    _first = False
+                    _sendlist.append(FlexSendMessage("裝備列表",contents=_flex))
+                    _temp = []
+            _lastflex = lineMessagePackerRpg.getEquipmentList(_temp,_first)
+            _sendlist.append(FlexSendMessage("裝備列表",contents=_lastflex))
+        else:
+            _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list,_first)
+            _sendlist.append(FlexSendMessage("裝備列表",contents=_flex_equipment))
         line_bot_api.reply_message(
-            event.reply_token,
-            FlexSendMessage("裝備列表",contents=_flex_equipment))
+            event.reply_token,_sendlist)
         return
     elif user_send.startswith("@changeequipment"):
         try:
@@ -358,11 +374,27 @@ def handle_message(event):
             _user_job["hp"] = _maxhp
         database.setUserJobStatus(event.source.user_id,_user_job)
         _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
-        _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list)
+        _sendlist = []
+        _first = True
+        _sendlist.append(TextSendMessage(text="切換裝備成功"))
+        if len(_weapon_json_list)>12:
+            _temp = []
+            for _weapon in _weapon_json_list:
+                _temp.append(_weapon)
+                if len(_temp) == 12:
+                    print("超過12把 送一次")
+                    print(_temp)
+                    _flex =  lineMessagePackerRpg.getEquipmentList(_temp,_first)
+                    _first = False
+                    _sendlist.append(FlexSendMessage("裝備列表",contents=_flex))
+                    _temp = []
+            _lastflex = lineMessagePackerRpg.getEquipmentList(_temp,_first)
+            _sendlist.append(FlexSendMessage("裝備列表",contents=_lastflex))
+        else:
+            _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list,_first)
+            _sendlist.append(FlexSendMessage("裝備列表",contents=_flex_equipment))
         line_bot_api.reply_message(
-            event.reply_token,[
-            TextSendMessage(text="切換裝備成功"),
-            FlexSendMessage("切換裝備",contents=_flex_equipment)])
+            event.reply_token,_sendlist)
     elif user_send =="@skill":
         _skillpoint = database.getUserJob(event.source.user_id)["skill_point"]
         _skilllist = database.getUserSkillList(event.source.user_id)
@@ -1035,35 +1067,35 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=_result))
-    #回傳價格表
-    elif user_send == "!price":
-        price = apiThread.getPrice()
-        _reply=""
-        for symbol in price:
-            _reply+= symbol+" : "+price[symbol]+"\n"
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=_reply))
-    #訂閱交易對
-    elif user_send.startswith('!subscribe'):
-        _symbol = user_send.split("!subscribe")[1].upper()
-        _reply = apiThread.subScribe(_symbol+"USDT")
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=_reply))
-    #移除訂閱交易對
-    elif user_send.startswith('!unsubscribe'):
-        _symbol = user_send.split("!unsubscribe")[1].upper()
-        _reply = apiThread.unSubScribe(_symbol+"USDT")
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=_reply))
-    #獲得目前交易對
-    elif user_send == '!list':
-        _reply = apiThread.getSubscribeList()
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=_reply))
+    # #回傳價格表
+    # elif user_send == "!price":
+    #     price = apiThread.getPrice()
+    #     _reply=""
+    #     for symbol in price:
+    #         _reply+= symbol+" : "+price[symbol]+"\n"
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         TextSendMessage(text=_reply))
+    # #訂閱交易對
+    # elif user_send.startswith('!subscribe'):
+    #     _symbol = user_send.split("!subscribe")[1].upper()
+    #     _reply = apiThread.subScribe(_symbol+"USDT")
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         TextSendMessage(text=_reply))
+    # #移除訂閱交易對
+    # elif user_send.startswith('!unsubscribe'):
+    #     _symbol = user_send.split("!unsubscribe")[1].upper()
+    #     _reply = apiThread.unSubScribe(_symbol+"USDT")
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         TextSendMessage(text=_reply))
+    # #獲得目前交易對
+    # elif user_send == '!list':
+    #     _reply = apiThread.getSubscribeList()
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         TextSendMessage(text=_reply))
     elif user_send == '!help':
         print("send")
         line_bot_api.reply_message(
