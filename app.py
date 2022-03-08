@@ -499,10 +499,10 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage("輸入好像有問題 請使用介面的按鈕進行互動~"))
             return
-        _legalweapon = [1,2,3]
+        _legalweapon = [1,2,3,5,6,7]
         _legalreel = [1,3,5]
         if _itemtype == "weapon":
-            _spentmoney = 19999
+            _spentmoney = 199990
             if _item_id not in _legalweapon:
                 line_bot_api.reply_message(
                 event.reply_token,

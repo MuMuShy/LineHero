@@ -4324,13 +4324,13 @@ def getShopingMan():
                         "contents": [
                         {
                             "type": "image",
-                            "url": "https://mumu.tw/images/weapons/1.png",
+                            "url": "https://mumu.tw/images/weapons/7.jpg",
                             "size": "xxs",
                             "align": "start"
                         },
                         {
                             "type": "text",
-                            "text": "$ 19999",
+                            "text": "$ 199990",
                             "offsetTop": "10px",
                             "color": "#ffffff"
                         },
@@ -4339,7 +4339,7 @@ def getShopingMan():
                             "action": {
                             "type": "message",
                             "label": "購買",
-                            "text": "@buyshopweapon 1"
+                            "text": "@buyshopweapon 7"
                             },
                             "margin": "none",
                             "style": "primary",
@@ -4351,7 +4351,7 @@ def getShopingMan():
                     },
                     {
                         "type": "text",
-                        "text": "劍士裝備 勇者之劍",
+                        "text": "劍士裝備 高等大劍",
                         "color": "#ffffff"
                     }
                     ],
@@ -4367,13 +4367,13 @@ def getShopingMan():
                         "contents": [
                         {
                             "type": "image",
-                            "url": "https://mumu.tw/images/weapons/2.png",
+                            "url": "https://mumu.tw/images/weapons/6.jpg",
                             "size": "xxs",
                             "align": "start"
                         },
                         {
                             "type": "text",
-                            "text": "$ 19999",
+                            "text": "$ 199990",
                             "offsetTop": "10px",
                             "color": "#ffffff"
                         },
@@ -4382,7 +4382,7 @@ def getShopingMan():
                             "action": {
                             "type": "message",
                             "label": "購買",
-                            "text": "@buyshopweapon 2"
+                            "text": "@buyshopweapon 6"
                             },
                             "margin": "none",
                             "style": "primary",
@@ -4394,7 +4394,7 @@ def getShopingMan():
                     },
                     {
                         "type": "text",
-                        "text": "盜賊裝備 勇者匕首",
+                        "text": "盜賊裝備 高等暗殺短刃",
                         "color": "#ffffff"
                     }
                     ],
@@ -4410,13 +4410,13 @@ def getShopingMan():
                         "contents": [
                         {
                             "type": "image",
-                            "url": "https://mumu.tw/images/weapons/3.jpg",
+                            "url": "https://mumu.tw/images/weapons/5.jpg",
                             "size": "xxs",
                             "align": "start"
                         },
                         {
                             "type": "text",
-                            "text": "$ 19999",
+                            "text": "$ 199990",
                             "offsetTop": "10px",
                             "color": "#ffffff"
                         },
@@ -4425,7 +4425,7 @@ def getShopingMan():
                             "action": {
                             "type": "message",
                             "label": "購買",
-                            "text": "@buyshopweapon 3"
+                            "text": "@buyshopweapon 5"
                             },
                             "margin": "none",
                             "style": "primary",
@@ -4437,7 +4437,7 @@ def getShopingMan():
                     },
                     {
                         "type": "text",
-                        "text": "法師裝備 勇者之書",
+                        "text": "法師裝備 高等遺忘法書",
                         "color": "#ffffff"
                     }
                     ],
