@@ -93,6 +93,8 @@ def addweapon():
             description = request.form.get("otherdescript")
 
             descriptionvalue = request.form.get("otherdescription")
+            if description =="credit_add" or description =="hp_add":
+                descriptionvalue = str(descriptionvalue)+"%"
             description = '{%s:%s}'%(description,descriptionvalue)
             result = database.createNewWeapon(_stradd,_int_add,_dex_add,_atk_add,_rare,_weaponname,_imagetype,description,10)
             if result == True:
