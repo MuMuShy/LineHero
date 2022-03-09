@@ -1248,3 +1248,25 @@ class DataBase():
         self.conn.commit()
         print(int(_result))
         return int(_result)
+    
+    def createNewWeapon(self,str_add,int_add,dex_add,atk_add,rare,weapon_name,image_type,other_description,available_reeltime):
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.cursor = self.conn.cursor()
+        try:
+            sql ="""INSERT INTO weapon_list (str_add, int_add,dex_add,atk_add,rare,weapon_name,image_type,other_description,available_reeltime) VALUES (%(str_add)s, %(int_add)s, %(dex_add)s, %(atk_add)s,%(rare)s,%(weapon_name)s,%(image_type)s,%(other_description)s,%(available_reeltime)s)"""
+            params = {'str_add':str_add, 'int_add':int_add,'dex_add':dex_add,'atk_add':atk_add,'rare':rare,'weapon_name':weapon_name,'image_type':image_type,'other_description':other_description,'available_reeltime':available_reeltime}
+            self.cursor.execute(sql,params)
+            self.conn.commit()
+            self.conn.close()
+            return True
+        except:
+            return False
+    
+    def getMaxWeaponNow(self):
+        self.cursor = self.conn.cursor()
+        sql = "SELECT max(weapon_id) FROM weapon_list"
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchone()[0]
+        self.conn.commit()
+        print(int(_result))
+        return int(_result)

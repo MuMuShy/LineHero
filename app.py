@@ -15,7 +15,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,TemplateSendMessage,
+    MessageEvent, TextMessage, TextSendMessage,TemplateSendMessage,PostbackEvent,
     ButtonsTemplate,
     MessageTemplateAction,FlexSendMessage
 )
@@ -67,6 +67,57 @@ def callback():
 def home():
     return render_template("home.html")
 
+@app.route("/gm",methods=['post','get'])
+def gm():
+    if request.method == 'POST':
+        account = request.form.get("account")
+        password = request.form.get("password")
+        if account == "123" and password == "123":
+            return render_template("gmaddweapon.html")
+    user = database.getUserById(0)
+    return render_template("gm.html")
+
+@app.route("/addweapon",methods=['post'])
+def addweapon():
+    if request.method == 'POST':
+        try:
+            _weaponname = request.form.get("weapon_name")
+            _stradd = int(request.form.get("str_add"))
+            _int_add = int(request.form.get("int_add"))
+            _dex_add = int(request.form.get("dex_add"))
+            _atk_add = int(request.form.get("atk_add"))
+            _rare = int(request.form.get("rare"))
+            if _rare > 5:
+                _rare = 5
+            _imagetype = request.form.get("imagetype")
+            description = request.form.get("otherdescript")
+
+            descriptionvalue = request.form.get("otherdescription")
+            description = '{%s:%s}'%(description,descriptionvalue)
+            result = database.createNewWeapon(_stradd,_int_add,_dex_add,_atk_add,_rare,_weaponname,_imagetype,description,10)
+            if result == True:
+                return render_template("weaponAddSuccess.html")
+            else:
+                return render_template("weaponAddfailed.html")
+        except:
+            return render_template("weaponAddfailed.html")
+
+    return render_template("gm.html")
+
+
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    ts = event.postback.data
+    print(ts)
+    keyword = ts[7:]
+    print(keyword)
+    if ts[7:] == '{}'.format(keyword):
+
+        text_message = TextSendMessage(text='訊息{}'.format(keyword))
+
+        line_bot_api.reply_message(event.reply_token, text_message)    
+
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -88,6 +139,11 @@ def handle_message(event):
             return
     print(event)
     user_send =event.message.text
+    # if user_send =="test":
+    #     flex = lineMessagePacker.getPostButtonTest()
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         FlexSendMessage("BUG回報",contents=flex))
     if user_send.strip().startswith("!"):
         _command_check = "!"+user_send.strip().split("!")[1].strip().lower()
     else:
@@ -120,6 +176,11 @@ def handle_message(event):
         line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=_reply))
+    if user_send =="@gmaddweapon":
+        line_bot_api.reply_message(
+                event.reply_token,[
+                TextSendMessage(text="gm新增表單:"),
+                TextSendMessage(text="https://lineherorpg.herokuapp.com/gm")])
     if user_send =="@bugreport":
         line_bot_api.reply_message(
                 event.reply_token,

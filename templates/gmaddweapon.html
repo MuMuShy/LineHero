@@ -1,0 +1,64 @@
+
+<!------ Include the above in your HEAD tag ---------->
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static',    filename='gm.css') }}">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    
+    <title>Simple is BEST</title>
+  </head>
+  <body>
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <!-- Tabs Titles -->
+
+    <!-- Icon -->
+    <div class="fadeIn first">
+      <img src="https://mumu.tw/images/game_ui/job_bkg.jpg" id="icon" alt="User Icon" />
+    </div>
+
+    <!-- Login Form -->
+    <form method="POST" action="addweapon">
+      <input type="text" id="url" class="fadeIn second" name="url" placeholder="武器圖片url請直接填寫路徑 上方會有縮圖">
+      <input type="text" id="weapon_name" class="fadeIn second" name="weapon_name" placeholder="武器名稱">
+      <input type="number" id="str_add" class="fadeIn third" name="str_add" placeholder="增加力量">
+      <input type="number" id="int_add" class="fadeIn third" name="int_add" placeholder="增加智力">
+      <input type="number" id="dex_add" class="fadeIn third" name="dex_add" placeholder="增加敏捷">
+      <input type="number" id="atk_add" class="fadeIn third" name="atk_add" placeholder="增加攻擊力">
+      <input type="number" id="rare" class="fadeIn third" name="rare" placeholder="稀有度">
+      <select id ="imagetype" name="imagetype" >
+        <option>圖片類型</option>
+        <option value="jpg">jpg</option>
+        <option value="png">png</option>
+      </select>
+      <select id ="otherdescript" name="otherdescript" >
+        <option>其他敘述 爆傷 等等</option>
+        <option value="credit_add">爆擊</option>
+        <option value="credit_damage_add">爆傷</option>
+        <option value="hp_add">血量</option>
+        <option value="defend_add">防禦</option>
+        <option value="matk_add">魔法傷害增加</option>
+      </select>
+      <input type="number" id="otherdescription" class="fadeIn third" name="otherdescription" placeholder="其他敘述">
+      <div>
+          其他敘述 請輸入數值 爆擊機率會自動轉成百分比
+      </div>
+      <input type="submit" class="fadeIn fourth" value="Submit">
+    </form>
+    <img src="" />
+
+
+    <script>
+        $("#url").on("change paste keyup", function() {
+            $('#icon').attr('src', $('#weapon_name').val());
+        });
+    </script>
+
+  </div>
+</div>
+</body>
+</html>

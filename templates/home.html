@@ -4,6 +4,11 @@
     <title>Simple is BEST</title>
   </head>
   <body>
-    <h1>Hello, world!</h1>
+    <div>
+      {% for row in data %}
+      <p>{{ row[0] }}</p>
+      <p>{{ row[1] }}</p>
+      {% endfor %}
+  </div>
   </body>
 </html>
