@@ -2196,7 +2196,7 @@ def getJobInfoSubMenu():
             "contents": [
             {
                 "type": "text",
-                "text": "橘子村莊(NEW!)",
+                "text": "橘子村莊",
                 "color": "#ffffff",
                 "align": "start",
                 "size": "md",
@@ -2231,6 +2231,68 @@ def getJobInfoSubMenu():
                     "type": "message",
                     "label": "逛逛",
                     "text": "@govillage"
+                    },
+                    "style": "primary",
+                    "margin": "md",
+                    "height": "sm"
+                }
+                ],
+                "borderWidth": "2px",
+                "height": "55px"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
+        },{
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "陣營系統",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "加入陣營,奪得天下",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#A17DF5",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "button",
+                    "action": {
+                    "type": "message",
+                    "label": "拜訪",
+                    "text": "@wordguide"
                     },
                     "style": "primary",
                     "margin": "md",
@@ -4669,6 +4731,618 @@ def getShopingMan():
                 "offsetStart": "18px",
                 "height": "25px",
                 "width": "53px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        }
+    ]
+    }
+    return json
+
+
+def getWordJoinMenu():
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/npc/valen.png",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "瓦倫艾爾",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "守護神 - 狩獵女神阿提密斯",
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    },
+                    {
+                        "type": "text",
+                        "text": "擁有豐腴的土地,適合建造與自然發展",
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    }
+                    ],
+                    "spacing": "lg"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "text",
+                            "text": "加入",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px"
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm"
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px",
+                    "action": {
+                    "type": "message",
+                    "label": "action",
+                    "text": "@joinword1"
+                    }
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "HOT",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#ff334b",
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "53px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        },
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/npc/asla.png",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "阿斯拉",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "守護神 - 維京戰神提爾",
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    },
+                    {
+                        "type": "text",
+                        "text": "地處較北,自然資源較匱乏",
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    },
+                    {
+                        "type": "text",
+                        "text": "但擁有強大的戰鬥力",
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    }
+                    ],
+                    "spacing": "lg"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "text",
+                            "text": "加入",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px"
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm"
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px",
+                    "action": {
+                    "type": "message",
+                    "label": "action",
+                    "text": "@joinword2"
+                    }
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "HOT",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#ff334b",
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "53px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        },
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/npc/hela.png",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "荷拉薇亞",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "守護神 - 天神族維拉",
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    },
+                    {
+                        "type": "text",
+                        "text": "極力避免紛爭,擁有強大的科技力量",
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    }
+                    ],
+                    "spacing": "lg"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "text",
+                            "text": "加入",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px"
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm"
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px",
+                    "action": {
+                    "type": "message",
+                    "label": "action",
+                    "text": "@joinword3"
+                    }
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "HOT",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#ff334b",
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "53px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        }
+    ]
+    }
+    return json
+
+
+def getWordGuideStatus(word_info,user_word_info,top1):
+    word_id = word_info["word_id"]
+    if word_id == 1:
+        url = "https://mumu.tw/images/npc/valen.png"
+    elif word_id ==2:
+        url = "https://mumu.tw/images/npc/asla.png"
+    else:
+        url = "https://mumu.tw/images/npc/hela.png"
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": url,
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": word_info["word_name"],
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "守護神 - "+word_info["word_god"],
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    },
+                    {
+                        "type": "text",
+                        "text": "國王 - "+top1+" (貢獻最高者)",
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    },
+                    {
+                        "type": "text",
+                        "text": "勢力等級 : "+str(word_info["word_level"]),
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    },
+                    {
+                        "type": "text",
+                        "text": "國家財力: "+str(word_info["word_money"]),
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0
+                    }
+                    ],
+                    "spacing": "lg"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "text",
+                            "text": "捐獻(目前戰鬥會自動獲得貢獻)",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px"
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm"
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px",
+                    "action": {
+                    "type": "message",
+                    "label": "action",
+                    "text": "@joinword2"
+                    }
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        },
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/game_ui/job_bkg.jpg",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "個人貢獻狀態",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "金錢 : "+str(user_word_info["money_give"]),
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0,
+                        "margin": "xl",
+                        "weight": "bold",
+                        "align": "center"
+                    },
+                    {
+                        "type": "text",
+                        "text": "exp : "+str(user_word_info["exp_give"]),
+                        "color": "#ebebeb",
+                        "size": "sm",
+                        "flex": 0,
+                        "align": "center"
+                    }
+                    ],
+                    "spacing": "lg",
+                    "offsetTop": "150px"
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px",
+                "height": "450px"
             }
             ],
             "paddingAll": "0px"

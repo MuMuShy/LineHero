@@ -639,7 +639,7 @@ class DataBase():
         self.conn.commit()
         row = self.cursor.fetchone()
         _json = {}
-        _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7],"weapon":row[8],"pet":row[9],"skill_point":row[10]}
+        _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7],"weapon":row[8],"pet":row[9],"skill_point":row[10],"word":row[11]}
         print("玩家職業資料")
         print(_json)
         return _json
@@ -708,13 +708,125 @@ class DataBase():
             print("連線以丟失 重連")
             self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             self.cursor = self.conn.cursor()
-        sql = """UPDATE users_job SET str = %s , dex = %s ,intelligence = %s , hp = %s,level = %s,exp = %s,skill_point = %s Where user_line_id = %s"""
-        data = (user_job_json["str"], user_job_json["dex"],user_job_json["int"],user_job_json["hp"],user_job_json["level"],user_job_json["exp"],user_job_json["skill_point"],user_line_id)
+        sql = """UPDATE users_job SET str = %s , dex = %s ,intelligence = %s , hp = %s,level = %s,exp = %s,skill_point = %s,word=%s Where user_line_id = %s"""
+        data = (user_job_json["str"], user_job_json["dex"],user_job_json["int"],user_job_json["hp"],user_job_json["level"],user_job_json["exp"],user_job_json["skill_point"],user_job_json["word"],user_line_id)
         self.cursor.execute(sql,data)
         self.conn.commit()
         print("更新使用者狀態:")
         print(user_job_json)
     
+    def joinUserWord(self,user_line_id,word,money_give=0,exp_give=0):
+        word = "word"+str(word)+"_users_status"
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql ="INSERT INTO {word} (user_line_id, money_give,exp_give) VALUES ('{user_line_id}',{money_give},{exp_give})".format(word=word,user_line_id=user_line_id,money_give=money_give,exp_give=exp_give)
+        self.cursor.execute(sql)
+        self.conn.commit()
+
+    def updateUserWordStatus(self,user_line_id,word,money_give=0,exp_give=0):
+        word = "word"+str(word)+"_users_status"
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql ="UPDATE {word} SET money_give = {money_give},exp_give={exp_give} where user_line_id = '{user_line_id}'".format(word=word,user_line_id=user_line_id,money_give=money_give,exp_give=exp_give)
+        self.cursor.execute(sql)
+        self.conn.commit()
+    
+    def addUserWordStatus(self,user_line_id,word,money_give=0,exp_give=0):
+        word = "word"+str(word)+"_users_status"
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql ="UPDATE {word} SET money_give = money_give+{money_give},exp_give = exp_give+{exp_give} where user_line_id = '{user_line_id}'".format(word=word,user_line_id=user_line_id,money_give=money_give,exp_give=exp_give)
+        self.cursor.execute(sql)
+        self.conn.commit()
+
+    
+    def updateWordStatus(self,word_id,word_level,word_exp,word_money):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "UPDATE word_list SET word_level = {word_level}, word_exp = {word_exp} ,word_money = {word_money} Where word_id = {word_id}".format(word_level=word_level,word_exp=word_exp,word_money=word_money,word_id=word_id)
+        data = (word_level, word_exp,word_money,word_id)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+    
+    def addWordStatus(self,word_id,word_level,word_exp,word_money):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "UPDATE word_list SET word_level = {word_level}, word_exp = word_exp+{word_exp} ,word_money = word_money+{word_money} Where word_id = {word_id}".format(word_level=word_level,word_exp=word_exp,word_money=word_money,word_id=word_id)
+        data = (word_level, word_exp,word_money,word_id)
+        self.cursor.execute(sql,data)
+        self.conn.commit()
+    
+    def getWordStatus(self,word_id):
+        word_id = int(word_id)
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "SELECT word_name,word_god,word_level,word_exp,word_money FROM word_list WHERE word_id = {word_id}".format(word_id=word_id)
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()
+        json = {"word_name":result[0],"word_god":result[1],"word_level":result[2],"word_exp":result[3],"word_money":result[4],"word_id":word_id}
+        print(json)
+        self.conn.commit()
+        return json
+    
+    def getUserWordStatus(self,user_line_id,word):
+        word = "word"+str(word)+"_users_status"
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "SELECT user_line_id,money_give,exp_give FROM {word} WHERE user_line_id = '{user_line_id}'".format(word=word,user_line_id=user_line_id)
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()
+        json = {"user_line_id":result[0],"money_give":result[1],"exp_give":result[2]}
+        print(json)
+        self.conn.commit()
+        return json
+    
+    def getWordRank1(self,word):
+        word = "word"+str(word)+"_users_status"
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql ="SELECT user_line_id FROM {word} order by money_give desc".format(word=word)
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()[0]
+        self.conn.commit()
+        if result is not None:
+            return result
+        else:
+            return None
+        
+
+
     def setUserMaxHp(self,user_line_id,hp):
         try:
             self.cursor = self.conn.cursor()

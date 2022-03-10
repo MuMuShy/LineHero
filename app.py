@@ -15,7 +15,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,TemplateSendMessage,PostbackEvent,
+    MessageEvent, TextMessage, TextSendMessage,TemplateSendMessage,PostbackEvent,ImageSendMessage,
     ButtonsTemplate,
     MessageTemplateAction,FlexSendMessage
 )
@@ -332,6 +332,67 @@ def handle_message(event):
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text="掛機成功 記得要按時來領取冒險隊獎勵,最多累積24HR"))
+    elif user_send =="@wordguide":
+        try:
+            _userjobinfo = database.getUserJob(event.source.user_id)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="資料有問題 請確認有加我好友 並且使用!info 建檔 接著透過@jobinfo進行創角"))
+            return
+        if _userjobinfo["word"] is None:
+            flex = lineMessagePackerRpg.getWordJoinMenu()
+            line_bot_api.reply_message(
+            event.reply_token,[
+            TextSendMessage(text="看來你還沒有陣營呢 這是勢力地圖,是否要加入勢力呢?"),
+            ImageSendMessage(original_content_url="https://mumu.tw/images/game_ui/wordmap.png",preview_image_url="https://mumu.tw/images/game_ui/wordmap.png"),
+            FlexSendMessage("勢力選擇",contents=flex)
+            ])
+        else:
+            _userword = _userjobinfo["word"]
+            _wordinfo = database.getWordStatus(_userword)
+            _top1 = database.getWordRank1(_userword)
+            if _top1 is None:
+                _top1 = "從缺"
+            else:
+                top1name = database.getUser(_top1)["user_line_name"]
+            _userwordinfo = database.getUserWordStatus(event.source.user_id,_userword)
+            flex = lineMessagePackerRpg.getWordGuideStatus(_wordinfo,_userwordinfo,top1name)
+            line_bot_api.reply_message(
+            event.reply_token,
+                FlexSendMessage("勢力狀態",contents=flex)
+            )
+    elif user_send.startswith("@joinword"):
+        try:
+            word = user_send.split("@joinword")[1]
+            word = int(word)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="資料有問題 請使用按鈕加入"))
+            return
+        try:
+            _userjobinfo = database.getUserJob(event.source.user_id)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="沒有冒險家資料 請確認已經加我好友 並且透過!info 與 @jobinfo 建檔"))
+            return
+        if _userjobinfo["word"] is None:
+            _userjobinfo["word"] = word
+            database.setUserJobStatus(event.source.user_id,_userjobinfo)
+            database.joinUserWord(event.source.user_id,word)
+            word_now = database.getWordStatus(word)
+            database.updateWordStatus(word,1,1,1001)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="加入陣營成功 可透過陣營頁面瀏覽詳細資料"))
+            return
+        else:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="你已經有加入陣營囉..."))
+            return
     elif user_send == "@jobinfo":
         user_id = event.source.user_id
         try:

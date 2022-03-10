@@ -459,6 +459,16 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
         _money = random.randrange(500,2000)
         _money+=_user_job_json["level"]*30
         _originmoney = int(dataBase.getUserMoney(_user_line_id))+_money
+        #存入陣營
+        if _user_job_json["word"] is not None:
+            _givemoney = int(_money*0.3)
+            _giveexp = int(_monster_base_info["exp"]*0.3)
+            _userword = _user_job_json["word"]
+            wordinfo = dataBase.getWordStatus(_userword)
+            wordinfo["word_exp"] += _giveexp
+            wordinfo["word_money"]+= _givemoney
+            dataBase.addUserWordStatus(_user_line_id,_userword,_givemoney,_giveexp)
+            dataBase.updateWordStatus(_userword,wordinfo["word_level"],wordinfo["word_exp"],wordinfo["word_money"])
         dataBase.SetUserMoneyByLineId(_user_line_id,_originmoney)
         dataBase.ClearUserBattle(_user_line_id)
         _origlevel = _user_job_json["level"]
