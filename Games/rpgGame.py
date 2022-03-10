@@ -362,6 +362,7 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
             skill_effec = "觸發盜賊被動技能! 嗜血如命 回復HP:"+str(int(_attack_result*0.1))+_avoid_str
         else:
             skill_effec=_avoid_str
+    
         
     skill_effec+=_skilldes
     _result={}

@@ -14,7 +14,12 @@ class DataBase():
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
     
     def checkUser(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="SELECT user_line_id FROM users where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         row = self.cursor.fetchone()
@@ -26,7 +31,12 @@ class DataBase():
             return False
     
     def createUser(self,user_line_id,user_line_name,user_img_link):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""INSERT INTO users (user_line_name, user_line_id,user_img,user_money,locked_money) VALUES (%(user_line_name)s, %(user_line_id)s, %(user_img)s, %(user_money)s,%(locked_money)s)"""
         params = {'user_line_name':user_line_name, 'user_line_id':user_line_id,'user_img':user_img_link,'user_money':100000,'locked_money':0}
         self.cursor.execute(sql,params)
@@ -34,7 +44,12 @@ class DataBase():
     
 
     def getUser(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * from users WHERE user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -50,7 +65,12 @@ class DataBase():
             return json
     
     def getUserById(self,user_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT user_line_id from users WHERE user_id = '"+str(user_id)+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -65,7 +85,12 @@ class DataBase():
         return self.getUser(user_line_id)["user_money"]
     
     def getUserName(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * from users WHERE user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -73,7 +98,12 @@ class DataBase():
         return row[0]
 
     def getCommandList(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * FROM commands"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -85,7 +115,12 @@ class DataBase():
         return commandlist
     
     def getUserRank(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * from users order by user_money DESC"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -100,7 +135,12 @@ class DataBase():
         return rank
     
     def getUserRpgRank(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * from users_job order by level DESC"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -114,21 +154,36 @@ class DataBase():
         return rank
 
     def SetUserMoneyByIndex(self,user_index_id,money):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""UPDATE users SET user_money = """+str(money)+"""WHERE user_id = """+str(user_index_id)
         self.cursor.execute(sql)
         self.conn.commit()
 
 
     def SetUserMoneyByLineId(self,user_line_id,money):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""UPDATE users SET user_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
         params = {'money':money,'line_id':user_line_id}
         self.cursor.execute(sql,params)
         self.conn.commit()
     
     def AddUserMoneyByLineId(self,user_lind_id,money):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""UPDATE users SET user_money = user_money+(%(money)s) WHERE user_line_id = (%(line_id)s)"""
         params = {'money':money,'line_id':user_lind_id}
         self.cursor.execute(sql,params)
@@ -136,14 +191,24 @@ class DataBase():
         print("增加:"+user_lind_id+"金錢:"+str(money))
     
     def SetUserLockedMoneyByLineId(self,user_line_id,money):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""UPDATE users SET locked_money = (%(money)s) WHERE user_line_id = (%(line_id)s)"""
         params = {'money':money,'line_id':user_line_id}
         self.cursor.execute(sql,params)
         self.conn.commit()
     
     def GetUserLockedMoneyLineId(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT locked_money from users WHERE user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -152,7 +217,12 @@ class DataBase():
     
 
     def getTop5Ranking(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="Select user_line_name, user_money from users ORDER BY user_money desc"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -166,7 +236,12 @@ class DataBase():
         return result
     
     def getTop5RpgRanking(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="Select * from users_job ORDER BY level desc"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -183,7 +258,12 @@ class DataBase():
         return result
     
     def getHobbyBet(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * FROM users where user_line_id = '" +user_line_id+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -191,7 +271,12 @@ class DataBase():
         return int(row[6])
 
     def setHobbyBet(self,user_line_id,new_hobbybet):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE users SET hobby_bet = %s WHERE user_line_id = %s"""
         data = (new_hobbybet, user_line_id)
         self.cursor.execute(sql,data)
@@ -199,7 +284,12 @@ class DataBase():
 
 
     def getDiceHistory(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """SELECT dice_history from gameinfo"""
         self.cursor.execute(sql)
         self.conn.commit()
@@ -211,7 +301,12 @@ class DataBase():
 
     def setDiceHistory(self,new):
         old = self.getDiceHistory()
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         _new =str(str(old)+new)
         lis = list(_new)
         if len(lis) > 10:
@@ -223,7 +318,12 @@ class DataBase():
         self.conn.commit()
     
     def getWatherMoney(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """select wather_money from gameinfo"""
         self.cursor.execute(sql)
         self.conn.commit()
@@ -235,7 +335,12 @@ class DataBase():
     
     def setWatherMoney(self,new):
         print("目前水錢"+str(new))
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE gameinfo SET wather_money = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
@@ -250,7 +355,12 @@ class DataBase():
         print("目前水錢:"+str(new_wather_money))
     
     def getGrand(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """select grand from jackpot"""
         self.cursor.execute(sql)
         self.conn.commit()
@@ -261,7 +371,12 @@ class DataBase():
         return int(_wathermoney)
 
     def getMajor(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """select major from jackpot"""
         self.cursor.execute(sql)
         self.conn.commit()
@@ -272,7 +387,12 @@ class DataBase():
         return int(_wathermoney)
     
     def getMinor(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """select minor from jackpot"""
         self.cursor.execute(sql)
         self.conn.commit()
@@ -283,7 +403,12 @@ class DataBase():
         return int(_wathermoney)
     
     def getMini(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """select mini from jackpot"""
         self.cursor.execute(sql)
         self.conn.commit()
@@ -296,34 +421,59 @@ class DataBase():
     
     def setGrand(self,new):
         print("設定jackpot Grand"+str(new))
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE jackpot SET grand = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
     
     def setMajor(self,new):
         print("設定jackpot Major"+str(new))
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE jackpot SET major = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
     
     def setMinor(self,new):
         print("設定jackpot Minor"+str(new))
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE jackpot SET minor = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
     
     def setMini(self,new):
         print("設定jackpot Mini"+str(new))
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE jackpot SET mini = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
     
     def getAllJackpot(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """select * from jackpot"""
         self.cursor.execute(sql)
         self.conn.commit()
@@ -332,7 +482,12 @@ class DataBase():
         return row
     
     def setAllJackpot(self,grand,major,minor,mini):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE jackpot SET grand = %s , major = %s , minor = %s , mini = %s """
         data = (grand, major,minor,mini)
         self.cursor.execute(sql,data)
@@ -340,7 +495,12 @@ class DataBase():
         print("更新jp:"+str(grand)+","+str(major)+","+str(minor)+","+str(mini))
     
     def setJpLastWin(self,_winnername,_winmoney):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE jackpot SET last_winner = %s , last_winprice = %s"""
         data = (_winnername, _winmoney)
         self.cursor.execute(sql,data)
@@ -348,7 +508,12 @@ class DataBase():
         print("更新jp中獎者:"+str(_winnername)+":"+str(_winmoney))
     
     def addAllJp(self,grand,major,minor,mini):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE jackpot SET grand = grand+ %s , major = major+ %s , minor = minor+%s , mini = mini+ %s """
         data = (grand, major,minor,mini)
         self.cursor.execute(sql,data)
@@ -359,7 +524,12 @@ class DataBase():
 
 
     def checkUserDaily(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT daily_request_done FROM users where user_line_id = '" +user_line_id+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -367,7 +537,12 @@ class DataBase():
         return bool(row[0])
     
     def setUserDaily(self,user_line_id,bool):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         if bool == True:
             bool = "true"
         else:
@@ -378,7 +553,12 @@ class DataBase():
         self.conn.commit()
     
     def setAllUserDaily(self,bool):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         if bool == True:
             bool = "true"
         else:
@@ -389,7 +569,12 @@ class DataBase():
         self.conn.commit()
     
     def checkUserHasJob(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="SELECT user_line_id FROM users_job where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         row = self.cursor.fetchone()
@@ -404,7 +589,12 @@ class DataBase():
     def createUserJob(self,user_line_id,jobs):
         from Games import rpgGame
         maxhp = rpgGame.getMaxHp(jobs,1)
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         _pet = 2
         if jobs =="rog":
             _pet = 1
@@ -438,7 +628,12 @@ class DataBase():
         
     
     def getUserJob(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * FROM users_job where user_line_id = '" +user_line_id+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -450,7 +645,12 @@ class DataBase():
         return _json
     
     def getPetInfo(self,pet_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * FROM pets_list where pet_id = '" +str(pet_id)+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -467,7 +667,12 @@ class DataBase():
         return _json
     
     def getWeaponInfo(self,weapon_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """SELECT * FROM weapon_list where weapon_id = %s"""
         self.cursor.execute(sql,(weapon_id,))
         self.conn.commit()
@@ -486,13 +691,23 @@ class DataBase():
         return _json        
 
     def addExpForPlayer(self,user_line_id,exp):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "UPDATE users_job SET exp = exp+{exp} where user_line_id = '{user_line_id}'".format(exp=exp,user_line_id=user_line_id)
         self.cursor.execute(sql)
         self.conn.commit()
     
     def setUserJobStatus(self,user_line_id,user_job_json):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE users_job SET str = %s , dex = %s ,intelligence = %s , hp = %s,level = %s,exp = %s,skill_point = %s Where user_line_id = %s"""
         data = (user_job_json["str"], user_job_json["dex"],user_job_json["int"],user_job_json["hp"],user_job_json["level"],user_job_json["exp"],user_job_json["skill_point"],user_line_id)
         self.cursor.execute(sql,data)
@@ -501,7 +716,12 @@ class DataBase():
         print(user_job_json)
     
     def setUserMaxHp(self,user_line_id,hp):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE users_job SET hp = %s Where user_line_id = %s"""
         data = (hp,user_line_id)
         self.cursor.execute(sql,data)
@@ -510,7 +730,12 @@ class DataBase():
 
     
     def getMapInfo(self,map_command_name):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * FROM maps where map_command_name = '" +map_command_name+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -521,7 +746,12 @@ class DataBase():
         return _json
     
     def getAdventureMapInfo(self,map_command_name):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * FROM adventure_map_list where map_command_name = '" +map_command_name+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -532,7 +762,12 @@ class DataBase():
         return _json
     
     def getAdventureMapInfoById(self,map_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT * FROM adventure_map_list where adventure_map_id = '" +str(map_id)+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -543,7 +778,12 @@ class DataBase():
         return _json
     
     def UserIsInCombat(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="SELECT user_line_id FROM battle_status_list where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         row = self.cursor.fetchone()
@@ -555,7 +795,12 @@ class DataBase():
             return False
     
     def UserIsInAdventure(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="SELECT user_line_id FROM users_adventure_list where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         row = self.cursor.fetchone()
@@ -567,7 +812,12 @@ class DataBase():
             return False
     
     def ClearUserBattle(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="DELETE FROM battle_status_list where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         # 事物提交
@@ -575,7 +825,12 @@ class DataBase():
         print("清空戰鬥:"+user_line_id)
     
     def getMonsterInfo(self,monster_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="SELECT * FROM monsters where monster_id = '"+str(monster_id)+"'"
         self.cursor.execute(sql)
         self.conn.commit()
@@ -588,7 +843,12 @@ class DataBase():
         return _json
     
     def setUserbattleStatus(self,user_line_id,monster_id,now_turn,monster_hp):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""INSERT INTO battle_status_list (user_line_id, target_monster_id,now_turn,monster_hp) VALUES (%(user_line_id)s, %(target_monster_id)s, %(now_turn)s, %(monster_hp)s)"""
         params = {'user_line_id':user_line_id, 'target_monster_id':monster_id,'now_turn':now_turn,'monster_hp':monster_hp,}
         self.cursor.execute(sql,params)
@@ -599,7 +859,12 @@ class DataBase():
         current =  datetime.now()
         str_todatabase = (current.strftime("%m/%d/%Y %H:%M:%S"))
         _user_pet = self.getUserJob(user_line_id)["pet"]
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""INSERT INTO users_adventure_list (user_line_id, adventure_map_id,pet_id,start_time) VALUES (%(user_line_id)s, %(adventure_map_id)s, %(pet_id)s, %(start_time)s)"""
         params = {'user_line_id':user_line_id, 'adventure_map_id':map_id,'pet_id':_user_pet,'start_time':str_todatabase,}
         self.cursor.execute(sql,params)
@@ -607,7 +872,12 @@ class DataBase():
         print("進入探險隊列表:"+user_line_id)
     
     def getUserAdventureStatus(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="SELECT * FROM users_adventure_list where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         row = self.cursor.fetchone()
@@ -618,7 +888,12 @@ class DataBase():
         return _json
     
     def ClearUserAdventureStatus(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="DELETE FROM users_adventure_list where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         # 事物提交
@@ -626,7 +901,12 @@ class DataBase():
         print("清空探險隊:"+user_line_id)
     
     def UpdateUserBattleStatus(self,user_line_id,monster_id,now_turn,monster_hp):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""UPDATE battle_status_list SET target_monster_id = (%(target_monster_id)s),monster_hp =(%(monster_hp)s)  WHERE user_line_id = (%(line_id)s)"""
         params = {'line_id':user_line_id, 'target_monster_id':monster_id,'monster_hp':monster_hp,}
         self.cursor.execute(sql,params)
@@ -634,7 +914,12 @@ class DataBase():
         print("更新對戰列表:"+user_line_id)
     
     def getUserRoundInfo(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="SELECT * FROM battle_status_list where user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
         row = self.cursor.fetchone()
@@ -645,7 +930,12 @@ class DataBase():
         return _json
     
     def setUserRoundRunChance(self,user_line_id,bool):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""UPDATE battle_status_list SET use_run_chance = (%(use_run_chance)s) WHERE user_line_id = (%(line_id)s)"""
         params = {'line_id':user_line_id, 'use_run_chance':bool}
         self.cursor.execute(sql,params)
@@ -653,14 +943,24 @@ class DataBase():
         print("更新對戰逃跑列表:"+user_line_id)
     
     def clearDailyRequest(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""UPDATE users SET daily_request_done = false"""
         self.cursor.execute(sql)
         self.conn.commit()
         print("0.00 DAILY CLEAR REQUEST DONE")
     
     def checkUserPackMaxLoc(self,user_line_id,item_type,item_id):###有修改###
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""select max(backpack_loc) from user_backpack where user_line_id =(%(line_id)s) """
         params = {'line_id':user_line_id}
         self.cursor.execute(sql,params)
@@ -689,7 +989,12 @@ class DataBase():
                 return True,row
     
     def addToUserBackPack(self,user_line_id,item_type,item_id,quantity,IS_EXIST,loc=-1):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         if IS_EXIST == False:
             if loc ==-1:
                 hassame,_nowpackindex = self.checkUserPackMaxLoc(user_line_id,item_type,item_id)
@@ -710,7 +1015,12 @@ class DataBase():
     
     #會移除玩家背包某個位置的東西 如果是武器會再幫她清除user_Weapon
     def removeUserBackPack(self,user_line_id,backpack_loc,quantity = 1):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT item_type,item_id,quantity FROM user_backpack where user_line_id = '{user_line_id}' and backpack_loc = {backpack_loc}".format(user_line_id = user_line_id,backpack_loc = backpack_loc)
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
@@ -731,14 +1041,24 @@ class DataBase():
                 self.removeUsefulItemFromPack(user_line_id,backpack_loc,quantity)
     
     def removeFromUserBackPack(self,user_line_id,backpack_loc):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""DELETE FROM user_backpack where user_line_id = %s and backpack_loc = %s """
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         self.conn.commit()
     
     #確定某格欄位有多少個物品
     def checkItemNumFromLoc(self,user_line_id,backpack_loc):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """SELECT quantity FROM user_backpack WHERE user_line_id = %s and backpack_loc = %s"""
         self.cursor.execute(sql,(user_line_id,backpack_loc,))
         try:
@@ -765,7 +1085,12 @@ class DataBase():
 
     
     def getItemFromUserBackPack(self,user_line_id,backpack_loc):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """SELECT * FROM user_backpack where user_line_id = %s and backpack_loc = %s"""
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         _result = self.cursor.fetchone()
@@ -782,7 +1107,12 @@ class DataBase():
     
     
     def addToUserWeapon(self,user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         #empty='{}'
         sql ="""INSERT INTO user_weapon (user_line_id, weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add) VALUES (%(user_line_id)s, %(weapon_id)s, %(backpack_loc)s, %(str_add)s, %(int_add)s,%(dex_add)s,%(atk_add)s)"""
         params = {'user_line_id':user_line_id,'weapon_id':weapon_id,'backpack_loc':backpack_loc,'str_add':str_add,'int_add':int_add,'dex_add':dex_add,'atk_add':atk_add}
@@ -790,7 +1120,12 @@ class DataBase():
         self.conn.commit()
     
     def getValueFromUserWeapon(self,user_line_id,backpack_loc):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         print("back pac loc:"+str(backpack_loc))
         sql = """SELECT user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add,uses_reel,available_reeltime,success_time,description FROM user_weapon where user_line_id = %s and backpack_loc = %s"""
         self.cursor.execute(sql,(user_line_id,backpack_loc,))
@@ -806,7 +1141,12 @@ class DataBase():
         return _json
 
     def removeUserWeapon(self,user_line_id,backpack_loc):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql ="""DELETE FROM user_weapon where user_line_id = %s and backpack_loc = %s """
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         self.conn.commit()
@@ -875,7 +1215,12 @@ class DataBase():
         return _basic_weapon_info
     
     def changeEquipmentWeapon(self,user_line_id,backpack_loc):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE users_job SET equipment_weapon = %s WHERE user_line_id = %s"""
         self.cursor.execute(sql,(backpack_loc,user_line_id,))
         self.conn.commit()
@@ -884,7 +1229,12 @@ class DataBase():
         user_job = self.getUserJob(user_line_id)
         equipment_back_loc = user_job["weapon"]
         equipment_back_loc = int(equipment_back_loc)
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT backpack_loc,item_id FROM user_backpack where user_line_id = %s and item_type = 'weapon'"
         self.cursor.execute(sql,(user_line_id,))
         _result = self.cursor.fetchall()
@@ -960,7 +1310,12 @@ class DataBase():
     
     #給卷軸id 判斷玩家有沒有這個卷軸
     def getUserPackReelInfo(self,user_line_id,reel_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT backpack_loc,item_id,quantity FROM user_backpack WHERE user_line_id = %s and item_type = 'reel' and item_id = %s"
         self.cursor.execute(sql,(user_line_id,reel_id,))
         rows = self.cursor.fetchone()
@@ -972,14 +1327,24 @@ class DataBase():
     
     #使用時勿必先判斷玩家有沒有該卷軸
     def setUserPackReelNum(self,user_line_id,reel_id,quantity):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE user_backpack SET quantity={quantity} WHERE user_line_id = '{user_line_id}' and item_type = 'reel' and item_id = {reel_id}""".format(quantity=quantity,user_line_id=user_line_id,reel_id=reel_id)
         self.cursor.execute(sql)
         self.conn.commit()
 
     
     def getUserUsingWeapon(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT equipment_weapon FROM users_job WHERE user_line_id = '" + user_line_id + "'"
         self.cursor.execute(sql)
         rows = self.cursor.fetchone()
@@ -997,13 +1362,23 @@ class DataBase():
         return {}
     
     def addWeaponReelSuccessTime(self,user_line_id,backpack_loc):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """UPDATE user_weapon SET success_time = success_time+1 WHERE user_line_id = %s and backpack_loc = %s"""
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         self.conn.commit()
     
     def getUserUsingReel(self,reel_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT reel_id,plus_str,plus_int,plus_dex,plus_atk,description,probability,image_type,reel_name FROM reel_list WHERE reel_id = '" + str(reel_id) + "'"
         self.cursor.execute(sql)
         rows = self.cursor.fetchone()
@@ -1017,7 +1392,12 @@ class DataBase():
 
     
     def getUserReelList(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """SELECT user_line_id,backpack_loc,item_type,item_id,quantity from user_backpack where user_line_id = %s and item_type = 'reel'"""
         self.cursor.execute(sql,(user_line_id,))
         _result = self.cursor.fetchall()
@@ -1035,7 +1415,12 @@ class DataBase():
             return None
     
     def setEnhancedResult(self,enhancedData):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         if enhancedData['description'] is not None:
             sql = """UPDATE user_weapon SET str_add = '{0}',int_add = '{1}',dex_add = '{2}',atk_add = '{3}',uses_reel = '{4}',description = '{5}',available_reeltime = '{6}'
                      WHERE user_line_id = '{7}' and backpack_loc = '{8}'
@@ -1050,7 +1435,12 @@ class DataBase():
         self.conn.commit()
     
     def getSkillInfo(self,skill_id,job):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         table_name = "skill_list_"+job
         sql = "SELECT skill_id,skill_name,skill_description,skill_effect_description,max_level,max_book_time,leveladd_one_book,skill_type,own_level,own_job_level,skill_effect_addlv_description,image_type FROM {table_name} where skill_id = {skill_id}".format(table_name = table_name,skill_id = skill_id)
         self.cursor.execute(sql)
@@ -1067,14 +1457,24 @@ class DataBase():
         if self.checkUserHasSkill(user_line_id,skill_id,skill_job):
             print("已有此技能")
             return
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = """INSERT INTO public.user_skill(user_line_id, skill_id, skill_job, skill_level, used_book_time) VALUES ( %(user_line_id)s,%(skill_id)s,%(skill_job)s,%(skill_level)s,%(used_book_time)s)"""
         params = {'user_line_id':user_line_id, 'skill_id':skill_id,'skill_job':skill_job,'skill_level':skill_level,'used_book_time':used_book_time}
         self.cursor.execute(sql,params)
         self.conn.commit()
 
     def getLevelSkillList(self,level,job):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         table_name = "skill_list_"+job
         sql = "SELECT skill_id FROM {table_name} where own_level <= {level}".format(table_name = table_name,level = level)
         self.cursor.execute(sql)
@@ -1090,7 +1490,12 @@ class DataBase():
             return None
     
     def getUserSkillList(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT skill_id,skill_job FROM user_skill where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
         self.cursor.execute(sql)
         _result = self.cursor.fetchall()
@@ -1108,7 +1513,12 @@ class DataBase():
         return _userskill_list
     
     def checkUserHasSkill(self,user_line_id,skill_id,skill_job):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT skill_id FROM user_skill where user_line_id = '{user_line_id}' and skill_id = {skill_id} and skill_job = '{skill_job}'".format(user_line_id = user_line_id,skill_id = skill_id,skill_job=skill_job)
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
@@ -1118,7 +1528,12 @@ class DataBase():
             return False
     
     def getUserActiveSkillList(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT skill_id,skill_job FROM user_skill where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
         self.cursor.execute(sql)
         _result = self.cursor.fetchall()
@@ -1142,7 +1557,12 @@ class DataBase():
     
     def getSkillFromUser(self,user_line_id,skill_id,job):
         _skillbasic = self.getSkillInfo(skill_id,job)
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT skill_id,skill_level,used_book_time FROM user_skill where user_line_id = '{user_line_id}' and skill_id = {skill_id} and skill_job = '{skill_job}'".format(user_line_id = user_line_id,skill_id = skill_id,skill_job=job)
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
@@ -1211,13 +1631,23 @@ class DataBase():
         return _skillbasic
 
     def addUserSkillLevel(self,user_line_id,skill_id,skill_job):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "UPDATE user_skill SET skill_level = skill_level+1 where skill_id = {skill_id} and skill_job ='{skill_job}' and user_line_id = '{user_line_id}'".format(skill_id=skill_id,skill_job=skill_job,user_line_id=user_line_id)
         self.cursor.execute(sql)
         self.conn.commit()
     
     def decUserSkillPoint(self,user_line_id):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "UPDATE users_job SET skill_point = skill_point-1 where user_line_id = '{user_line_id}'".format(user_line_id=user_line_id)
         self.cursor.execute(sql)
         self.conn.commit()
@@ -1227,7 +1657,12 @@ class DataBase():
         
         _NumTable = ['zero','one','two','three']#數字英文表
         
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         gashapon_tableName = _NumTable[gashapon_num]
         sql = "SELECT * FROM gashapon_list_{gashapon_tableName}".format(gashapon_tableName=gashapon_tableName)
         self.cursor.execute(sql)
@@ -1238,7 +1673,12 @@ class DataBase():
     
     #查詢玩家有的類型 type不傳就是所有的背包疊加數量 (卷軸等消耗道具會疊加,佔一格) type 可船 weapon reel
     def getUserBackItemNum(self,user_line_id,item_type="all"):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         if item_type == "all":
             sql = "SELECT count(*) FROM user_backpack where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
         else:
@@ -1251,7 +1691,12 @@ class DataBase():
     
     def createNewWeapon(self,str_add,int_add,dex_add,atk_add,rare,weapon_name,image_type,other_description,available_reeltime):
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         try:
             sql ="""INSERT INTO weapon_list (str_add, int_add,dex_add,atk_add,rare,weapon_name,image_type,other_description,available_reeltime) VALUES (%(str_add)s, %(int_add)s, %(dex_add)s, %(atk_add)s,%(rare)s,%(weapon_name)s,%(image_type)s,%(other_description)s,%(available_reeltime)s)"""
             params = {'str_add':str_add, 'int_add':int_add,'dex_add':dex_add,'atk_add':atk_add,'rare':rare,'weapon_name':weapon_name,'image_type':image_type,'other_description':other_description,'available_reeltime':available_reeltime}
@@ -1263,7 +1708,12 @@ class DataBase():
             return False
     
     def getMaxWeaponNow(self):
-        self.cursor = self.conn.cursor()
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         sql = "SELECT max(weapon_id) FROM weapon_list"
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()[0]
