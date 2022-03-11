@@ -364,8 +364,14 @@ def handle_message(event):
                 TextSendMessage(text="裝備欄好像滿了喔 請確認或是清理"))
             return
         #獲取訂單資料
-        auction = database.getAuction(_auction_id)
-        auction_info = auction["auction_info"]
+        try:
+            auction = database.getAuction(_auction_id)
+            auction_info = auction["auction_info"]
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="該商品似乎不存在了 請再刷新一次試試看"))
+            return
         #獲取使用者金錢資料
         user_money = int(database.getUserMoney(event.source.user_id))
         #可以購買 -> 新增該加成武器去買家 -> 移除拍賣場該筆訂單 -> 給予賣家金錢
