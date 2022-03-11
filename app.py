@@ -1,4 +1,3 @@
-from msilib import datasizemask
 import random
 from time import sleep, time
 from flask import Flask, request, abort
