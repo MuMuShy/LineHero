@@ -388,6 +388,19 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage(text="購買成功! 已撥款給賣家 $"+str(auction_info["list_price"])))
             return
+        #購買人同上架人 不給錢不扣錢
+        elif event.source.user_id == auction_info["auction_line_id"]:
+            _weapon_info = auction["weapon_json"]
+            hassame,loc = database.checkUserPackMaxLoc(event.source.user_id,"weapon",_weapon_info["weapon_id"])
+            database.addToUserBackPack(event.source.user_id,"weapon",_weapon_info["weapon_id"],1,hassame,loc)
+            database.addToUserWeaponWithEnhanced(event.source.user_id,_weapon_info["weapon_id"],loc,auction_info["str_add"],auction_info["int_add"],
+            auction_info["dex_add"],auction_info["atk_add"],auction_info["uses_reel"],auction_info["available_reeltime"],auction_info["description"],auction_info["success_time"])
+            #移除拍賣場訂單
+            database.removeAuction(_auction_id,auction_info["auction_line_id"])
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="購買人為上架者 成功下架商品"))
+            return
         else:
             line_bot_api.reply_message(
                 event.reply_token,
@@ -428,6 +441,11 @@ def handle_message(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage("最大價格不可超過 20E"))
+            return
+        if _price < 0:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("最小價格不可低於 0"))
             return
         #上架流程 ->　檢查該格是否真的有武器　-> 新增至拍賣系統 -> 移除使用者該武器 -> 扣除手續費用
         _checkitem = database.getItemFromUserBackPack(event.source.user_id,_loc)
