@@ -1,7 +1,6 @@
 import os
 from pydoc import describe
 import random
-from tkinter.messagebox import RETRY
 import psycopg2
 from dotenv import load_dotenv
 import time
