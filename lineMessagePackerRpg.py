@@ -5655,18 +5655,21 @@ def getUserWeaponToAuctionList(_weapon_json_list,isFirst = True):
         #print("要打包")
         #print(weapon)
         _buttontext = "已生成武器ID\n請複製後加一個空格輸入價格\nEX:\n@auctionAddequipment "+str(weapon["backpack_loc"])+" 15000\n(15000即為上架價格)"
-        _postdate = "@auctionAddequipment "+str(weapon["backpack_loc"])
+        
         if isFirst:
             if index == 0:
                 _btnstyle = "secondary"
                 _btnlabel = "裝備中"
                 _buttontext = " "
+                _postdate = "n"
             else:
                 _btnstyle = "primary"
                 _btnlabel = "上架"
+                _postdate = "@auctionAddequipment "+str(weapon["backpack_loc"])
         else:
             _btnstyle = "primary"
             _btnlabel = "上架"
+            _postdate = "@auctionAddequipment "+str(weapon["backpack_loc"])
         
         _reel_time = ""
         if weapon["success_time"] > 0:
