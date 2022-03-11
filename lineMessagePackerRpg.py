@@ -2204,7 +2204,7 @@ def getJobInfoSubMenu():
             },
             {
                 "type": "text",
-                "text": "商人&NPC",
+                "text": "商人/世界拍賣",
                 "color": "#ffffff",
                 "align": "start",
                 "size": "xs",
@@ -4159,6 +4159,73 @@ def getVillageMenu():
             "separator": False
             }
         }
+        },{
+        "type": "bubble",
+        "size": "nano",
+        "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": "世界拍賣",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "md",
+                "gravity": "center"
+            },
+            {
+                "type": "text",
+                "text": "玩家自由上架物品",
+                "color": "#ffffff",
+                "align": "start",
+                "size": "xs",
+                "gravity": "center",
+                "margin": "lg"
+            }
+            ],
+            "backgroundColor": "#FF6B6E",
+            "paddingTop": "19px",
+            "paddingAll": "12px",
+            "paddingBottom": "16px"
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "玩家交易",
+                    "color": "#8C8C8C",
+                    "size": "sm",
+                    "wrap": True
+                }
+                ],
+                "flex": 1
+            },
+            {
+                "type": "button",
+                "action": {
+                "type": "message",
+                "label": "前往",
+                "text": "@showAuctionNpc"
+                },
+                "style": "primary",
+                "margin": "none"
+            }
+            ],
+            "spacing": "md",
+            "paddingAll": "12px"
+        },
+        "styles": {
+            "footer": {
+            "separator": False
+            }
+        }
         }
     ]
     }
@@ -5343,6 +5410,850 @@ def getWordGuideStatus(word_info,user_word_info,top1):
                 "paddingAll": "20px",
                 "paddingTop": "18px",
                 "height": "450px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        }
+    ]
+    }
+    return json
+
+def getAuctionWeaponList(auction_json_list):
+    from datetime import datetime, timedelta
+    from Games import rpgDictionary
+    index = 0 # 0的時候為裝備中道具
+    bubble_contents=[]
+    for auction in auction_json_list:
+        weapon = auction["weapon_json"]
+        auction_info = auction["auction_info"]
+
+        _buttontext = "@auctionbuyweapon "+str(auction_info["auction_id"])
+        _btnstyle = "primary"
+        _btnlabel = "購買"
+        _price = auction_info["list_price"]
+        _pricecolor = "#000000"
+        if int(_price) > 9999:
+            _pricecolor = "#13C6D8"
+        if int(_price) > 99999:
+            _pricecolor = "#103EE9"
+        if int(_price) > 999999:
+            _pricecolor = "#8310E9"
+        if int(_price) > 9999999:
+            _pricecolor = "#E91010"
+
+        #時間處裡
+        current =  datetime.now()
+        _begintime = datetime.strptime(auction_info["auction_start_time"],"%m/%d/%Y %H:%M:%S")
+        _endtime = _begintime+timedelta(days=1)
+        _endtime = _endtime.strftime("%m/%d %H:%M")
+        # time_elapsed = (current-_begintime) #經過的掛機時間
+        # time_elapsed = math.floor(time_elapsed.total_seconds())
+        # if time_elapsed > 86400: #如果超過24小時 設定為一小時
+        #     time_elapsed = 86400
+        
+        _reel_time = ""
+        if weapon["success_time"] > 0:
+            _reel_time =" + "+str(weapon["success_time"])
+        url = "https://mumu.tw/images/weapons/"+str(weapon["weapon_id"])+"."+weapon["img_type"]
+        _start_list =["https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"]
+        _rare = int(weapon["rare"])-1
+        _star = 0
+        for i in range(0,_rare):
+            _start_list[i] = "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+            _star+=1
+            contents = [
+                            {
+                                "type": "text",
+                                "text": "STR + "+str(weapon["str_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "DEX + "+str(weapon["dex_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "INT + "+str(weapon["int_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "攻擊力 + "+str(weapon["atk_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+
+            ]
+        for i in weapon["other_effect"]:
+            _effectchinese = rpgDictionary.getChineseEffectName(i)
+            print (weapon["other_effect"])
+            contents.append(
+                {
+                            "type": "text",
+                            "text": _effectchinese+" : +"+str(weapon["other_effect"][i]),
+                            "wrap": True,
+                            "color": "#ff0000",
+                            "size": "xs",
+                            "flex": 5
+                }
+            )
+        contents.append(
+            {
+                "type": "text",
+                "text": "可使用卷軸次數:"+str(weapon["available_reeltime"]),
+                "wrap": True,
+                "color": "#000000",
+                "size": "xs",
+                "flex": 5
+            }
+        )
+        bubbble = {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213",
+            "url": url
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": weapon["weapon_name"]+_reel_time,
+                "weight": "bold",
+                "size": "sm",
+                "wrap": True
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[0]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[1]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[2]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[3]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[4]
+                },
+                {
+                    "type": "text",
+                    "text": str(_star)+".0",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": contents
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "separator",
+                "color": "#000000"
+            },
+            {
+                "type": "text",
+                "text": "$: "+str("{:,}".format(auction_info["list_price"])),
+                "color": _pricecolor,
+                "align": "center"
+            },
+            {
+                "type": "text",
+                "text": "上架者: "+str(auction_info["auction_owner"]),
+                "align": "center",
+                "weight": "bold",
+                "size": "xs"
+            },
+            {
+                "type": "text",
+                "text": "下架時間:  "+_endtime,
+                "size": "xs",
+                "align": "center"
+            },
+            {
+                 "type": "button",
+                "action": {
+                "type": "message",
+                "label": _btnlabel,
+                "text": _buttontext
+                },
+                "style": _btnstyle
+            }
+            ]
+        }
+        }
+        index+=1
+        bubble_contents.append(bubbble)
+    json = {
+    "type": "carousel",
+    "contents":bubble_contents
+    }
+    return json
+
+
+def getUserWeaponToAuctionList(_weapon_json_list,isFirst = True):
+    index = 0 # 0的時候為裝備中道具
+    bubble_contents=[]
+    for weapon in _weapon_json_list:
+        #print("要打包")
+        #print(weapon)
+        _buttontext = "已生成武器ID\n請複製後加一個空格輸入價格\nEX:\n@auctionAddequipment "+str(weapon["backpack_loc"])+" 15000\n(15000即為上架價格)"
+        _postdate = "@auctionAddequipment "+str(weapon["backpack_loc"])
+        if isFirst:
+            if index == 0:
+                _btnstyle = "secondary"
+                _btnlabel = "裝備中"
+                _buttontext = " "
+            else:
+                _btnstyle = "primary"
+                _btnlabel = "上架"
+        else:
+            _btnstyle = "primary"
+            _btnlabel = "上架"
+        
+        _reel_time = ""
+        if weapon["success_time"] > 0:
+            _reel_time =" + "+str(weapon["success_time"])
+        url = "https://mumu.tw/images/weapons/"+str(weapon["weapon_id"])+"."+weapon["img_type"]
+        _start_list =["https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png",
+        "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gray_star_28.png"]
+        _rare = int(weapon["rare"])-1
+        _star = 0
+        for i in range(0,_rare):
+            _start_list[i] = "https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png"
+            _star+=1
+            contents = [
+                            {
+                                "type": "text",
+                                "text": "STR + "+str(weapon["str_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "DEX + "+str(weapon["dex_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "INT + "+str(weapon["int_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+                            {
+                                "type": "text",
+                                "text": "攻擊力 + "+str(weapon["atk_add"]),
+                                "wrap": True,
+                                "color": "#8c8c8c",
+                                "size": "xs",
+                                "flex": 5
+                            },
+
+            ]
+        for i in weapon["other_effect"]:
+            _effectchinese = rpgDictionary.getChineseEffectName(i)
+            print (weapon["other_effect"])
+            contents.append(
+                {
+                            "type": "text",
+                            "text": _effectchinese+" : +"+str(weapon["other_effect"][i]),
+                            "wrap": True,
+                            "color": "#ff0000",
+                            "size": "xs",
+                            "flex": 5
+                }
+            )
+        contents.append(
+            {
+                "type": "text",
+                "text": "可使用卷軸次數:"+str(weapon["available_reeltime"]),
+                "wrap": True,
+                "color": "#000000",
+                "size": "xs",
+                "flex": 5
+            }
+        )
+        bubbble = {
+        "type": "bubble",
+        "size": "micro",
+        "hero": {
+            "type": "image",
+            "size": "full",
+            "aspectMode": "cover",
+            "aspectRatio": "320:213",
+            "url": url
+        },
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "text",
+                "text": weapon["weapon_name"]+_reel_time,
+                "weight": "bold",
+                "size": "sm",
+                "wrap": True
+            },
+            {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[0]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[1]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[2]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[3]
+                },
+                {
+                    "type": "icon",
+                    "size": "xs",
+                    "url": _start_list[4]
+                },
+                {
+                    "type": "text",
+                    "text": str(_star)+".0",
+                    "size": "xs",
+                    "color": "#8c8c8c",
+                    "margin": "md",
+                    "flex": 0
+                }
+                ]
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": contents
+                }
+                ]
+            }
+            ],
+            "spacing": "sm",
+            "paddingAll": "13px"
+        },
+        "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                 "type": "button",
+                "action": {
+                "type": "postback",
+                "label": _btnlabel,
+                "text": _buttontext,
+                "data": _postdate
+                },
+                "style": _btnstyle
+            }
+            ]
+        }
+        }
+        index+=1
+        bubble_contents.append(bubbble)
+    json = {
+    "type": "carousel",
+    "contents":bubble_contents
+    }
+    return json
+
+def getAuctionNpc():
+    json = {
+    "type": "carousel",
+    "contents": [
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/game_ui/auction_bg.png",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "中立拍賣所 - 錢德",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "玩家之間的買賣都透過我,來逛逛吧",
+                        "color": "#ffffffcc",
+                        "gravity": "bottom",
+                        "flex": 0,
+                        "size": "sm"
+                    },
+                    {
+                        "type": "text",
+                        "text": "歡迎上架物品給其他玩家購買.",
+                        "color": "#ffffffcc",
+                        "gravity": "bottom",
+                        "flex": 0,
+                        "size": "sm"
+                    }
+                    ],
+                    "spacing": "xs"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "上架專區",
+                        "color": "#ffffff",
+                        "weight": "bold",
+                        "style": "italic",
+                        "align": "center"
+                    }
+                    ],
+                    "offsetTop": "10px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "icon",
+                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip14.png"
+                        },
+                        {
+                            "type": "text",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px",
+                            "text": "販賣裝備"
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm",
+                        "action": {
+                        "type": "message",
+                        "text": "@auctionaddWeapon",
+                        "label": " "
+                        }
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px",
+                    "action": {
+                    "type": "message",
+                    "label": "action",
+                    "text": "@auctionaddWeapon"
+                    }
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "icon",
+                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip14.png"
+                        },
+                        {
+                            "type": "text",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px",
+                            "text": "販賣消耗品(開發中)"
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "action",
+                        "text": " "
+                        }
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px",
+                    "action": {
+                    "type": "message",
+                    "label": "action",
+                    "text": " "
+                    }
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "NPC",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#ff334b",
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "53px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        },
+        {
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/game_ui/auction_bg.png",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "中立拍賣所 - 錢德",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "從我這邊買,絕對安全",
+                        "color": "#ffffffcc",
+                        "gravity": "bottom",
+                        "flex": 0,
+                        "size": "sm"
+                    },
+                    {
+                        "type": "text",
+                        "text": "看看有什麼稀有裝備吧!",
+                        "color": "#ffffffcc",
+                        "gravity": "bottom",
+                        "flex": 0,
+                        "size": "sm"
+                    }
+                    ],
+                    "spacing": "xs"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "購買專區",
+                        "color": "#ffffff",
+                        "weight": "bold",
+                        "style": "italic",
+                        "align": "center"
+                    }
+                    ],
+                    "offsetTop": "10px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "icon",
+                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip14.png"
+                        },
+                        {
+                            "type": "text",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px",
+                            "text": "瀏覽拍賣裝備"
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm",
+                        "action": {
+                        "type": "message",
+                        "text": "@auctionlistWeapon",
+                        "label": " "
+                        }
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px",
+                    "action": {
+                    "type": "message",
+                    "label": "action",
+                    "text": "@auctionlistWeapon"
+                    }
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "icon",
+                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/flexsnapshot/clip/clip14.png"
+                        },
+                        {
+                            "type": "text",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px",
+                            "text": "瀏覽消耗品(開發中)"
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm",
+                        "action": {
+                        "type": "message",
+                        "label": "action",
+                        "text": " "
+                        }
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px",
+                    "action": {
+                    "type": "message",
+                    "label": "action",
+                    "text": " "
+                    }
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "NPC",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#ff334b",
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "53px"
             }
             ],
             "paddingAll": "0px"

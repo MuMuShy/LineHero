@@ -1,3 +1,4 @@
+from msilib import datasizemask
 import random
 from time import sleep, time
 from flask import Flask, request, abort
@@ -110,15 +111,12 @@ def addweapon():
 
 @handler.add(PostbackEvent)
 def handle_postback(event):
-    ts = event.postback.data
-    print(ts)
-    keyword = ts[7:]
-    print(keyword)
-    if ts[7:] == '{}'.format(keyword):
-
-        text_message = TextSendMessage(text='訊息{}'.format(keyword))
-
-        line_bot_api.reply_message(event.reply_token, text_message)    
+    data = event.postback.data
+    if data.startswith("@auctionAddequipment"):
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=data))
+        return
 
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -141,11 +139,11 @@ def handle_message(event):
     #         return
     print(event)
     user_send =event.message.text
-    # if user_send =="test":
-    #     flex = lineMessagePacker.getPostButtonTest()
-    #     line_bot_api.reply_message(
-    #         event.reply_token,
-    #         FlexSendMessage("BUG回報",contents=flex))
+    if user_send =="test":
+        flex = lineMessagePacker.getPostButtonTest(event.source.user_id)
+        line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("post 測試",contents=flex))
     if user_send.strip().startswith("!"):
         _command_check = "!"+user_send.strip().split("!")[1].strip().lower()
     else:
@@ -332,6 +330,130 @@ def handle_message(event):
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text="掛機成功 記得要按時來領取冒險隊獎勵,最多累積24HR"))
+    elif user_send =="@showAuctionNpc":
+        _flex = lineMessagePackerRpg.getAuctionNpc()
+        line_bot_api.reply_message(
+            event.reply_token,
+                FlexSendMessage("世界拍賣",contents=_flex)
+            )
+        return
+    elif user_send =="@auctionlistWeapon":
+        _auction_list_info = database.getAuctionList("weapon")
+        if _auction_list_info is None:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="目前拍賣場沒有人上架物品"))
+            return
+        _flex = lineMessagePackerRpg.getAuctionWeaponList(_auction_list_info)
+        line_bot_api.reply_message(
+            event.reply_token,
+                FlexSendMessage("拍賣裝備列表",contents=_flex)
+            )
+        return
+    elif user_send.startswith("@auctionbuyweapon"):
+        try:
+            _auction_id = int(user_send.split("@auctionbuyweapon")[1])
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="格式好像有問題ㄛ"))
+            return
+        #確認玩家是否達到武器上線
+        if database.getUserBackItemNum(event.source.user_id,"weapon") >= 60:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="裝備欄好像滿了喔 請確認或是清理"))
+            return
+        #獲取訂單資料
+        auction = database.getAuction(_auction_id)
+        auction_info = auction["auction_info"]
+        #獲取使用者金錢資料
+        user_money = int(database.getUserMoney(event.source.user_id))
+        #可以購買 -> 新增該加成武器去買家 -> 移除拍賣場該筆訂單 -> 給予賣家金錢
+        if user_money >= int(auction_info["list_price"]):
+            #新增該武器去買家 並且扣款
+            user_money -= int(auction_info["list_price"])
+            database.SetUserMoneyByLineId(event.source.user_id,user_money)
+            _weapon_info = auction["weapon_json"]
+            hassame,loc = database.checkUserPackMaxLoc(event.source.user_id,"weapon",_weapon_info["weapon_id"])
+            database.addToUserBackPack(event.source.user_id,"weapon",_weapon_info["weapon_id"],1,hassame,loc)
+            database.addToUserWeaponWithEnhanced(event.source.user_id,_weapon_info["weapon_id"],loc,auction_info["str_add"],auction_info["int_add"],
+            auction_info["dex_add"],auction_info["atk_add"],auction_info["uses_reel"],auction_info["available_reeltime"],auction_info["description"],auction_info["success_time"])
+            #移除拍賣場訂單
+            database.removeAuction(_auction_id,auction_info["auction_line_id"])
+            #給予賣家金錢
+            seller_money = int(database.getUserMoney(auction_info["auction_line_id"]))
+            seller_money+= int(auction_info["list_price"])
+            database.SetUserMoneyByLineId(auction_info["auction_line_id"],seller_money)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="購買成功! 已撥款給賣家 $"+str(auction_info["list_price"])))
+            return
+        else:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="哦... 妳的錢好像不夠喔"))
+            return
+    elif user_send =="@auctionaddWeapon":
+        _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
+        _sendlist = []
+        _first = True
+        if len(_weapon_json_list)>12:
+            _temp = []
+            for _weapon in _weapon_json_list:
+                _temp.append(_weapon)
+                if len(_temp) == 12:
+                    print(_temp)
+                    _flex =  lineMessagePackerRpg.getUserWeaponToAuctionList(_temp,_first)
+                    _first = False
+                    _sendlist.append(FlexSendMessage("裝備列表",contents=_flex))
+                    _temp = []
+            _lastflex = lineMessagePackerRpg.getUserWeaponToAuctionList(_temp,_first)
+            _sendlist.append(FlexSendMessage("裝備列表",contents=_lastflex))
+        else:
+            _flex_equipment = lineMessagePackerRpg.getUserWeaponToAuctionList(_weapon_json_list,_first)
+            _sendlist.append(FlexSendMessage("裝備列表",contents=_flex_equipment))
+        line_bot_api.reply_message(
+            event.reply_token,_sendlist)
+        return
+    elif user_send.startswith("@auctionAddequipment"):
+        try:
+            _loc = int(user_send.split(" ")[1])
+            _price = int(user_send.split(" ")[2])
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("資料格式好像有問題 請使用按鈕給的指令(@)開頭 -> 格式為: @auctionAddequipment ID 價格"))
+            return
+        if _price > 2000000000:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage("最大價格不可超過 20E"))
+            return
+        #上架流程 ->　檢查該格是否真的有武器　-> 新增至拍賣系統 -> 移除使用者該武器 -> 扣除手續費用
+        _checkitem = database.getItemFromUserBackPack(event.source.user_id,_loc)
+        if _checkitem == None:
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="您並沒有這個裝備喔"))
+            return
+        #新增至拍賣系統
+        user_weapon = database.getValueFromUserWeapon(event.source.user_id,_loc)
+        database.addAuction(event.source.user_id,"weapon",user_weapon["weapon_id"],_price,user_weapon)
+        #移除使用者該武器
+        database.removeUserBackPack(event.source.user_id,_loc)
+        #扣除手續費用
+        _money = int(database.getUserMoney(event.source.user_id))
+        _money-= 5000
+        database.SetUserMoneyByLineId(event.source.user_id,_money)
+        _flex = lineMessagePackerRpg.getAuctionNpc()
+        line_bot_api.reply_message(
+            event.reply_token,[
+            TextSendMessage(text="上架成功! 酌收手續費用 $5000 請注意24小時以後會自動下架退回物品喔"),
+            FlexSendMessage("世界拍賣",contents=_flex)
+            ])
+        return
+
     elif user_send =="@wordguide":
         try:
             _userjobinfo = database.getUserJob(event.source.user_id)
@@ -382,8 +504,7 @@ def handle_message(event):
             _userjobinfo["word"] = word
             database.setUserJobStatus(event.source.user_id,_userjobinfo)
             database.joinUserWord(event.source.user_id,word)
-            word_now = database.getWordStatus(word)
-            database.updateWordStatus(word,1,1,1001)
+            database.addWordMoneyExp(word,1000,1000)
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="加入陣營成功 可透過陣營頁面瀏覽詳細資料"))
@@ -435,6 +556,7 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             FlexSendMessage("冒險列表",contents=_reply))
+    
     elif user_send == "@equipment":
         _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
         _sendlist = []

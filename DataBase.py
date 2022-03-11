@@ -1,5 +1,7 @@
 import os
+from pydoc import describe
 import random
+from tkinter.messagebox import RETRY
 import psycopg2
 from dotenv import load_dotenv
 import time
@@ -764,16 +766,15 @@ class DataBase():
         self.cursor.execute(sql,data)
         self.conn.commit()
     
-    def addWordStatus(self,word_id,word_level,word_exp,word_money):
+    def addWordMoneyExp(self,word_id,word_exp,word_money):
         try:
             self.cursor = self.conn.cursor()
         except:
             print("連線以丟失 重連")
             self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             self.cursor = self.conn.cursor()
-        sql = "UPDATE word_list SET word_level = {word_level}, word_exp = word_exp+{word_exp} ,word_money = word_money+{word_money} Where word_id = {word_id}".format(word_level=word_level,word_exp=word_exp,word_money=word_money,word_id=word_id)
-        data = (word_level, word_exp,word_money,word_id)
-        self.cursor.execute(sql,data)
+        sql = "UPDATE word_list SET word_exp = word_exp+{word_exp} ,word_money = word_money+{word_money} Where word_id = {word_id}".format(word_exp=word_exp,word_money=word_money,word_id=word_id)
+        self.cursor.execute(sql)
         self.conn.commit()
     
     def getWordStatus(self,word_id):
@@ -1231,6 +1232,22 @@ class DataBase():
         self.cursor.execute(sql,params)
         self.conn.commit()
     
+    def addToUserWeaponWithEnhanced(self,user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add,uses_reel,available_reeltime,description,success_time):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        #empty='{}'
+        if description == [] or len(description) == 0 or description is None:
+            description = '{}'
+        sql ="""INSERT INTO user_weapon (user_line_id, weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add,uses_reel,available_reeltime,description,success_time) VALUES (%(user_line_id)s, %(weapon_id)s, %(backpack_loc)s, %(str_add)s, %(int_add)s,%(dex_add)s,%(atk_add)s,%(uses_reel)s,%(available_reeltime)s,%(description)s,%(success_time)s)"""
+        params = {'user_line_id':user_line_id,'weapon_id':weapon_id,'backpack_loc':backpack_loc,'str_add':str_add,'int_add':int_add,'dex_add':dex_add,'atk_add':atk_add,
+        'uses_reel':uses_reel,'available_reeltime':available_reeltime,'description':description,'success_time':success_time}
+        self.cursor.execute(sql,params)
+        self.conn.commit()
+    
     def getValueFromUserWeapon(self,user_line_id,backpack_loc):
         try:
             self.cursor = self.conn.cursor()
@@ -1271,6 +1288,7 @@ class DataBase():
             self.addToUserWeapon(user_lind_id,item_id,loc,0,0,0,0)
         self.addToUserBackPack(user_lind_id,item_type,item_id,quantity,hassame,loc)
     
+    
     def getUserEquipmentWeapon(self,user_line_id):
         user_job = self.getUserJob(user_line_id)
         equipment_back_loc = user_job["weapon"]
@@ -1293,6 +1311,53 @@ class DataBase():
         _basic_weapon_info["uses_reel"] = _weapon_add_info["uses_reel"]
         _basic_weapon_info["available_reeltime"] = _weapon_add_info["available_reeltime"]
         _basic_weapon_info["backpack_loc"] = _weapon_add_info["backpack_loc"]
+        _basic_weapon_info["success_time"] = _weapon_add_info["success_time"]
+        #基本武器沒有任何加乘 直接套用addinfo
+        if _basic_weapon_info["other_effect"] is None or _basic_weapon_info['other_effect'] == "None":
+            _basic_weapon_info["other_effect"] = _weapon_add_info["description"]
+        #基本武器有加乘 看weapon_add有沒有特殊加乘 要拿來加
+        else:
+            #weapon_add 沒有特殊加乘 照舊
+            if _weapon_add_info["description"] is None or _weapon_add_info["description"] == "None":
+                _basic_weapon_info["other_effect"] = _basic_weapon_info["other_effect"]
+            else:
+                for _effect in _weapon_add_info["description"]:
+                    print(_effect)
+                    _effect_type = _effect.split(":")[0]
+                    _value = _effect.split(":")[1]
+                    if _effect_type in _basic_weapon_info["other_effect"].keys():
+                        _originvalue = _basic_weapon_info["other_effect"][_effect_type]
+                        if "%" in _originvalue:
+                            _ogvalue = int(_originvalue.split("%")[0])
+                            if "%" in _value == False:
+                                print("數值怪怪的 一個有%一個沒有")
+                            else:
+                                temp = int(_value.split("%")[0])
+                                _ogvalue+=temp
+                            _basic_weapon_info["other_effect"][_effect_type] = str(_ogvalue)+"%"
+                        else:
+                            _originvalue = int(_originvalue)
+                            _value = int(_value)
+                            _originvalue+=_value
+                            _basic_weapon_info["other_effect"][_effect_type]=str(_originvalue)
+                    else:
+                        _basic_weapon_info["other_effect"][_effect_type] = str(_value)
+        return _basic_weapon_info
+
+    def getWeaponWithUserValue(self,weapon_id,user_weapon_value):
+        print("get weapon info:"+str(weapon_id))
+        _basic_weapon_info = self.getWeaponInfo(weapon_id)
+        #取得玩家對這個武器的加乘資料
+        _weapon_add_info = user_weapon_value
+        print("加成資料")
+        print(_weapon_add_info)
+        #_json={"weapon_id":row[0],"str_add":row[1],"int_add":row[2],"dex_add":row[3],"atk_add":row[4],"rare":row[5],"weapon_name":row[6],"img_type":row[7],"other_effect":_weapon_other_effect}
+        _basic_weapon_info["str_add"]+=_weapon_add_info["str_add"]
+        _basic_weapon_info["int_add"]+=_weapon_add_info["int_add"]
+        _basic_weapon_info["dex_add"]+=_weapon_add_info["dex_add"]
+        _basic_weapon_info["atk_add"]+=_weapon_add_info["atk_add"]
+        _basic_weapon_info["uses_reel"] = _weapon_add_info["uses_reel"]
+        _basic_weapon_info["available_reeltime"] = _weapon_add_info["available_reeltime"]
         _basic_weapon_info["success_time"] = _weapon_add_info["success_time"]
         #基本武器沒有任何加乘 直接套用addinfo
         if _basic_weapon_info["other_effect"] is None or _basic_weapon_info['other_effect'] == "None":
@@ -1832,3 +1897,119 @@ class DataBase():
         self.conn.commit()
         print(int(_result))
         return int(_result)
+
+    def addAuction(self,user_line_id,item_type,item_id,list_price,weapon_json = {}):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        if item_type == "weapon":
+            current =  datetime.now()
+            str_time = current.strftime("%m/%d/%Y %H:%M:%S")
+            print("time:")
+            print(str_time)
+            _str_add = weapon_json["str_add"]
+            _int_add = weapon_json["int_add"]
+            _dex_add = weapon_json["dex_add"]
+            _atk_add = weapon_json["atk_add"]
+            _description = str(weapon_json["description"]).replace("'", "").replace(" ","").replace("[","{").replace("]","}")
+            if _description == 'None' or _description is None:
+                _description = "{}"
+            _uses_reel = str(weapon_json["uses_reel"]).replace("'", "").replace(" ","")
+            print(_uses_reel)
+            print(type(_uses_reel))
+            available_reeltime = weapon_json["available_reeltime"]
+            success_time = weapon_json["success_time"]
+            sql = """INSERT INTO public.auction_list(
+            user_line_id, item_type, item_id, list_price, auction_start_time, 
+            str_add, int_add, dex_add, atk_add, uses_reel, available_reeltime, description, success_time) 
+            VALUES (
+            '{user_line_id}', '{item_type}', {item_id}, {list_price}, '{auction_start_time}'
+            , {str_add}, {int_add}, {dex_add}, {atk_add}, '{uses_reel}', {available_reeltime}, '{_description}', {success_time}
+            )""".format(user_line_id=user_line_id,item_type=item_type,item_id=item_id,list_price=list_price,auction_start_time = str_time,
+                str_add = _str_add,int_add = _int_add,dex_add = _dex_add,atk_add = _atk_add,uses_reel = _uses_reel,available_reeltime = available_reeltime,
+                _description = _description,success_time = success_time
+            )
+            self.cursor.execute(sql)
+            self.conn.commit()
+    
+    def getAuction(self,auction_id):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "SELECT auction_id,user_line_id,item_id,list_price,auction_start_time,str_add,int_add,dex_add,atk_add,available_reeltime,description,success_time,uses_reel FROM auction_list where auction_id = '{auction_id}'".format(auction_id = auction_id)
+        self.cursor.execute(sql)
+        _auction = self.cursor.fetchone()
+        self.conn.commit()
+        owner_name = self.getUser(_auction[1])["user_line_name"]
+        _auction_json = {"auction_id":_auction[0],"auction_line_id":_auction[1],"auction_owner":owner_name,"item_id":_auction[2],"list_price":_auction[3],
+        "auction_start_time":_auction[4],"str_add":_auction[5],"int_add":_auction[6],"dex_add":_auction[7],"atk_add":_auction[8],"available_reeltime":_auction[9],
+        "description":_auction[10],"success_time":_auction[11],"uses_reel":_auction[12]}
+        _user_weapon_value = {"weapon_id":_auction[2],"str_add":_auction[5],"int_add":_auction[6],"dex_add":_auction[7],"atk_add":_auction[8],"available_reeltime":_auction[9],
+        "description":_auction[10],"success_time":_auction[11],"uses_reel":_auction[12]}
+        print(_user_weapon_value)
+        _weapon = self.getWeaponWithUserValue(_auction[2],_user_weapon_value)
+        auctions = {"weapon_json":_weapon,"auction_info":_auction_json}
+        return auctions
+    
+    def removeAuction(self,auction_id,user_line_id):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "DELETE FROM auction_list where auction_id = '{auction_id}' AND user_line_id = '{user_line_id}'".format(auction_id = auction_id,user_line_id = user_line_id)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        print("remove auction:"+str(auction_id)+"done")
+    
+    def getAuctionList(self,item_type):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "SELECT auction_id,user_line_id,item_id,list_price,auction_start_time,str_add,int_add,dex_add,atk_add,available_reeltime,description,success_time,uses_reel FROM auction_list where item_type = '{item_type}'".format(item_type = item_type)
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        if result is None or len(result) ==0:
+            return None
+        self.conn.commit()
+        auctions = []
+        for _auction in result:
+            #print(_auction)
+            #透過加成資料獲取武器數值
+            #_json ={"user_line_id":_result[0],"weapon_id":_result[1],"backpack_loc":_result[2],"str_add":_result[3],"int_add":_result[4],"dex_add":_result[5],"atk_add":_result[6],"uses_reel":_result[7],"available_reeltime":_result[8],"success_time":_result[9],"description":_otherdescription}
+            owner_name = self.getUser(_auction[1])["user_line_name"]
+            _auction_json = {"auction_id":_auction[0],"auction_line_id":_auction[1],"auction_owner":owner_name,"item_id":_auction[2],"list_price":_auction[3],
+            "auction_start_time":_auction[4],"str_add":_auction[5],"int_add":_auction[6],"dex_add":_auction[7],"atk_add":_auction[8],"available_reeltime":_auction[9],
+            "description":_auction[10],"success_time":_auction[11],"uses_reel":_auction[12]}
+            _user_weapon_value = {"weapon_id":_auction[2],"str_add":_auction[5],"int_add":_auction[6],"dex_add":_auction[7],"atk_add":_auction[8],"available_reeltime":_auction[9],
+            "description":_auction[10],"success_time":_auction[11],"uses_reel":_auction[12]}
+            print(_user_weapon_value)
+            _weapon = self.getWeaponWithUserValue(_auction[2],_user_weapon_value)
+            auctions.append({"weapon_json":_weapon,"auction_info":_auction_json})
+            #print(_auction)
+        return auctions
+        
+
+if __name__ == "__main__":
+    id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
+    database = DataBase()
+    _weapon = database.getUserEquipmentWeapon(id)
+    user_weapon = database.getValueFromUserWeapon(id,_weapon["backpack_loc"])
+    database.addAuction(id,"weapon",user_weapon["weapon_id"],125555,user_weapon)
+    # list = database.getAuctionList("weapon")
+    # for auction in list:
+    #     print("weapon info:\n")
+    #     print(auction["weapon_json"])
+    #     print("\nauction info:\n")
+    #     print(auction["auction_info"])
+    #print(database.getAuction(5))

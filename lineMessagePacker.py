@@ -1466,7 +1466,7 @@ def getBugReport():
     }
     return json
 
-def getPostButtonTest():
+def getPostButtonTest(user_line_id):
     json = {
     "type": "bubble",
     "hero": {
@@ -1596,7 +1596,7 @@ def getPostButtonTest():
             "action": {
             "type": "postback",
             "label": "action",
-            "data": "test123"
+            "data": user_line_id
             }
         },
         {
