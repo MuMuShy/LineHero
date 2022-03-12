@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import lineMessagePacker
 import lineMessagePackerRpg
 from DataBase import DataBase
+from RedisTool import RedisTool
 from Games import diceGame, jpGame,rpgGame
 load_dotenv()
 from linebot import (
@@ -20,8 +21,6 @@ from linebot.models import (
     MessageTemplateAction,FlexSendMessage
 )
 import os
-import bybitApi
-import sys
 
 app = Flask(__name__)
 
@@ -41,7 +40,7 @@ else:
     handler = WebhookHandler(os.getenv("LINE_BOT_SECRET"))
 
 database = DataBase()
-
+redistool = RedisTool()
 
 
 @app.route("/callback", methods=['POST'])
@@ -107,7 +106,7 @@ def addweapon():
     return render_template("gm.html")
 
 
-
+#用戶post訊息
 @handler.add(PostbackEvent)
 def handle_postback(event):
     data = event.postback.data
@@ -117,25 +116,27 @@ def handle_postback(event):
             TextSendMessage(text=data))
         return
 
-
+#用戶文字訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    #被鎖定用戶
-    # if (event.source.user_id in limite_user.keys()) == True:
-    #     if event.message.text == limite_user[event.source.user_id]:
-    #         print("用戶測謊成功")
-    #         del limite_user[event.source.user_id]
-    #         database.addExpForPlayer(event.source.user_id,4000)
-    #         line_bot_api.reply_message(
-    #         event.reply_token,
-    #         TextSendMessage(text="成功驗證 可進續進行遊戲 獎勵經驗值: 4000"))
-    #         return
-    #     else:
-    #         print("玩家測謊失敗")
-    #         line_bot_api.reply_message(
-    #         event.reply_token,
-    #         TextSendMessage(text="由於大量請求 請輸入下列訊息驗證:\n"+limite_user[event.source.user_id]))
-    #         return
+    #檢查是否是鎖定玩家
+    if redistool.getValue(event.source.user_id) is not None:
+        _usersend = event.message.text
+        _answerright = redistool.getValue(event.source.user_id).decode()
+        if _usersend == _answerright:
+            print("用戶測謊成功")
+            redistool.removeKey(event.source.user_id)
+            database.addExpForPlayer(event.source.user_id,4000)
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="成功驗證 可進續進行遊戲 獎勵經驗值: 4000"))
+            return
+        else:
+            print("玩家測謊失敗")
+            line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="由於大量請求 請輸入下列訊息驗證:\n"+_answerright))
+            return
     print(event)
     user_send =event.message.text
     if user_send =="test":
@@ -954,18 +955,21 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage("指令格式有問題"))
             return
-        # if (event.source.user_id in limite_user.keys()) is False:
-        #     _random = random.randrange(1,100)
-        #     if _random <=5:
-        #         print("玩家: 進入測謊")
-        #         from Games import questions
-        #         _question = random.choice(questions.question)
-        #         #del local_storage[event.source.user_id]
-        #         limite_user[event.source.user_id] = _question
-        #         line_bot_api.reply_message(
-        #             event.reply_token,
-        #             TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"+_question))
-        #         return                
+        #測謊確認
+        try:
+            if redistool.getValue(event.source.user_id) is None:
+                _random = random.randrange(1,100)
+                if _random <=5:
+                    print("玩家 進入測謊")
+                    from Games import questions
+                    _question = random.choice(questions.question)
+                    redistool.setKey(event.source.user_id,_question)
+                    line_bot_api.reply_message(
+                     event.reply_token,
+                     TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"+_question))
+                    return
+        except:
+            print("測謊好像有問題")         
         if database.checkUserHasJob(event.source.user_id) == False:
             line_bot_api.reply_message(
                 event.reply_token,
@@ -981,7 +985,6 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage("請先復活 復活指令: @health"))
             return
-        
         _result = rpgGame.goToMap(_map,event.source.user_id)
         if _result["intobattle"] == False:
             _reply = _result["reply_text"]
@@ -1455,18 +1458,21 @@ def handle_message(event):
         event.reply_token,
         FlexSendMessage("目前彩金!",contents=lineMessagePacker.getJackPotFlex(_jackpotjson)))
     elif _command_check.startswith("!spin"):
-        # if (event.source.user_id in limite_user.keys()) is False:
-        #     _random = random.randrange(1,100)
-        #     if _random <=5:
-        #         print("玩家: 進入測謊")
-        #         from Games import questions
-        #         _question = random.choice(questions.question)
-        #         #del local_storage[event.source.user_id]
-        #         limite_user[event.source.user_id] = _question
-        #         line_bot_api.reply_message(
-        #             event.reply_token,
-        #             TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"+_question))
-        #         return   
+        #測謊確認
+        try:
+            if redistool.getValue(event.source.user_id) is None:
+                _random = random.randrange(1,100)
+                if _random <=5:
+                    print("玩家 進入測謊")
+                    from Games import questions
+                    _question = random.choice(questions.question)
+                    redistool.setKey(event.source.user_id,_question)
+                    line_bot_api.reply_message(
+                     event.reply_token,
+                     TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"+_question))
+                    return
+        except:
+            print("測謊好像有問題")   
         try:
             _times = int(_command_check.split(" ")[1])
         except:
