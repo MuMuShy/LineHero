@@ -413,6 +413,13 @@ def handle_message(event):
                 TextSendMessage(text="哦... 妳的錢好像不夠喔"))
             return
     elif user_send =="@auctionaddWeapon":
+        _nowlist = database.getAuctionList("weapon")
+        if _nowlist is not None:
+            if len(_nowlist) > 59:
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="抱歉我的拍賣場最多只能販賣60把武器,請等武器下架或是被買走"))
+                return
         _weapon_json_list = database.getUserEquipmentList(event.source.user_id)
         _sendlist = []
         _first = True

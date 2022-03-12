@@ -2002,10 +2002,11 @@ class DataBase():
 if __name__ == "__main__":
     id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     database = DataBase()
-    _weapon = database.getUserEquipmentWeapon(id)
-    user_weapon = database.getValueFromUserWeapon(id,_weapon["backpack_loc"])
-    database.addAuction(id,"weapon",user_weapon["weapon_id"],125555,user_weapon)
-    # list = database.getAuctionList("weapon")
+    # _weapon = database.getUserEquipmentWeapon(id)
+    # user_weapon = database.getValueFromUserWeapon(id,_weapon["backpack_loc"])
+    # database.addAuction(id,"weapon",user_weapon["weapon_id"],125555,user_weapon)
+    list = database.getAuctionList("weapon")
+    print(len(list))
     # for auction in list:
     #     print("weapon info:\n")
     #     print(auction["weapon_json"])
