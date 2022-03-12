@@ -1,5 +1,4 @@
 
-from tkinter.messagebox import NO
 import redis
 from dotenv import load_dotenv
 load_dotenv()
