@@ -517,16 +517,9 @@ def handle_message(event):
         _userjob = database.getUserJob(event.source.user_id)
         attackresult = rpgGame.attackBoss(event.source.user_id,_userjob)
         database.addUserWordBossDamage(event.source.user_id,attackresult)
-        # totaldamage = database.getWordBossNowTotalDamage()
-        # database.damageWordBoss(totaldamage)
-        # _boss_basic_info = database.getWordBossInfo(_wordboss_status["boss_id"])
-        # _user_word_boss_status = database.getWordBossUserList()
-        # _wordboss_status = database.getWordBossStatus()
-        # if _wordboss_status is None:
-        #     line_bot_api.reply_message(
-        #         event.reply_token,
-        #         TextSendMessage(text="對boss造成傷害:"+str(attackresult)+" 世界boss已陣亡"))
-        # else:
+        _boss_basic_info = database.getWordBossInfo(_wordboss_status["boss_id"])
+        _user_word_boss_status = database.getWordBossUserList()
+
         flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
         line_bot_api.reply_message(
             event.reply_token,[
