@@ -7,7 +7,7 @@ import lineMessagePacker
 import lineMessagePackerRpg
 from DataBase import DataBase
 from RedisTool import RedisTool
-from Games import diceGame, jpGame,rpgGame
+from Games import diceGame, jpGame,rpgGame, wordBossFlexPacker
 load_dotenv()
 from linebot import (
     LineBotApi, WebhookHandler
@@ -487,7 +487,53 @@ def handle_message(event):
             FlexSendMessage("世界拍賣",contents=_flex)
             ])
         return
-
+    elif user_send =="@wordboss":
+        #check word boss status
+        _wordboss_status = database.getWordBossStatus()
+        if _wordboss_status is None:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="目前沒有世界王喔"),
+                )
+            return
+        _boss_basic_info = database.getWordBossInfo(_wordboss_status["boss_id"])
+        _user_word_boss_status = database.getWordBossUserList()
+        flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
+        line_bot_api.reply_message(
+            event.reply_token,[
+            TextSendMessage(text="Boss"),
+            FlexSendMessage("Boss",contents=flex)
+            ])
+        return
+    elif user_send =="@attackWordBoss":
+        #check word boss status
+        _wordboss_status = database.getWordBossStatus()
+        if _wordboss_status is None:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="目前沒有世界王喔"),
+                )
+            return
+        _userjob = database.getUserJob(event.source.user_id)
+        attackresult = rpgGame.attackBoss(event.source.user_id,_userjob)
+        database.addUserWordBossDamage(event.source.user_id,attackresult)
+        # totaldamage = database.getWordBossNowTotalDamage()
+        # database.damageWordBoss(totaldamage)
+        # _boss_basic_info = database.getWordBossInfo(_wordboss_status["boss_id"])
+        # _user_word_boss_status = database.getWordBossUserList()
+        # _wordboss_status = database.getWordBossStatus()
+        # if _wordboss_status is None:
+        #     line_bot_api.reply_message(
+        #         event.reply_token,
+        #         TextSendMessage(text="對boss造成傷害:"+str(attackresult)+" 世界boss已陣亡"))
+        # else:
+        flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
+        line_bot_api.reply_message(
+            event.reply_token,[
+            TextSendMessage(text="對boss造成傷害:"+str(attackresult)+"\n世界BOSS傷害與血量更新頻率為每分鐘更新一次"),
+            FlexSendMessage("Boss",contents=flex)])
+        return
+        
     elif user_send =="@wordguide":
         try:
             _userjobinfo = database.getUserJob(event.source.user_id)

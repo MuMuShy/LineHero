@@ -1,6 +1,8 @@
+from cgitb import reset
 import os
 from pydoc import describe
 import random
+from unittest import result
 import psycopg2
 from dotenv import load_dotenv
 import time
@@ -2010,16 +2012,202 @@ class DataBase():
             auctions.append({"weapon_json":_weapon,"auction_info":_auction_json})
             #print(_auction)
         return auctions
-        
+    
+    def startWordBoss(self,boss_id):
+        if self.getWordBossStatus() is not None:
+            print("已有世界王進行中")
+            return
+        bossinfo = self.getWordBossInfo(boss_id)
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        current =  datetime.now()
+        str_database = (current.strftime("%m/%d/%Y %H:%M:%S"))
+        sql = "INSERT INTO word_boss_status(boss_id,start_time,hp) VALUES({boss_id},'{start_time}',{hp})".format(boss_id = boss_id,start_time = str_database,hp = bossinfo["boss_hp"])
+        self.cursor.execute(sql)
+        self.conn.commit()
 
+    def getWordBossStatus(self):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "select boss_id,start_time,hp from word_boss_status"
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()
+        if result is None:
+            print("目前沒有世界boss喔")
+            return None
+        self.conn.commit()
+        _json ={"boss_id":result[0],"start_time":result[1],"hp":result[2]}
+        return _json
+    
+    def getWordBossInfo(self,boss_id):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "select boss_id,boss_name,boss_hp,boss_drop_weapon,boss_image_url,boss_atk,boss_drop_reel from word_boss_list where boss_id = {boss_id}".format(boss_id = boss_id)
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()
+        self.conn.commit()
+        if result is None:
+            return None
+        _json = {"boss_id":result[0],"boss_name":result[1],"boss_hp":result[2],"boss_drop_weapon":result[3],"boss_image_url":result[4],
+        "boss_atk":result[5],"boss_drop_reel":result[6]}
+        print(_json)
+        return _json
+    
+    def getUserWordBossStatus(self,user_line_id):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "select user_line_id,total_damage,word_guide from user_word_boss_status where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()
+        self.conn.commit()
+        if result is None:
+            return None
+        _json = {"user_line_id":result[0],"total_damage":result[1],"word_guide":result[2]}
+        print(_json)
+        return _json
+    
+    def setUserWordBossStatus(self,user_line_id):
+        if self.getUserWordBossStatus(user_line_id) is not None:
+            print("此玩家已有世界王資料不能使用set")
+            return
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        
+        user_word = self.getUserJob(user_line_id)["word"]
+        if user_word is None:
+            user_word = -1
+        sql = "INSERT INTO user_word_boss_status(user_line_id,total_damage,word_guide) VALUES('{user_line_id}',{total_damage},{word_guide})".format(user_line_id = user_line_id,total_damage = 0,word_guide =user_word)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        print("玩家加入世界王")
+    
+    def addUserWordBossDamage(self,user_line_id,damage):
+        if self.getUserWordBossStatus(user_line_id) is None:
+            self.setUserWordBossStatus(user_line_id)
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "UPDATE user_word_boss_status SET total_damage = total_damage+{damage} where user_line_id ='{user_line_id}' ".format(user_line_id = user_line_id,damage = damage)
+        self.cursor.execute(sql)
+        self.conn.commit()
+        print("玩家攻擊世界王")
+
+
+    def getWordBossUserList(self):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM user_word_boss_status order by total_damage desc"
+        self.cursor.execute(sql)
+        result = self.cursor.fetchall()
+        self.conn.commit()
+        players=[]
+        for player in result:
+            _username = self.getUser(player[0])["user_line_name"]
+            players.append({"user_line_id":player[0],"total_damage":player[1],"word_guide":player[2],"player_name":_username})
+        return players
+    
+    def getWordBossNowTotalDamage(self):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "select sum(total_damage) from user_word_boss_status"
+        self.cursor.execute(sql)
+        result = self.cursor.fetchone()
+        self.conn.commit()
+        result = int(result[0])
+        return result
+    
+    def damageWordBoss(self,totaldamage):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        now_boss_status = self.getWordBossStatus()
+        if now_boss_status is None:
+            print("目前沒有世界王")
+            return None
+        if now_boss_status["hp"] > totaldamage:
+            now_boss_status["hp"] -= totaldamage
+            sql = "UPDATE word_boss_status SET hp = {hp}".format(hp = now_boss_status["hp"])
+            self.cursor.execute(sql)
+            self.conn.commit()
+        else:
+            print("世界boss已陣亡")
+            now_boss_status = self.getWordBossStatus()
+            _bossinfo = self.getWordBossInfo(now_boss_status["boss_id"])
+            _weaponlist = _bossinfo["boss_drop_weapon"]
+            _reel = _bossinfo["boss_drop_reel"][0]
+            #武器得獎主
+            _userlist = self.getWordBossUserList()
+            weights = []
+            for user in _userlist:
+                self.givePlayerItem(user["user_line_id"],"reel",_reel)
+                weights.append(user["total_damage"])
+            print("總遊戲玩家")
+            print(_userlist)
+            print("權重:")
+            print(weights)
+            weaponwinner = random.choices(_userlist,weights=weights)[0]
+            weapon = random.choice(_weaponlist)
+            _weaponid = int(weapon)
+            _id = weaponwinner["user_line_id"]
+            print("得獎主:"+str(_id))
+            print("獲得武器:"+str(_weaponid))
+            self.givePlayerItem(_id,"weapon",_weaponid)
+            sql = "delete from word_boss_status"
+            self.cursor.execute(sql)
+            self.conn.commit()
+            sql = "delete from user_word_boss_status"
+            self.cursor.execute(sql)
+            self.conn.commit()
+        return result
+
+        
 if __name__ == "__main__":
     id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     database = DataBase()
     # _weapon = database.getUserEquipmentWeapon(id)
     # user_weapon = database.getValueFromUserWeapon(id,_weapon["backpack_loc"])
     # database.addAuction(id,"weapon",user_weapon["weapon_id"],125555,user_weapon)
-    list = database.getAuctionList("weapon")
-    print(len(list))
+    database.startWordBoss(0)
+    # database.getWordBossStatus()
+    # database.addUserWordBossDamage(id,100)
+    # # print(database.getUserWordBossStatus(id))
+    # print(database.getWordBossUserList())
+    # #print(database.damageWordBoss(999999999))
+    # print(database.getWordBossStatus())
     # for auction in list:
     #     print("weapon info:\n")
     #     print(auction["weapon_json"])

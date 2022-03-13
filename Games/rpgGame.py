@@ -1,6 +1,4 @@
-from ctypes.wintypes import INT
 import decimal
-from attr import dataclass
 import psycopg2
 from psycopg2.extras import Json
 import sys
@@ -239,6 +237,66 @@ def addPlayerExp(_user_job_json,_exp):
         _now_max_exp = getMaxExp(_user_job_json["level"])
     
     return _user_job_json
+
+def attackBoss(user_line_id,user_job_json):
+    _isCredit = False
+    _playerjob = user_job_json["job"]
+    print("職業:"+_playerjob)
+    skill_effec = "無觸發交戰技能"
+    _weapon_info = dataBase.getUserEquipmentWeapon(user_line_id)
+    _user_job_temp = copy.deepcopy(user_job_json)
+    _user_job_temp["str"]+=_weapon_info["str_add"]
+    _user_job_temp["int"]+=_weapon_info["int_add"]
+    _user_job_temp["dex"]+=_weapon_info["dex_add"]
+    #確認武器加乘血量
+    try:
+        hp_add = _weapon_info["other_effect"]["hp_add"]
+        if "%" in hp_add:
+            hp_add = int(hp_add.split("%")[0])
+            hp_add/=100
+            hp_add = getMaxHp(_playerjob,user_job_json["level"])*hp_add
+        else:
+            hp_add = int(hp_add)
+            hp_add = hp_add
+    except:
+        hp_add = 0 
+    #依照四維的基礎傷害
+    baseAttack = getJobAttackByjson(_user_job_temp)
+    if _playerjob == "majic":
+        _skill_active = random.randrange(0,100)
+        if _skill_active >= 31:
+            _afterjson = copy.deepcopy(_user_job_temp)
+            print(_afterjson)
+            _afterint = int(_afterjson["int"]*0.3)
+            _afterjson["int"] = _afterjson["int"]+_afterint
+            print(_afterjson)
+            skill_effec = "觸發法師被動技能! 賢者之力 增加INT30% 目前INT:"+str(_afterjson["int"])
+            baseAttack = getJobAttackByjson(_afterjson)
+    #BASE ATTACK 戰士STR*1.3 法師INT*2 盜賊DEX*1.5
+    #基礎傷害 -> 骰子 * 能力點   
+    attackpow = getJobRollResult(_playerjob)
+    #基礎爆擊率  戰士: 10% 盜賊 30% 法師 20% 基礎爆擊傷害: 1.3
+    _credit = getJobCreditResult(_playerjob,_weapon_info)
+    if _credit > 1:
+        _isCredit = True
+    #武器數值計算
+    _weaponpow = getJobWeaponAttackByjson(_user_job_temp,_weapon_info["atk_add"])
+    
+    
+    #法師武器攻擊會另外算魔法傷害
+    if _playerjob == "majic":
+        try:
+            _majic_weaponpower = int(_weapon_info["other_effect"]["matk_add"])
+            _majic_weaponpower = _majic_weaponpower/100
+            _weaponpow += 1+(1*_majic_weaponpower)
+            print("法師Weapon power"+str(_majic_weaponpower))
+        except:
+            _weaponpow = _weaponpow
+
+    print("武器傷害:"+str(_weaponpow))
+    _attack_result = int(int(baseAttack*attackpow)+int(_weaponpow)*_credit)
+    print("攻擊世界boss傷害:"+str(_attack_result))
+    return _attack_result
 
 
 
