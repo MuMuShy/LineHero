@@ -206,13 +206,16 @@ def handle_message(event):
                 TextSendMessage("你已領取過每日獎賞囉"))
             return
         else:
+            _dailybroadcast = database.checkDailyBroadcast()
+            _broadcast_str = "伺服器公告:\n"+_dailybroadcast
             _nowmoney = int(database.getUserMoney(event.source.user_id))
-            _nowmoney+=10000
+            _nowmoney+=100000
             database.SetUserMoneyByLineId(event.source.user_id,_nowmoney)
             database.setUserDaily(event.source.user_id,True)
             line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage("每日獎賞已到帳!"))
+                event.reply_token,[
+                TextSendMessage("每日獎賞已到帳!"),
+                TextSendMessage(_broadcast_str)])
             return
     elif _command_check.startswith("!initjob"):
         try:

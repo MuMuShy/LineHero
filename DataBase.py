@@ -537,6 +537,19 @@ class DataBase():
         row = self.cursor.fetchone()
         return bool(row[0])
     
+    def checkDailyBroadcast(self):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "SELECT broadcast from daily_broadcast"
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchone()
+        return row[0]
+    
     def setUserDaily(self,user_line_id,bool):
         try:
             self.cursor = self.conn.cursor()
