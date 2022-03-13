@@ -539,6 +539,7 @@ def handle_message(event):
                 _lasttime = datetime.strptime(_time,"%m/%d/%Y %H:%M:%S")
                 time_elapsed = (current-_lasttime) #經過的掛機時間
                 time_elapsed = math.floor(time_elapsed.total_seconds())
+                print("經過秒數:"+str(time_elapsed))
                 if time_elapsed < 10: #超過10秒才能攻擊
                     line_bot_api.reply_message(
                     event.reply_token,
