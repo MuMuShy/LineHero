@@ -5,9 +5,11 @@ from flask import render_template
 from dotenv import load_dotenv
 import lineMessagePacker
 import lineMessagePackerRpg
+import math
 from DataBase import DataBase
 from RedisTool import RedisTool
 from Games import diceGame, jpGame,rpgGame, wordBossFlexPacker
+from datetime import datetime, timedelta
 load_dotenv()
 from linebot import (
     LineBotApi, WebhookHandler
@@ -514,6 +516,34 @@ def handle_message(event):
                 TextSendMessage(text="目前沒有世界王喔"),
                 )
             return
+        #測謊確認
+        try:
+            if redistool.getValue(event.source.user_id) is None:
+                _random = random.randrange(1,100)
+                if _random <=5:
+                    print("玩家 進入測謊")
+                    from Games import questions
+                    _question = random.choice(questions.question)
+                    redistool.setKey(event.source.user_id,_question)
+                    line_bot_api.reply_message(
+                     event.reply_token,
+                     TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"+_question))
+                    return
+        except:
+            print("測謊好像有問題")   
+        _userstatus = database.getUserWordBossStatus(event.source.user_id)
+        if _userstatus is not None:
+            _time = _userstatus["last_atack_time"]
+            if _time is not None:
+                current =  datetime.now()
+                _lasttime = datetime.strptime(_time,"%m/%d/%Y %H:%M:%S")
+                time_elapsed = (current-_lasttime) #經過的掛機時間
+                time_elapsed = math.floor(time_elapsed.total_seconds())
+                if time_elapsed < 10: #超過10秒才能攻擊
+                    line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="屈服於Boss的強大的威脅,玩家只能10秒攻擊他一次"))
+                    return
         _userjob = database.getUserJob(event.source.user_id)
         attackresult = rpgGame.attackBoss(event.source.user_id,_userjob)
         database.addUserWordBossDamage(event.source.user_id,attackresult)

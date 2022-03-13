@@ -2072,13 +2072,13 @@ class DataBase():
             print("連線以丟失 重連")
             self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             self.cursor = self.conn.cursor()
-        sql = "select user_line_id,total_damage,word_guide from user_word_boss_status where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
+        sql = "select user_line_id,total_damage,word_guide,last_atack_time from user_word_boss_status where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
         self.conn.commit()
         if result is None:
             return None
-        _json = {"user_line_id":result[0],"total_damage":result[1],"word_guide":result[2]}
+        _json = {"user_line_id":result[0],"total_damage":result[1],"word_guide":result[2],"last_atack_time":result[3]}
         print(_json)
         return _json
     
@@ -2110,7 +2110,9 @@ class DataBase():
             print("連線以丟失 重連")
             self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             self.cursor = self.conn.cursor()
-        sql = "UPDATE user_word_boss_status SET total_damage = total_damage+{damage} where user_line_id ='{user_line_id}' ".format(user_line_id = user_line_id,damage = damage)
+        current =  datetime.now()
+        current = (current.strftime("%m/%d/%Y %H:%M:%S"))
+        sql = "UPDATE user_word_boss_status SET total_damage = total_damage+{damage}, last_atack_time = '{current}' where user_line_id ='{user_line_id}' ".format(user_line_id = user_line_id,damage = damage,current = current)
         self.cursor.execute(sql)
         self.conn.commit()
         print("玩家攻擊世界王")
