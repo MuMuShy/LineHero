@@ -15,7 +15,7 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
     except:
         _begintime = datetime.now()
     nexttime = _begintime+timedelta(minutes=60)
-    nexttime = nexttime.strftime("%m/%d/%Y %H:%M:%S")
+    nexttime = nexttime.strftime("%m/%d %H:%M:%S")
     # _weaponurl = "https://mumu.tw/images/weapons/"+str(drop_weapon[0])+".jpg"
     # _weaponurl2 = "https://mumu.tw/images/weapons/"+str(drop_weapon[1])+".jpg"
     # _weaponurl3 = "https://mumu.tw/images/weapons/"+str(drop_weapon[2])+".jpg"
