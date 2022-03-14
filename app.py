@@ -137,8 +137,10 @@ def handle_message(event):
         else:
             print("玩家測謊失敗")
             line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="由於大量請求 請輸入下列訊息驗證:\n"+_answerright))
+                event.reply_token,[
+                TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"),
+                ImageSendMessage("https://mumu.tw/images/questions/"+event.source.user_id+".png","https://mumu.tw/images/questions/qlittle.png")
+                ])
             return
     user_send =event.message.text
     if user_send =="test":
@@ -523,11 +525,13 @@ def handle_message(event):
                 if _random <=5:
                     print("玩家 進入測謊")
                     from Games import questions
-                    _question = questions.getRandomQuestion()
+                    _question = questions.getRandomQuestionImage(event.source.user_id)
                     redistool.setKey(event.source.user_id,_question)
                     line_bot_api.reply_message(
-                     event.reply_token,
-                     TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"+_question))
+                        event.reply_token,[
+                        TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"),
+                        ImageSendMessage("https://mumu.tw/images/questions/"+event.source.user_id+".png","https://mumu.tw/images/questions/qlittle.png")
+                        ])
                     return
         except:
             print("測謊好像有問題")   
@@ -1035,11 +1039,13 @@ def handle_message(event):
                 if _random <=5:
                     print("玩家 進入測謊")
                     from Games import questions
-                    _question = questions.getRandomQuestion()
+                    _question = questions.getRandomQuestionImage(event.source.user_id)
                     redistool.setKey(event.source.user_id,_question)
                     line_bot_api.reply_message(
-                     event.reply_token,
-                     TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"+_question))
+                        event.reply_token,[
+                        TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"),
+                        ImageSendMessage("https://mumu.tw/images/questions/"+event.source.user_id+".png","https://mumu.tw/images/questions/qlittle.png")
+                        ])
                     return
         except:
             print("測謊好像有問題")         
@@ -1538,11 +1544,13 @@ def handle_message(event):
                 if _random <=5:
                     print("玩家 進入測謊")
                     from Games import questions
-                    _question = questions.getRandomQuestion()
+                    _question = questions.getRandomQuestionImage(event.source.user_id)
                     redistool.setKey(event.source.user_id,_question)
                     line_bot_api.reply_message(
-                     event.reply_token,
-                     TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"+_question))
+                        event.reply_token,[
+                        TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值 驗證文字:\n"),
+                        ImageSendMessage("https://mumu.tw/images/questions/"+event.source.user_id+".png","https://mumu.tw/images/questions/qlittle.png")
+                        ])
                     return
         except:
             print("測謊好像有問題")   
