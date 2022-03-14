@@ -567,7 +567,7 @@ def handle_message(event):
         _user_word_boss_status = database.getWordBossUserList()
         _getreel = random.randrange(1,100)
         _specialstr = ""
-        if _getreel >= 10:
+        if _getreel <= 10:
             database.givePlayerItem(event.source.user_id,"reel",2,1)
             _specialstr = "恭喜獲得掉落物 60%攻擊卷軸"
         flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
@@ -646,7 +646,7 @@ def handle_message(event):
         _user_word_boss_status = database.getWordBossUserList()
         _getreel = random.randrange(1,100)
         _specialstr = ""
-        if _getreel >= 10:
+        if _getreel <= 10:
             database.givePlayerItem(event.source.user_id,"reel",2,1)
             _specialstr = "恭喜獲得掉落物 60%攻擊卷軸"
         flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
