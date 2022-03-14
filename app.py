@@ -1538,22 +1538,22 @@ def handle_message(event):
         FlexSendMessage("目前彩金!",contents=lineMessagePacker.getJackPotFlex(_jackpotjson)))
     elif _command_check.startswith("!spin"):
         #測謊確認
-        try:
-            if redistool.getValue(event.source.user_id) is None:
-                _random = random.randrange(1,100)
-                if _random <=5:
-                    print("玩家 進入測謊")
-                    from Games import questions
-                    _question = questions.getRandomQuestionImage(event.source.user_id)
-                    redistool.setKey(event.source.user_id,_question)
-                    line_bot_api.reply_message(
-                        event.reply_token,[
-                        TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值\n因快取問題如果驗證碼有問題請重新點選圖片即可獲得最新驗證碼\n 驗證文字:\n"),
-                        ImageSendMessage("https://mumu.tw/images/questions/"+event.source.user_id+".png","https://mumu.tw/images/questions/qlittle.png")
-                        ])
-                    return
-        except:
-            print("測謊好像有問題")   
+        #try:
+        if redistool.getValue(event.source.user_id) is None:
+            _random = random.randrange(1,100)
+            if _random <=100:
+                print("玩家 進入測謊")
+                from Games import questions
+                _question = questions.getRandomQuestionImage(event.source.user_id)
+                redistool.setKey(event.source.user_id,_question)
+                line_bot_api.reply_message(
+                    event.reply_token,[
+                    TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行 輸入正確會給予獎勵經驗值\n因快取問題如果驗證碼有問題請重新點選圖片即可獲得最新驗證碼\n 驗證文字:\n"),
+                    ImageSendMessage("https://mumu.tw/images/questions/"+event.source.user_id+".png","https://mumu.tw/images/questions/qlittle.png")
+                    ])
+                return
+        # except:
+        #     print("測謊好像有問題")   
         try:
             _times = int(_command_check.split(" ")[1])
         except:

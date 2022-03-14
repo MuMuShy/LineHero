@@ -1,4 +1,5 @@
 import random
+from unittest.mock import patch
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -53,10 +54,12 @@ def createImg(random_txt,user_line_id):
     # draw.line(draw)
     # draw.point(draw)
     # 打開圖片操作，並保存在當前文件夾下
-    with open(user_line_id+".png", "wb") as f:
+    path = os.getcwd()
+    print(path)
+    with open(path+"/"+user_line_id+".png", "wb") as f:
         img.save(f, format="png")
     
-    uploadfile("./"+user_line_id+".png")
+    uploadfile(path+"./"+user_line_id+".png")
 
 
 def uploadfile(filename):
