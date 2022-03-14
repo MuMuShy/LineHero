@@ -7,7 +7,7 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
     _endtime = _starttime+timedelta(days=7)
     _endtime = _endtime.strftime("%m/%d/%Y")
     _nowhp = word_boss_status["hp"]
-    _maxhp = word_boss_basic_info["boss_hp"]
+    _maxhp = int(word_boss_basic_info["boss_hp"])
     _percent = (_nowhp/_maxhp)*100
     drop_weapon = word_boss_basic_info["boss_drop_weapon"]
     # _weaponurl = "https://mumu.tw/images/weapons/"+str(drop_weapon[0])+".jpg"

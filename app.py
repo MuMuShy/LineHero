@@ -523,7 +523,7 @@ def handle_message(event):
                 if _random <=5:
                     print("玩家 進入測謊")
                     from Games import questions
-                    _question = random.choice(questions.question)
+                    _question = questions.getRandomQuestion()
                     redistool.setKey(event.source.user_id,_question)
                     line_bot_api.reply_message(
                      event.reply_token,
@@ -540,7 +540,7 @@ def handle_message(event):
                 time_elapsed = (current-_lasttime) #經過的掛機時間
                 time_elapsed = math.floor(time_elapsed.total_seconds())
                 print("經過秒數:"+str(time_elapsed))
-                if time_elapsed < 10: #超過10秒才能攻擊
+                if time_elapsed < 10 and time_elapsed > 0: #超過10秒才能攻擊
                     line_bot_api.reply_message(
                     event.reply_token,
                     TextSendMessage(text="屈服於Boss的強大的威脅,玩家只能10秒攻擊他一次"))
@@ -1035,7 +1035,7 @@ def handle_message(event):
                 if _random <=5:
                     print("玩家 進入測謊")
                     from Games import questions
-                    _question = random.choice(questions.question)
+                    _question = questions.getRandomQuestion()
                     redistool.setKey(event.source.user_id,_question)
                     line_bot_api.reply_message(
                      event.reply_token,
@@ -1538,7 +1538,7 @@ def handle_message(event):
                 if _random <=5:
                     print("玩家 進入測謊")
                     from Games import questions
-                    _question = random.choice(questions.question)
+                    _question = questions.getRandomQuestion()
                     redistool.setKey(event.source.user_id,_question)
                     line_bot_api.reply_message(
                      event.reply_token,
