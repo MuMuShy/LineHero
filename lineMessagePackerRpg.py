@@ -4012,6 +4012,36 @@ def getUserActiveSkills(skill_list):
     }
     return json
 
+def getUserActiveSkillsBoss(skill_list):
+    bubbles = []
+    for skill in skill_list:
+        _url = "https://mumu.tw/images/skill/"+skill["job"]+"/"+str(skill["skill_id"])+"."+skill["image_type"]
+        _name = skill["skill_name"]
+        bubble = {
+      "type": "bubble",
+      "size": "nano",
+      "hero": {
+        "type": "image",
+        "url": _url,
+        "action": {
+          "type": "message",
+          "label": "action",
+          "text": "@wordbossuseskill "+skill["job"]+" "+str(skill["skill_id"])
+        }
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    }
+    bubbles.append(bubble)
+    json =  {
+    "type": "carousel",
+    "contents": bubbles
+    }
+    return json
+
 #轉但結果
 def getGashsopResult(url,text):
     json = {
@@ -5436,7 +5466,7 @@ def getWordGuideStatus(word_info,user_word_info,top1,word_level_info):
             "contents": [
             {
                 "type": "image",
-                "url": "https://i.pinimg.com/originals/50/b8/17/50b8175428ef1dc1c4b6d95f032f15b1.jpg",
+                "url": "https://mumu.tw/images/game_ui/wordguidebg.jpg",
                 "size": "full",
                 "aspectMode": "cover",
                 "aspectRatio": "2:3",

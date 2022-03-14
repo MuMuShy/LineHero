@@ -238,7 +238,7 @@ def addPlayerExp(_user_job_json,_exp):
     
     return _user_job_json
 
-def attackBoss(user_line_id,user_job_json):
+def attackBoss(user_line_id,user_job_json,skill=None):
     _isCredit = False
     _playerjob = user_job_json["job"]
     print("職業:"+_playerjob)
@@ -295,6 +295,24 @@ def attackBoss(user_line_id,user_job_json):
 
     print("武器傷害:"+str(_weaponpow))
     _attack_result = int(int(baseAttack*attackpow)+int(_weaponpow)*_credit)
+
+    if skill is not None:
+        _effects = skill["skill_effect_description"][0]
+        _type = _effects.split(":")[0]
+        _value = _effects.split(":")[1]
+        #傷害性技能
+        if _type == "damage":
+            if "%" in _value:
+                _value = int(_value.split("%")[0])
+                _value = _value/100
+            else:
+                _value = int(_value)
+            _skilldamage = int(baseAttack*attackpow)*_value*_credit
+            _skilldamage = math.ceil(_skilldamage)
+            print("技能傷害:"+str(_skilldamage))
+            
+            _attack_result = _skilldamage
+
     print("攻擊世界boss傷害:"+str(_attack_result))
     return _attack_result
 

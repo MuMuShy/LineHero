@@ -503,11 +503,22 @@ def handle_message(event):
         _boss_basic_info = database.getWordBossInfo(_wordboss_status["boss_id"])
         _user_word_boss_status = database.getWordBossUserList()
         flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
-        line_bot_api.reply_message(
-            event.reply_token,[
-            TextSendMessage(text="Boss"),
-            FlexSendMessage("Boss",contents=flex)
-            ])
+        _activeskills = database.getUserActiveSkillList(event.source.user_id)
+        if _activeskills != [] and len(_activeskills) > 0:
+            _skillflex = lineMessagePackerRpg.getUserActiveSkillsBoss(_activeskills)
+            line_bot_api.reply_message(
+                event.reply_token,[
+                    TextSendMessage(text="Boss"),
+                    FlexSendMessage("Boss",contents=flex),
+                    FlexSendMessage("Boss!",contents=_skillflex)
+                ])
+        else:
+            #無技能
+            line_bot_api.reply_message(
+                event.reply_token,[
+                TextSendMessage(text="Boss"),
+                FlexSendMessage("Boss",contents=flex)
+                ])
         return
     elif user_send =="@attackWordBoss":
         #check word boss status
@@ -554,13 +565,108 @@ def handle_message(event):
         database.addUserWordBossDamage(event.source.user_id,attackresult)
         _boss_basic_info = database.getWordBossInfo(_wordboss_status["boss_id"])
         _user_word_boss_status = database.getWordBossUserList()
-
+        _getreel = random.randrange(1,100)
+        _specialstr = ""
+        if _getreel >= 10:
+            database.givePlayerItem(event.source.user_id,"reel",2,1)
+            _specialstr = "恭喜獲得掉落物 60%攻擊卷軸"
         flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
-        line_bot_api.reply_message(
-            event.reply_token,[
-            TextSendMessage(text="對boss造成傷害:"+str(attackresult)+"\n世界BOSS傷害與血量更新頻率為每分鐘更新一次"),
-            FlexSendMessage("Boss",contents=flex)])
+        _activeskills = database.getUserActiveSkillList(event.source.user_id)
+        if _activeskills != [] and len(_activeskills) > 0:
+            _skillflex = lineMessagePackerRpg.getUserActiveSkillsBoss(_activeskills)
+            line_bot_api.reply_message(
+                event.reply_token,[
+                    TextSendMessage(text="對boss造成傷害:"+str(attackresult)+_specialstr+"\n世界BOSS傷害與血量更新頻率為每分鐘更新一次"),
+                    FlexSendMessage("Boss",contents=flex),
+                    FlexSendMessage("Boss!",contents=_skillflex)
+                ])
+        else:
+            #無技能
+           line_bot_api.reply_message(
+                event.reply_token,[
+                TextSendMessage(text="對boss造成傷害:"+str(attackresult)+_specialstr+"\n世界BOSS傷害與血量更新頻率為每分鐘更新一次"),
+                FlexSendMessage("Boss",contents=flex)])
         return
+    elif user_send.startswith("@wordbossuseskill"):
+        try:
+            _skilljob = user_send.split(" ")[1]
+            _skillid = user_send.split(" ")[2]
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="指令好像有問題ㄛ 請盡量用按鈕謝謝"))
+            return
+        if database.checkUserHasSkill(event.source.user_id,_skillid,_skilljob) == True:
+            _skillinfo = database.getSkillFromUser(event.source.user_id,_skillid,_skilljob)
+        else:
+            _skillinfo = None
+        #check word boss status
+        _wordboss_status = database.getWordBossStatus()
+        if _wordboss_status is None:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="目前沒有世界王喔"),
+                )
+            return
+        #測謊確認
+        try:
+            if redistool.getValue(event.source.user_id) is None:
+                _random = random.randrange(1,100)
+                if _random <=5:
+                    print("玩家 進入測謊")
+                    from Games import questions
+                    _question = questions.getRandomQuestionImage(event.source.user_id)
+                    redistool.setKey(event.source.user_id,_question)
+                    line_bot_api.reply_message(
+                        event.reply_token,[
+                        TextSendMessage("內測期間防止流量問題 請輸入以下文字驗證後再繼續進行\n因快取問題如果驗證碼有問題請重新點選圖片即可獲得最新驗證碼\n 輸入正確會給予獎勵經驗值 驗證文字:\n"),
+                        ImageSendMessage("https://mumu.tw/images/questions/"+event.source.user_id+".png","https://mumu.tw/images/questions/qlittle.png")
+                        ])
+                    return
+        except:
+            print("測謊好像有問題")   
+        _userstatus = database.getUserWordBossStatus(event.source.user_id)
+        if _userstatus is not None:
+            _time = _userstatus["last_atack_time"]
+            if _time is not None:
+                current =  datetime.now()
+                _lasttime = datetime.strptime(_time,"%m/%d/%Y %H:%M:%S")
+                time_elapsed = (current-_lasttime) #經過的掛機時間
+                time_elapsed = math.floor(time_elapsed.total_seconds())
+                print("經過秒數:"+str(time_elapsed))
+                if time_elapsed < 30 and time_elapsed > 0: #技能要超過30秒才能攻擊
+                    line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text="屈服於Boss的強大的威脅,玩家技能只能30秒攻擊他一次"))
+                    return
+        _userjob = database.getUserJob(event.source.user_id)
+        attackresult = rpgGame.attackBoss(event.source.user_id,_userjob,_skillinfo)
+        database.addUserWordBossDamage(event.source.user_id,attackresult)
+        _boss_basic_info = database.getWordBossInfo(_wordboss_status["boss_id"])
+        _user_word_boss_status = database.getWordBossUserList()
+        _getreel = random.randrange(1,100)
+        _specialstr = ""
+        if _getreel >= 10:
+            database.givePlayerItem(event.source.user_id,"reel",2,1)
+            _specialstr = "恭喜獲得掉落物 60%攻擊卷軸"
+        flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
+        _activeskills = database.getUserActiveSkillList(event.source.user_id)
+        if _activeskills != [] and len(_activeskills) > 0:
+            _skillflex = lineMessagePackerRpg.getUserActiveSkillsBoss(_activeskills)
+            line_bot_api.reply_message(
+                event.reply_token,[
+                    TextSendMessage(text="使用技能對boss造成傷害:"+str(attackresult)+"\n"+_specialstr+"\n世界BOSS傷害與血量更新頻率為每分鐘更新一次"),
+                    FlexSendMessage("Boss",contents=flex),
+                    FlexSendMessage("Boss!",contents=_skillflex)
+                ])
+        else:
+            #無技能
+           line_bot_api.reply_message(
+                event.reply_token,[
+                TextSendMessage(text="對boss造成傷害:"+str(attackresult)+"\n"+_specialstr+"\n世界BOSS傷害與血量更新頻率為每分鐘更新一次"),
+                FlexSendMessage("Boss",contents=flex)])
+        return
+
         
     elif user_send =="@wordguide":
         try:
