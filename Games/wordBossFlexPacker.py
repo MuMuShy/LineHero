@@ -261,8 +261,7 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
                             "text": top5str[0],
                             "color": "#ebebeb",
                             "size": "sm",
-                            "flex": 0,
-                            "wrap":True
+                            "flex": 0
                         }
                         ],
                         "spacing": "lg"
@@ -276,8 +275,7 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
                             "text": top5str[1],
                             "color": "#ebebeb",
                             "size": "sm",
-                            "flex": 0,
-                            "wrap":True
+                            "flex": 0
                         }
                         ],
                         "spacing": "lg"
@@ -291,8 +289,7 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
                             "text": top5str[2],
                             "color": "#ebebeb",
                             "size": "sm",
-                            "flex": 0,
-                            "wrap":True
+                            "flex": 0
                         }
                         ],
                         "spacing": "lg"
@@ -306,8 +303,7 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
                             "text": top5str[3],
                             "color": "#ebebeb",
                             "size": "sm",
-                            "flex": 0,
-                            "wrap":True
+                            "flex": 0
                         }
                         ],
                         "spacing": "lg"
@@ -321,8 +317,7 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
                             "text": top5str[4],
                             "color": "#ebebeb",
                             "size": "sm",
-                            "flex": 0,
-                            "wrap":True
+                            "flex": 0
                         }
                         ],
                         "spacing": "lg"
