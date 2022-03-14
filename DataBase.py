@@ -2037,14 +2037,14 @@ class DataBase():
             print("連線以丟失 重連")
             self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
             self.cursor = self.conn.cursor()
-        sql = "select boss_id,start_time,hp from word_boss_status"
+        sql = "select boss_id,start_time,hp,word1_damage,word2_damage,word3_damage,last_word_army,word1_last_damage,word2_last_damage,word3_last_damage from word_boss_status"
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
         if result is None:
             print("目前沒有世界boss喔")
             return None
         self.conn.commit()
-        _json ={"boss_id":result[0],"start_time":result[1],"hp":result[2]}
+        _json ={"boss_id":result[0],"start_time":result[1],"hp":result[2],"word1_damage":result[3],"word2_damage":result[4],"word3_damage":result[5],"last_word_army":result[6],"word1_last_damage":result[7],"word2_last_damage":result[8],"word3_last_damage":result[9]}
         return _json
     
     def getWordBossInfo(self,boss_id):
@@ -2149,6 +2149,57 @@ class DataBase():
         result = int(result[0])
         return result
     
+    def ArmyDamageWordBoss(self):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        now_boss_status = self.getWordBossStatus()
+        if now_boss_status is None:
+            print("目前沒有世界王")
+            return None
+        current =  datetime.now()
+        str_todatabase = (current.strftime("%m/%d/%Y %H:%M:%S"))
+        _bossinfo = self.getWordBossInfo(now_boss_status["boss_id"])
+        _word1info = self.getWordStatus(1)
+        _word2info = self.getWordStatus(2)
+        _word3info = self.getWordStatus(3)
+        _word1army = self.getWordlevelList(_word1info["word_level"])["army_num"]
+        _word2army = self.getWordlevelList(_word2info["word_level"])["army_num"]
+        _word3army = self.getWordlevelList(_word3info["word_level"])["army_num"]
+        _word1army = random.randrange(int(_word1army*1.5),_word1army*2)  
+        _word2army = random.randrange(int(_word2army*1.5),_word2army*2)  
+        _word3army = random.randrange(int(_word3army*1.5),_word3army*2) 
+        sql = "UPDATE word_boss_status set word1_damage = word1_damage+{_word1army}, word2_damage = word2_damage+{_word2army}, word3_damage = word3_damage+{_word3army},last_word_army='{str_todatabase}',word1_last_damage = {_word1army},word2_last_damage={_word2army},word3_last_damage = {_word3army} ".format(_word1army = _word1army,_word2army = _word2army,_word3army = _word3army,str_todatabase = str_todatabase) 
+        self.cursor.execute(sql)
+        self.conn.commit()
+        _userlist = self.getWordBossUserList()
+        word1num = 0
+        word2num = 0
+        word3num = 0
+        for user in _userlist:
+            if user["word_guide"] == 1:
+                word1num+=1
+            elif user["word_guide"] ==2:
+                word2num+=1
+            elif user["word_guide"] ==3:
+                word3num+=1
+        print("陣營總資訊: 陣營1:"+str(word1num)+" 陣營2:"+str(word2num)+"陣營3:"+str(word3num))
+        _word1getDamage = int(_word1army/word1num)
+        _word2getDamage = int(_word2army/word2num)
+        _word3getDamage = int(_word3army/word2num)
+        print("陣營分享傷害: 陣營1:"+str(_word1getDamage)+" 陣營2:"+str(_word2getDamage)+"陣營3:"+str(_word3getDamage))
+        for user in _userlist:
+            if user["word_guide"] ==1:
+                self.addUserWordBossDamage(user["user_line_id"],_word1getDamage)
+            elif user["word_guide"] ==2:
+                self.addUserWordBossDamage(user["user_line_id"],_word2getDamage)
+            elif user["word_guide"] ==3:
+                self.addUserWordBossDamage(user["user_line_id"],_word3getDamage)
+        print("遠征軍出征完成")    
+        
     def damageWordBoss(self,totaldamage):
         try:
             self.cursor = self.conn.cursor()
@@ -2221,7 +2272,7 @@ if __name__ == "__main__":
     # _weapon = database.getUserEquipmentWeapon(id)
     # user_weapon = database.getValueFromUserWeapon(id,_weapon["backpack_loc"])
     # database.addAuction(id,"weapon",user_weapon["weapon_id"],125555,user_weapon)
-    print(database.getWordlevelList(1))
+    print(database.getWordBossStatus())
     # database.getWordBossStatus()
     # database.addUserWordBossDamage(id,100)
     # # print(database.getUserWordBossStatus(id))

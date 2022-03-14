@@ -10,6 +10,12 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
     _maxhp = int(word_boss_basic_info["boss_hp"])
     _percent = (_nowhp/_maxhp)*100
     drop_weapon = word_boss_basic_info["boss_drop_weapon"]
+    try:
+        _begintime = datetime.strptime(word_boss_status["last_word_army"],"%m/%d/%Y %H:%M:%S")
+    except:
+        _begintime = datetime.now()
+    nexttime = _begintime+timedelta(minutes=60)
+    nexttime = nexttime.strftime("%m/%d/%Y %H:%M:%S")
     # _weaponurl = "https://mumu.tw/images/weapons/"+str(drop_weapon[0])+".jpg"
     # _weaponurl2 = "https://mumu.tw/images/weapons/"+str(drop_weapon[1])+".jpg"
     # _weaponurl3 = "https://mumu.tw/images/weapons/"+str(drop_weapon[2])+".jpg"
@@ -480,6 +486,220 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
                 "backgroundColor": "#03303Acc",
                 "paddingAll": "20px",
                 "paddingTop": "18px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        },{
+        "type": "bubble",
+        "size": "giga",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://mumu.tw/images/game_ui/wordbossGuidebg.jpg",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "陣營遠征軍",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    },
+                    {
+                        "type": "text",
+                        "text": "下次出征時間 : "+nexttime,
+                        "color": "#ffffff"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "瓦倫艾爾",
+                            "color": "#ebebeb",
+                            "size": "sm",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": "上次出征總傷害 : "+str(word_boss_status["word1_last_damage"]),
+                            "color": "#ebebeb",
+                            "size": "xxs",
+                            "flex": 0
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "阿斯拉",
+                            "color": "#ebebeb",
+                            "size": "sm",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": "上次出征總傷害 : "+str(word_boss_status["word2_last_damage"]),
+                            "color": "#ebebeb",
+                            "size": "xxs",
+                            "flex": 0
+                        }
+                        ]
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "荷拉薇亞",
+                            "color": "#ebebeb",
+                            "size": "sm",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": "上次出征總傷害 : "+str(word_boss_status["word2_last_damage"]),
+                            "color": "#ebebeb",
+                            "size": "xxs",
+                            "flex": 0
+                        }
+                        ]
+                    }
+                    ],
+                    "spacing": "sm"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "陣營遠征軍為伺服器自動派出",
+                        "color": "#ffffff",
+                        "size": "xxs"
+                    },
+                    {
+                        "type": "text",
+                        "text": "造成傷害會平均獎勵給該陣營參加玩家",
+                        "color": "#ffffff",
+                        "size": "xxs"
+                    },
+                    {
+                        "type": "text",
+                        "text": "提升陣營等級將會增加兵力與兵種能力",
+                        "color": "#ffffff",
+                        "size": "xxs"
+                    }
+                    ],
+                    "offsetTop": "5px"
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "filler"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [
+                        {
+                            "type": "filler"
+                        },
+                        {
+                            "type": "icon",
+                            "url": "https://mumu.tw/images/menu_icons/37.png"
+                        },
+                        {
+                            "type": "text",
+                            "text": "查看陣營",
+                            "color": "#ffffff",
+                            "flex": 0,
+                            "offsetTop": "-2px",
+                            "action": {
+                            "type": "message",
+                            "label": "查看陣營",
+                            "text": "@wordguidemenu"
+                            }
+                        },
+                        {
+                            "type": "filler"
+                        }
+                        ],
+                        "spacing": "sm"
+                    },
+                    {
+                        "type": "filler"
+                    }
+                    ],
+                    "borderWidth": "1px",
+                    "cornerRadius": "4px",
+                    "spacing": "sm",
+                    "borderColor": "#ffffff",
+                    "margin": "xxl",
+                    "height": "40px",
+                    "action": {
+                    "type": "message",
+                    "label": "查看陣營",
+                    "text": "@wordguidemenu"
+                    }
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "text",
+                    "text": "遠征軍",
+                    "color": "#ffffff",
+                    "align": "center",
+                    "size": "xs",
+                    "offsetTop": "3px"
+                }
+                ],
+                "position": "absolute",
+                "cornerRadius": "20px",
+                "offsetTop": "18px",
+                "backgroundColor": "#ff334b",
+                "offsetStart": "18px",
+                "height": "25px",
+                "width": "106px"
             }
             ],
             "paddingAll": "0px"
