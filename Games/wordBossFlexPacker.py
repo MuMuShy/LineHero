@@ -584,7 +584,7 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
                         },
                         {
                             "type": "text",
-                            "text": "上次出征總傷害 : "+str(word_boss_status["word2_last_damage"]),
+                            "text": "上次出征總傷害 : "+str(word_boss_status["word3_last_damage"]),
                             "color": "#ebebeb",
                             "size": "xxs",
                             "flex": 0
