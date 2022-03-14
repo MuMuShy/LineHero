@@ -570,6 +570,13 @@ def handle_message(event):
         if _getreel <= 10:
             database.givePlayerItem(event.source.user_id,"reel",2,1)
             _specialstr = "恭喜獲得掉落物 60%攻擊卷軸"
+        _money = random.randrange(100,4500)
+        _exp = random.randrange(2100,10000)
+        user_jobafterexp = rpgGame.addPlayerExp(_userjob,_exp)
+        database.AddUserMoneyByLineId(event.source.user_id,_money)
+        database.setUserJobStatus(event.source.user_id,user_jobafterexp)
+        database.addUserWordStatus(event.source.user_id,_userjob["word"],int(_money*0.5),int(_exp*0.5))
+        _specialstr+="\n金幣:"+str(_money)+" EXP:"+str(_exp)
         flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
         _activeskills = database.getUserActiveSkillList(event.source.user_id)
         if _activeskills != [] and len(_activeskills) > 0:
@@ -649,6 +656,13 @@ def handle_message(event):
         if _getreel <= 10:
             database.givePlayerItem(event.source.user_id,"reel",2,1)
             _specialstr = "恭喜獲得掉落物 60%攻擊卷軸"
+        _money = random.randrange(100,4500)
+        _exp = random.randrange(2100,10000)
+        user_jobafterexp = rpgGame.addPlayerExp(_userjob,_exp)
+        database.AddUserMoneyByLineId(event.source.user_id,_money)
+        database.setUserJobStatus(event.source.user_id,user_jobafterexp)
+        database.addUserWordStatus(event.source.user_id,_userjob["word"],int(_money*0.5),int(_exp*0.5))
+        _specialstr+="\n金幣:"+str(_money)+" EXP:"+str(_exp)
         flex = wordBossFlexPacker.getWordBossInfo(_wordboss_status,_user_word_boss_status,_boss_basic_info)
         _activeskills = database.getUserActiveSkillList(event.source.user_id)
         if _activeskills != [] and len(_activeskills) > 0:
