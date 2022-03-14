@@ -568,8 +568,11 @@ def handle_message(event):
         _getreel = random.randrange(1,100)
         _specialstr = ""
         if _getreel <= 10:
-            database.givePlayerItem(event.source.user_id,"reel",2,1)
-            _specialstr = "恭喜獲得掉落物 60%攻擊卷軸"
+            _reellist = [2,6,9]
+            _reelchoose = random.choices(_reellist,weights=[100,10,5])[0]
+            database.givePlayerItem(event.source.user_id,"reel",_reelchoose,1)
+            _reelname = database.getUserUsingReel(_reelchoose)["reel_name"]
+            _specialstr = "恭喜獲得掉落物 "+_reelname
         _money = random.randrange(100,4500)
         _exp = random.randrange(2100,10000)
         user_jobafterexp = rpgGame.addPlayerExp(_userjob,_exp)
@@ -654,8 +657,11 @@ def handle_message(event):
         _getreel = random.randrange(1,100)
         _specialstr = ""
         if _getreel <= 10:
-            database.givePlayerItem(event.source.user_id,"reel",2,1)
-            _specialstr = "恭喜獲得掉落物 60%攻擊卷軸"
+            _reellist = [2,6,9]
+            _reelchoose = random.choices(_reellist,weights=[100,10,5])[0]
+            database.givePlayerItem(event.source.user_id,"reel",_reelchoose,1)
+            _reelname = database.getUserUsingReel(_reelchoose)["reel_name"]
+            _specialstr = "恭喜獲得掉落物 "+_reelname
         _money = random.randrange(100,4500)
         _exp = random.randrange(2100,10000)
         user_jobafterexp = rpgGame.addPlayerExp(_userjob,_exp)
