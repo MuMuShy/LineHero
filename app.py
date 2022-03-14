@@ -522,7 +522,7 @@ def handle_message(event):
         try:
             if redistool.getValue(event.source.user_id) is None:
                 _random = random.randrange(1,100)
-                if _random <=100:
+                if _random <=5:
                     print("玩家 進入測謊")
                     from Games import questions
                     _question = questions.getRandomQuestionImage(event.source.user_id)
