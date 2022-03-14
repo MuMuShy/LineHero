@@ -38,7 +38,9 @@ def createImg(random_txt,user_line_id):
     # 獲取圖片畫筆，用於描繪字
     draw = ImageDraw.Draw(img)
     # 修改字體
-    font = ImageFont.truetype(font="arial.ttf", size=36)
+    path = os.getcwd()
+    font_path = path+"/arial.ttf"
+    font = ImageFont.truetype(font=font_path, size=36)
     index = 0
     for char in random_txt:
         # 隨機生成5種字符+5種顏色
