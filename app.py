@@ -121,6 +121,7 @@ def handle_postback(event):
 #用戶文字訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    print(event)
     #檢查是否是鎖定玩家
     if redistool.getValue(event.source.user_id) is not None:
         _usersend = event.message.text
@@ -139,7 +140,6 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text="由於大量請求 請輸入下列訊息驗證:\n"+_answerright))
             return
-    print(event)
     user_send =event.message.text
     if user_send =="test":
         flex = lineMessagePacker.getPostButtonTest(event.source.user_id)
