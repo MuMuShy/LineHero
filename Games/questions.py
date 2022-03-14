@@ -61,7 +61,7 @@ def createImg(random_txt,user_line_id):
     with open(path+"/"+user_line_id+".png", "wb") as f:
         img.save(f, format="png")
     
-    uploadfile(path+"./"+user_line_id+".png")
+    uploadfile(path+"/"+user_line_id+".png")
 
 
 def uploadfile(filename):
