@@ -8,7 +8,7 @@ import lineMessagePackerRpg
 import math
 from DataBase import DataBase
 from RedisTool import RedisTool
-from Games import diceGame, jpGame,rpgGame, wordBossFlexPacker
+from Games import diceGame, jpGame,rpgGame, wordBossFlexPacker, wordGuideFlexPacker
 from datetime import datetime, timedelta
 load_dotenv()
 from linebot import (
@@ -666,8 +666,62 @@ def handle_message(event):
                 TextSendMessage(text="對boss造成傷害:"+str(attackresult)+"\n"+_specialstr+"\n世界BOSS傷害與血量更新頻率為每分鐘更新一次"),
                 FlexSendMessage("Boss",contents=flex)])
         return
+    elif user_send =="@wordranklist":
+        try:
+            _userjobinfo = database.getUserJob(event.source.user_id)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="資料有問題 請確認有加我好友 並且使用!info 建檔 接著透過@jobinfo進行創角"))
+            return
+        _word1 = database.getWordStatus(1)
+        _word2 = database.getWordStatus(2)
+        _word3 = database.getWordStatus(3)
+        _wordlist =[_word1,_word2,_word3]
+        _wordlist.sort(key=lambda word:(word["word_level"],word["word_money"]),reverse=True)
+        print(_wordlist)
 
-        
+        _w1top1 = database.getWordRank1(_wordlist[0]["word_id"])
+        _w1top1 = database.getUserName(_w1top1)
+        _w2top1 = database.getWordRank1(_wordlist[1]["word_id"])
+        _w2top1 = database.getUserName(_w2top1)
+        _w3top1 = database.getWordRank1(_wordlist[2]["word_id"])
+        _w3top1 = database.getUserName(_w3top1)
+        _top5list = [_w1top1,_w2top1,_w3top1]
+        _levellist = []
+        _levellist.append(database.getWordlevelList(_wordlist[0]["word_level"]))
+        _levellist.append(database.getWordlevelList(_wordlist[1]["word_level"]))
+        _levellist.append(database.getWordlevelList(_wordlist[2]["word_level"]))
+        flex = wordGuideFlexPacker.getWordGuideStatusList(_wordlist,_top5list,_levellist)
+        line_bot_api.reply_message(
+            event.reply_token,[
+            TextSendMessage(text="陣營狀態"),
+            FlexSendMessage("陣營",contents=flex)
+            ])
+        return
+    elif user_send =="@wordguidemenu":
+        try:
+            _userjobinfo = database.getUserJob(event.source.user_id)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="資料有問題 請確認有加我好友 並且使用!info 建檔 接著透過@jobinfo進行創角"))
+            return
+        if _userjobinfo["word"] is None:
+            flex = lineMessagePackerRpg.getWordJoinMenu()
+            line_bot_api.reply_message(
+            event.reply_token,[
+                TextSendMessage(text="看來你還沒有陣營呢 這是勢力地圖,是否要加入勢力呢?"),
+                ImageSendMessage(original_content_url="https://mumu.tw/images/game_ui/wordmap.png",preview_image_url="https://mumu.tw/images/game_ui/wordmap.png"),
+                FlexSendMessage("勢力選擇",contents=flex)
+            ])
+        else:
+            menu = lineMessagePackerRpg.getGuideMenu()
+            line_bot_api.reply_message(
+            event.reply_token,
+            FlexSendMessage("陣營選單",contents=menu)
+            )
+            return
     elif user_send =="@wordguide":
         try:
             _userjobinfo = database.getUserJob(event.source.user_id)
