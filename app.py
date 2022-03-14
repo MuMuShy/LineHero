@@ -581,17 +581,51 @@ def handle_message(event):
         else:
             _userword = _userjobinfo["word"]
             _wordinfo = database.getWordStatus(_userword)
+            _wordlevelinfo = database.getWordlevelList(_wordinfo["word_level"])
             _top1 = database.getWordRank1(_userword)
             if _top1 is None:
                 _top1 = "從缺"
             else:
                 top1name = database.getUser(_top1)["user_line_name"]
             _userwordinfo = database.getUserWordStatus(event.source.user_id,_userword)
-            flex = lineMessagePackerRpg.getWordGuideStatus(_wordinfo,_userwordinfo,top1name)
+            flex = lineMessagePackerRpg.getWordGuideStatus(_wordinfo,_userwordinfo,top1name,_wordlevelinfo)
             line_bot_api.reply_message(
             event.reply_token,
                 FlexSendMessage("勢力狀態",contents=flex)
             )
+    elif user_send == "@worduplevel":
+        try:
+            _userjobinfo = database.getUserJob(event.source.user_id)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="資料有問題 請確認有加我好友 並且使用!info 建檔 接著透過@jobinfo進行創角"))
+            return
+        _userword = _userjobinfo["word"]
+        _top1 = database.getWordRank1(_userword)
+        if event.source.user_id != _top1:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="只有陣營國王有權力進行陣營等級提升"))
+            return
+        _wordinfo = database.getWordStatus(_userword)
+        _wordlevelinfo = database.getWordlevelList(_wordinfo["word_level"])
+        if _wordinfo["word_money"] >= _wordlevelinfo["next_level_money"] and _wordinfo["word_exp"] >= _wordlevelinfo["next_level_exp"]:
+            _wordinfo["word_level"] += 1
+            _wordinfo["word_money"] -= _wordlevelinfo["next_level_money"]
+            _wordinfo["word_exp"] -= _wordlevelinfo["next_level_exp"]
+            database.updateWordStatus(_wordinfo["word_id"],_wordinfo["word_level"],_wordinfo["word_exp"],_wordinfo["word_money"])
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="陣營已成功升等至:"+str(_wordinfo["word_level"])))
+            return
+        else:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="陣營似乎不滿足升等條件呢"))
+            return
+        
+
     elif user_send.startswith("@joinword"):
         try:
             word = user_send.split("@joinword")[1]

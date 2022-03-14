@@ -2196,7 +2196,24 @@ class DataBase():
             self.cursor.execute(sql)
             self.conn.commit()
         return result
-
+    
+    def getWordlevelList(self,level):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "SELECT level,next_level_exp,next_level_money,abibilty_add,exp_add,build_num,daily_cost_money,army_num FROM word_level_list where level = {level}".format(level = level)
+        self.cursor.execute(sql)
+        _result = self.cursor.fetchone()
+        self.conn.commit()
+        if _result is not None:
+            json = {"level":_result[0],"next_level_exp":int(_result[1]),"next_level_money":int(_result[2]),"abibilty_add":_result[3],"exp_add":_result[4]
+            ,"build_num":_result[5],"daily_cost_money":_result[6],"army_num":_result[7]}
+            return json
+        else:
+            return None
         
 if __name__ == "__main__":
     id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
@@ -2204,7 +2221,7 @@ if __name__ == "__main__":
     # _weapon = database.getUserEquipmentWeapon(id)
     # user_weapon = database.getValueFromUserWeapon(id,_weapon["backpack_loc"])
     # database.addAuction(id,"weapon",user_weapon["weapon_id"],125555,user_weapon)
-    database.startWordBoss(0)
+    print(database.getWordlevelList(1))
     # database.getWordBossStatus()
     # database.addUserWordBossDamage(id,100)
     # # print(database.getUserWordBossStatus(id))

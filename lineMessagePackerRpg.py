@@ -5272,7 +5272,7 @@ def getWordJoinMenu():
     return json
 
 
-def getWordGuideStatus(word_info,user_word_info,top1):
+def getWordGuideStatus(word_info,user_word_info,top1,word_level_info):
     word_id = word_info["word_id"]
     if word_id == 1:
         url = "https://mumu.tw/images/npc/valen.png"
@@ -5280,6 +5280,30 @@ def getWordGuideStatus(word_info,user_word_info,top1):
         url = "https://mumu.tw/images/npc/asla.png"
     else:
         url = "https://mumu.tw/images/npc/hela.png"
+    army_num = word_level_info["army_num"]
+    _next_money = word_level_info["next_level_money"]
+    _next_exp = word_level_info["next_level_exp"]
+    _now_money = word_info["word_money"]
+    _now_exp = word_info["word_exp"]
+    _nextmoneystr = str(_now_money)+"/"+str(_next_money)
+    _nextexpstr = str(_now_exp)+"/"+str(_next_exp)
+    if _now_money > _next_money:
+        _nextmoneycolor =  "#00cc00"
+        _nextmoneyok = "達成"
+    else:
+        _nextmoneycolor =  "#cc0000"
+        _nextmoneyok = "未達成"
+    if _now_exp > _next_exp:
+        _nextexpcolor =  "#00cc00"
+        _nextexpok = "達成"
+    else:
+        _nextexpcolor =  "#cc0000"
+        _nextexpok = "未達成"
+
+    _abilty_add = word_level_info["abibilty_add"]
+    _exp_add = word_level_info["exp_add"]
+    print(_abilty_add)
+    print(_exp_add)
     json = {
     "type": "carousel",
     "contents": [
@@ -5391,6 +5415,186 @@ def getWordGuideStatus(word_info,user_word_info,top1):
                     "label": "action",
                     "text": "@joinword2"
                     }
+                }
+                ],
+                "position": "absolute",
+                "offsetBottom": "0px",
+                "offsetStart": "0px",
+                "offsetEnd": "0px",
+                "backgroundColor": "#03303Acc",
+                "paddingAll": "20px",
+                "paddingTop": "18px"
+            }
+            ],
+            "paddingAll": "0px"
+        }
+        },{
+        "type": "bubble",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+            {
+                "type": "image",
+                "url": "https://i.pinimg.com/originals/50/b8/17/50b8175428ef1dc1c4b6d95f032f15b1.jpg",
+                "size": "full",
+                "aspectMode": "cover",
+                "aspectRatio": "2:3",
+                "gravity": "top"
+            },
+            {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "text",
+                        "text": "陣營狀態",
+                        "size": "xl",
+                        "color": "#ffffff",
+                        "weight": "bold"
+                    }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "城防守軍 : 15000000",
+                            "color": "#ebebeb",
+                            "size": "sm",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": "世界BOSS,世界領土爭奪,戰爭,日常防禦",
+                            "size": "xxs",
+                            "color": "#FFFFFF"
+                        }
+                        ],
+                        "margin": "md"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "目前升級所需金錢 :"+_nextmoneystr,
+                            "color": "#ebebeb",
+                            "size": "sm",
+                            "flex": 0
+                        },{
+                            "type": "text",
+                            "text": _nextmoneyok,
+                            "color": _nextmoneycolor,
+                            "size": "sm",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": "目前升級所需經驗 :"+_nextexpstr,
+                            "color": "#ebebeb",
+                            "size": "sm",
+                            "flex": 0
+                        },{
+                            "type": "text",
+                            "text": _nextexpok,
+                            "color": _nextexpcolor,
+                            "size": "sm",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": "國王可透過升級按鈕進行陣營升級",
+                            "size": "xxs",
+                            "color": "#FFFFFF"
+                        },
+                        {
+                            "type": "button",
+                            "action": {
+                            "type": "message",
+                            "label": "升級",
+                            "text": "@worduplevel"
+                            },
+                            "style": "primary",
+                            "height": "sm",
+                            "position": "relative"
+                        }
+                        ],
+                        "margin": "md"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "各項屬性加成 (僅探索時生效) :",
+                            "color": "#ebebeb",
+                            "size": "sm",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": "三圍: "+str(_abilty_add)+"% 經驗加成 : "+str(_exp_add)+"%",
+                            "size": "xxs",
+                            "color": "#FFFFFF"
+                        }
+                        ],
+                        "margin": "md"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "公共建築:",
+                            "color": "#ebebeb",
+                            "size": "sm",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": str(word_level_info["build_num"]),
+                            "size": "xxs",
+                            "color": "#FFFFFF"
+                        }
+                        ],
+                        "margin": "md"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                        {
+                            "type": "text",
+                            "text": "每日維護開銷:",
+                            "color": "#ebebeb",
+                            "size": "sm",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": str(word_level_info["daily_cost_money"]),
+                            "size": "xxs",
+                            "color": "#FFFFFF"
+                        }
+                        ],
+                        "margin": "md"
+                    }
+                    ],
+                    "spacing": "lg"
                 }
                 ],
                 "position": "absolute",

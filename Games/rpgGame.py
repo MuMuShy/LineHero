@@ -310,6 +310,16 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
     _user_job_temp["str"]+=_weapon_info["str_add"]
     _user_job_temp["int"]+=_weapon_info["int_add"]
     _user_job_temp["dex"]+=_weapon_info["dex_add"]
+    if _user_job_json["word"] is not None:
+        _userword = _user_job_json["word"]
+        wordinfo = dataBase.getWordStatus(_userword)
+        word_level_info = dataBase.getWordlevelList(wordinfo["word_level"])
+        _abiliy_add = word_level_info["abibilty_add"]
+        _user_job_temp["str"] += int(_user_job_temp["str"]*(_abiliy_add/100))
+        _user_job_temp["int"] += int(_user_job_temp["int"]*(_abiliy_add/100))
+        _user_job_temp["dex"] += int(_user_job_temp["dex"]*(_abiliy_add/100))
+        print("使用者陣營等級加成後:")
+        print(_user_job_temp)
     #確認武器加乘血量
     try:
         hp_add = _weapon_info["other_effect"]["hp_add"]
@@ -517,20 +527,24 @@ def attackround(_user_line_id,_user_job_json,_target_monster_id,monster_hp,skill
         _money = random.randrange(500,2000)
         _money+=_user_job_json["level"]*30
         _originmoney = int(dataBase.getUserMoney(_user_line_id))+_money
+        _getexp = _monster_base_info["exp"]
         #存入陣營
         if _user_job_json["word"] is not None:
             _givemoney = int(_money*0.3)
             _giveexp = int(_monster_base_info["exp"]*0.3)
-            _userword = _user_job_json["word"]
-            wordinfo = dataBase.getWordStatus(_userword)
+            
             wordinfo["word_exp"] += _giveexp
             wordinfo["word_money"]+= _givemoney
             dataBase.addUserWordStatus(_user_line_id,_userword,_givemoney,_giveexp)
             dataBase.updateWordStatus(_userword,wordinfo["word_level"],wordinfo["word_exp"],wordinfo["word_money"])
+            #陣營經驗加成
+            _exp_add = word_level_info["exp_add"]
+            _getexp += int(_getexp*(_exp_add/100))
+            print("陣營經驗加成後:"+str(_getexp))
         dataBase.SetUserMoneyByLineId(_user_line_id,_originmoney)
         dataBase.ClearUserBattle(_user_line_id)
         _origlevel = _user_job_json["level"]
-        _user_job_json = addPlayerExp(_user_job_json,_monster_base_info["exp"])
+        _user_job_json = addPlayerExp(_user_job_json,_getexp)
         _islevelup = False
         print( _user_job_json["level"])
         print(_origlevel)
