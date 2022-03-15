@@ -4016,24 +4016,24 @@ def getUserActiveSkillsBoss(skill_list):
         _url = "https://mumu.tw/images/skill/"+skill["job"]+"/"+str(skill["skill_id"])+"."+skill["image_type"]
         _name = skill["skill_name"]
         bubble = {
-      "type": "bubble",
-      "size": "nano",
-      "hero": {
-        "type": "image",
-        "url": _url,
-        "action": {
-          "type": "message",
-          "label": "action",
-          "text": "@wordbossuseskill "+skill["job"]+" "+str(skill["skill_id"])
+            "type": "bubble",
+            "size": "nano",
+            "hero": {
+                "type": "image",
+                "url": _url,
+                "action": {
+                "type": "message",
+                "label": "action",
+                "text": "@wordbossuseskill "+skill["job"]+" "+str(skill["skill_id"])
+                }
+            },
+            "styles": {
+                "footer": {
+                "separator": False
+                }
+            }
         }
-      },
-      "styles": {
-        "footer": {
-          "separator": False
-        }
-      }
-    }
-    bubbles.append(bubble)
+        bubbles.append(bubble)
     json =  {
     "type": "carousel",
     "contents": bubbles
