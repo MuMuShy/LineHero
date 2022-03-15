@@ -240,7 +240,7 @@ def getWordBossInfo(word_boss_status,user_word_status,word_boss_basic_info):
                     "contents": [
                     {
                         "type": "text",
-                        "text": "傷害排行",
+                        "text": "傷害排行-前五名必得武器",
                         "size": "xl",
                         "color": "#ffffff",
                         "weight": "bold"
