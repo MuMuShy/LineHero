@@ -1713,6 +1713,7 @@ class DataBase():
         sql = "SELECT skill_id FROM user_skill where user_line_id = '{user_line_id}' and skill_id = {skill_id} and skill_job = '{skill_job}'".format(user_line_id = user_line_id,skill_id = skill_id,skill_job=skill_job)
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
+        self.conn.commit()
         if _result is not None:
             return True
         else:
@@ -1728,6 +1729,7 @@ class DataBase():
         sql = "SELECT skill_id,skill_job FROM user_skill where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
         self.cursor.execute(sql)
         _result = self.cursor.fetchall()
+        self.conn.commit()
         _skills = {}
         _userskill_list = []
         for _id in _result:
