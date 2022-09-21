@@ -52,15 +52,16 @@ if __name__ == "__main__":
     # r.setKey("list","dddd")
     # print(r.getKey("list"))
     r = RedisTool()
-    r.setKey("hello","word")
-    print(r.getValue("123"))
-    value = r.getValue("hello")
-    if value is not None:
-        value = value.decode()
-    print("word" == str(value))
-    r.removeKey("word")
-    r.removeKey("hello")
-    value = r.getValue("hello")
-    if value is not None:
-        value = value.decode()
-    print("word" == str(value))
+    print(r.getValue("U949dd999f9ea14f60a9c2a517e9e5e85"))
+    r.removeKey("U949dd999f9ea14f60a9c2a517e9e5e85")
+    print(r.getValue("U949dd999f9ea14f60a9c2a517e9e5e85"))
+    # value = r.getValue("hello")
+    # if value is not None:
+    #     value = value.decode()
+    # print("word" == str(value))
+    # r.removeKey("word")
+    # r.removeKey("hello")
+    # value = r.getValue("hello")
+    # if value is not None:
+    #     value = value.decode()
+    # print("word" == str(value))

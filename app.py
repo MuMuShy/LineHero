@@ -492,11 +492,11 @@ def handle_message(event):
             ])
         return
     elif user_send =="@wordboss":
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="世界王已消滅 獎勵已全數發放 敬請期待下一隻BOSS"),
-        )
-        return
+        # line_bot_api.reply_message(
+        # event.reply_token,
+        # TextSendMessage(text="世界王已消滅 獎勵已全數發放 敬請期待下一隻BOSS"),
+        # )
+        # return
         #check word boss status
         _wordboss_status = database.getWordBossStatus()
         if _wordboss_status is None:
@@ -528,11 +528,11 @@ def handle_message(event):
     elif user_send =="@attackWordBoss":
         #check word boss status
         _wordboss_status = database.getWordBossStatus()
-        line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="世界王已消滅 獎勵已全數發放 敬請期待下一隻BOSS"),
-                )
-        return
+        # line_bot_api.reply_message(
+        #         event.reply_token,
+        #         TextSendMessage(text="世界王已消滅 獎勵已全數發放 敬請期待下一隻BOSS"),
+        #         )
+        # return
         if _wordboss_status is None:
             line_bot_api.reply_message(
                 event.reply_token,
@@ -608,11 +608,11 @@ def handle_message(event):
                 FlexSendMessage("Boss",contents=flex)])
         return
     elif user_send.startswith("@wordbossuseskill"):
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="世界王已消滅 獎勵已全數發放 敬請期待下一隻BOSS"),
-        )
-        return
+        # line_bot_api.reply_message(
+        # event.reply_token,
+        # TextSendMessage(text="世界王已消滅 獎勵已全數發放 敬請期待下一隻BOSS"),
+        # )
+        # return
         try:
             _skilljob = user_send.split(" ")[1]
             _skillid = user_send.split(" ")[2]

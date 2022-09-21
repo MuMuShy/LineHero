@@ -2259,6 +2259,7 @@ class DataBase():
             sql = "delete from user_word_boss_status"
             self.cursor.execute(sql)
             self.conn.commit()
+        
     
     def getWordlevelList(self,level):
         try:
