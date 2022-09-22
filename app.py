@@ -541,6 +541,18 @@ def handle_message(event):
             return
         #測謊確認
         try:
+            _userjobinfo = database.getUserJob(event.source.user_id)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="資料有問題 請確認有加我好友 並且使用!info 建檔 接著透過@jobinfo進行創角"))
+            return
+        if _userjobinfo["word"] is None:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="請先加入陣營在攻打世界王 => 冒險之旅 => 陣營系統"))
+            return
+        try:
             if redistool.getValue(event.source.user_id) is None:
                 _random = random.randrange(1,100)
                 if _random <=5:
@@ -620,6 +632,18 @@ def handle_message(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="指令好像有問題ㄛ 請盡量用按鈕謝謝"))
+            return
+        try:
+            _userjobinfo = database.getUserJob(event.source.user_id)
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="資料有問題 請確認有加我好友 並且使用!info 建檔 接著透過@jobinfo進行創角"))
+            return
+        if _userjobinfo["word"] is None:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="請先加入陣營在攻打世界王 => 冒險之旅 => 陣營系統"))
             return
         if database.checkUserHasSkill(event.source.user_id,_skillid,_skilljob) == True:
             _skillinfo = database.getSkillFromUser(event.source.user_id,_skillid,_skilljob)
@@ -914,6 +938,8 @@ def handle_message(event):
         else:
             _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list,_first)
             _sendlist.append(FlexSendMessage("裝備列表",contents=_flex_equipment))
+        print("裝備列表:")
+        print(_sendlist)
         line_bot_api.reply_message(
             event.reply_token,_sendlist)
         return
