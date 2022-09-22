@@ -2241,6 +2241,12 @@ class DataBase():
         if user_word is None:
             user_word = -1
         sql = "INSERT INTO user_word_boss_status(user_line_id,total_damage,word_guide) VALUES('{user_line_id}',{total_damage},{word_guide})".format(user_line_id = user_line_id,total_damage = 0,word_guide =user_word)
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
         self.cursor.execute(sql)
         self.conn.commit()
         self.conn.close()
