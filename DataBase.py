@@ -2300,11 +2300,25 @@ class DataBase():
             if level >= 50:
                 self.addSkillToUser(id,4,job,1,0)
                     
-    
+    def giveReelToAllUser(self,reel_id,nums):
+        try:
+            self.cursor = self.conn.cursor()
+        except:
+            print("連線以丟失 重連")
+            self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.cursor = self.conn.cursor()
+        sql = "SELECT * FROM users_job "
+        self.cursor.execute(sql)
+        self.conn.commit()
+        row = self.cursor.fetchall()
+        for user in row:
+            id = user[0]
+            self.givePlayerItem(id,'reel',reel_id,nums)
         
 if __name__ == "__main__":
     id = 'U8d0f4dfe21ccb2f1dccd5c80d5bb20fe'
     database = DataBase()
+    database.giveReelToAllUser(9,10)
     # _weapon = database.getUserEquipmentWeapon(id)
     # user_weapon = database.getValueFromUserWeapon(id,_weapon["backpack_loc"])
     # database.addAuction(id,"weapon",user_weapon["weapon_id"],125555,user_weapon)
