@@ -1185,10 +1185,10 @@ class DataBase():
         self.cursor.execute(sql,params)
         self.conn.commit()
         row = self.cursor.fetchone()
-        self.conn.close()
         num = row[0]
         print("目前玩家背包序列index到達:"+str(num))
         if item_type == 'weapon':
+            self.conn.close()
             if num == None:
                 return False,0
             else:
