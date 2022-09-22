@@ -28,6 +28,7 @@ class DataBase():
         row = self.cursor.fetchone()
         # 事物提交
         self.conn.commit()
+        self.conn.close()
         if row is not None:
             return True
         else:
@@ -44,6 +45,7 @@ class DataBase():
         params = {'user_line_name':user_line_name, 'user_line_id':user_line_id,'user_img':user_img_link,'user_money':100000,'locked_money':0}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
     
 
     def getUser(self,user_line_id):
@@ -55,8 +57,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * from users WHERE user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         json={"user_line_name":"","user_img_link":"","user_money":123}
         if row is not None:
             json["user_line_name"] = row[0]
@@ -76,8 +80,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT user_line_id from users WHERE user_id = '"+str(user_id)+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         json={}
         if row is not None:
             id = row[0]
@@ -96,8 +102,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * from users WHERE user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         return row[0]
 
     def getCommandList(self):
@@ -109,8 +117,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * FROM commands"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchall()
+        self.conn.commit()
+        self.conn.close()
         commandlist = {}
         if row is not None:
             for item in row:
@@ -126,8 +136,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * from users order by user_money DESC"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchall()
+        self.conn.commit()
+        self.conn.close()
         commandlist = {}
         rank = 1
         if row is not None:
@@ -146,8 +158,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * from users_job order by level DESC"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchall()
+        self.conn.commit()
+        self.conn.close()
         rank = 1
         if row is not None:
             for item in row:
@@ -166,6 +180,7 @@ class DataBase():
         sql ="""UPDATE users SET user_money = """+str(money)+"""WHERE user_id = """+str(user_index_id)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
 
 
     def SetUserMoneyByLineId(self,user_line_id,money):
@@ -179,6 +194,7 @@ class DataBase():
         params = {'money':money,'line_id':user_line_id}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
     
     def AddUserMoneyByLineId(self,user_lind_id,money):
         try:
@@ -191,6 +207,7 @@ class DataBase():
         params = {'money':money,'line_id':user_lind_id}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
         print("增加:"+user_lind_id+"金錢:"+str(money))
     
     def SetUserLockedMoneyByLineId(self,user_line_id,money):
@@ -204,6 +221,7 @@ class DataBase():
         params = {'money':money,'line_id':user_line_id}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
     
     def GetUserLockedMoneyLineId(self,user_line_id):
         try:
@@ -214,8 +232,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT locked_money from users WHERE user_line_id = '"+user_line_id+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+       
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         return row[0]
     
 
@@ -228,8 +248,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql ="Select user_line_name, user_money from users ORDER BY user_money desc"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchmany(5)
+        self.conn.commit()
+        self.conn.close()
         result=[]
         for col in row:
             _reply =str(col[0])+" : $"+str(col[1])
@@ -247,8 +269,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql ="Select * from users_job ORDER BY level desc"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchmany(5)
+        self.conn.commit()
+        self.conn.close()
         result=[]
         for col in row:
             _name = self.getUserName(col[0])
@@ -269,8 +293,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * FROM users where user_line_id = '" +user_line_id+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         return int(row[6])
 
     def setHobbyBet(self,user_line_id,new_hobbybet):
@@ -284,6 +310,7 @@ class DataBase():
         data = (new_hobbybet, user_line_id)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        self.conn.close()
 
 
     def getDiceHistory(self):
@@ -295,8 +322,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = """SELECT dice_history from gameinfo"""
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _historystr = row[0]
         _parse = list(_historystr)
         print(_parse)
@@ -319,6 +348,7 @@ class DataBase():
         sql = """UPDATE gameinfo SET dice_history = """+_strtodb
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def getWatherMoney(self):
         try:
@@ -329,8 +359,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = """select wather_money from gameinfo"""
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _wathermoney = row[0]
         print("目前水錢")
         print(int(_wathermoney))
@@ -347,6 +379,7 @@ class DataBase():
         sql = """UPDATE gameinfo SET wather_money = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def addWatherMoney(self,add):
         now_wather_money = self.getWatherMoney()
@@ -366,8 +399,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = """select grand from jackpot"""
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _wathermoney = row[0]
         print("目前Grand:")
         print(int(_wathermoney))
@@ -382,8 +417,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = """select major from jackpot"""
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _wathermoney = row[0]
         print("目前Major:")
         print(int(_wathermoney))
@@ -398,8 +435,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = """select minor from jackpot"""
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _wathermoney = row[0]
         print("目前Minor:")
         print(int(_wathermoney))
@@ -414,8 +453,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = """select mini from jackpot"""
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _wathermoney = row[0]
         print("目前Mini:")
         print(int(_wathermoney))
@@ -433,6 +474,7 @@ class DataBase():
         sql = """UPDATE jackpot SET grand = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def setMajor(self,new):
         print("設定jackpot Major"+str(new))
@@ -445,6 +487,7 @@ class DataBase():
         sql = """UPDATE jackpot SET major = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def setMinor(self,new):
         print("設定jackpot Minor"+str(new))
@@ -457,6 +500,7 @@ class DataBase():
         sql = """UPDATE jackpot SET minor = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def setMini(self,new):
         print("設定jackpot Mini"+str(new))
@@ -469,6 +513,7 @@ class DataBase():
         sql = """UPDATE jackpot SET mini = """+str(new)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def getAllJackpot(self):
         try:
@@ -479,8 +524,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = """select * from jackpot"""
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         print("GRAND:"+str(row[0])+" MAJOR:"+str(row[1])+" MINOR:"+str(row[2])+" MINI:"+str(row[3])+" LASTWIN:"+str(row[4])+" LASTWINprice:"+str(row[5]))
         return row
     
@@ -495,6 +542,7 @@ class DataBase():
         data = (grand, major,minor,mini)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        self.conn.close()
         print("更新jp:"+str(grand)+","+str(major)+","+str(minor)+","+str(mini))
     
     def setJpLastWin(self,_winnername,_winmoney):
@@ -508,6 +556,7 @@ class DataBase():
         data = (_winnername, _winmoney)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        self.conn.close()
         print("更新jp中獎者:"+str(_winnername)+":"+str(_winmoney))
     
     def addAllJp(self,grand,major,minor,mini):
@@ -521,6 +570,7 @@ class DataBase():
         data = (grand, major,minor,mini)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        self.conn.close()
         print("增加jp:"+str(grand)+","+str(major)+","+str(minor)+","+str(mini))
     
     
@@ -535,8 +585,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT daily_request_done FROM users where user_line_id = '" +user_line_id+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         return bool(row[0])
     
     def checkDailyBroadcast(self):
@@ -548,8 +600,9 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT broadcast from daily_broadcast"
         self.cursor.execute(sql)
-        self.conn.commit()
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         return row[0]
     
     def setUserDaily(self,user_line_id,bool):
@@ -567,6 +620,7 @@ class DataBase():
         data = (bool, user_line_id)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        self.conn.close()
     
     def setAllUserDaily(self,bool):
         try:
@@ -583,6 +637,7 @@ class DataBase():
         data = (bool)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        self.conn.close()
     
     def checkUserHasJob(self,user_line_id):
         try:
@@ -596,6 +651,7 @@ class DataBase():
         row = self.cursor.fetchone()
         # 事物提交
         self.conn.commit()
+        self.conn.close()
         if row is not None:
             return True
         else:
@@ -641,6 +697,7 @@ class DataBase():
         params = {'user_line_id':user_line_id, 'jobs':jobs,'maxhp':maxhp,'weapon':loc,'pet':_pet}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
         
     
     def getUserJob(self,user_line_id):
@@ -652,8 +709,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * FROM users_job where user_line_id = '" +user_line_id+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _json = {}
         _json={"job":row[1],"str":row[2],"dex":row[3],"int":row[4],"level":row[5],"hp":row[6],"exp":row[7],"weapon":row[8],"pet":row[9],"skill_point":row[10],"word":row[11]}
         print("玩家職業資料")
@@ -669,8 +728,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * FROM pets_list where pet_id = '" +str(pet_id)+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         print(row)
         _json = {}
         _other_effect={}
@@ -691,8 +752,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = """SELECT * FROM weapon_list where weapon_id = %s"""
         self.cursor.execute(sql,(weapon_id,))
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         print(row)
         _json = {}
         _weapon_other_effect={}
@@ -716,6 +779,7 @@ class DataBase():
         sql = "UPDATE users_job SET exp = exp+{exp} where user_line_id = '{user_line_id}'".format(exp=exp,user_line_id=user_line_id)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def setUserJobStatus(self,user_line_id,user_job_json):
         try:
@@ -728,6 +792,7 @@ class DataBase():
         data = (user_job_json["str"], user_job_json["dex"],user_job_json["int"],user_job_json["hp"],user_job_json["level"],user_job_json["exp"],user_job_json["skill_point"],user_job_json["word"],user_line_id)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        self.conn.close()
         print("更新使用者狀態:")
         print(user_job_json)
     
@@ -742,6 +807,7 @@ class DataBase():
         sql ="INSERT INTO {word} (user_line_id, money_give,exp_give) VALUES ('{user_line_id}',{money_give},{exp_give})".format(word=word,user_line_id=user_line_id,money_give=money_give,exp_give=exp_give)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
 
     def updateUserWordStatus(self,user_line_id,word,money_give=0,exp_give=0):
         word = "word"+str(word)+"_users_status"
@@ -754,6 +820,7 @@ class DataBase():
         sql ="UPDATE {word} SET money_give = {money_give},exp_give={exp_give} where user_line_id = '{user_line_id}'".format(word=word,user_line_id=user_line_id,money_give=money_give,exp_give=exp_give)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def addUserWordStatus(self,user_line_id,word,money_give=0,exp_give=0):
         word = "word"+str(word)+"_users_status"
@@ -766,6 +833,7 @@ class DataBase():
         sql ="UPDATE {word} SET money_give = money_give+{money_give},exp_give = exp_give+{exp_give} where user_line_id = '{user_line_id}'".format(word=word,user_line_id=user_line_id,money_give=money_give,exp_give=exp_give)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
 
     
     def updateWordStatus(self,word_id,word_level,word_exp,word_money):
@@ -779,6 +847,7 @@ class DataBase():
         data = (word_level, word_exp,word_money,word_id)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        self.conn.close()
     
     def addWordMoneyExp(self,word_id,word_exp,word_money):
         try:
@@ -790,6 +859,7 @@ class DataBase():
         sql = "UPDATE word_list SET word_exp = word_exp+{word_exp} ,word_money = word_money+{word_money} Where word_id = {word_id}".format(word_exp=word_exp,word_money=word_money,word_id=word_id)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def getWordStatus(self,word_id):
         word_id = int(word_id)
@@ -805,6 +875,7 @@ class DataBase():
         json = {"word_name":result[0],"word_god":result[1],"word_level":result[2],"word_exp":result[3],"word_money":result[4],"word_id":word_id}
         print(json)
         self.conn.commit()
+        self.conn.close()
         return json
     
     def getUserWordStatus(self,user_line_id,word):
@@ -821,6 +892,7 @@ class DataBase():
         json = {"user_line_id":result[0],"money_give":result[1],"exp_give":result[2]}
         print(json)
         self.conn.commit()
+        self.conn.close()
         return json
     
     def getWordRank1(self,word):
@@ -835,6 +907,7 @@ class DataBase():
         self.cursor.execute(sql)
         result = self.cursor.fetchone()[0]
         self.conn.commit()
+        self.conn.close()
         if result is not None:
             return result
         else:
@@ -853,6 +926,7 @@ class DataBase():
         data = (hp,user_line_id)
         self.cursor.execute(sql,data)
         self.conn.commit()
+        self.conn.close()
         print("補滿血:")
 
     
@@ -865,8 +939,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * FROM maps where map_command_name = '" +map_command_name+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _json = {}
         _json={"map_id":row[0],"content_monster":row[1],"map_name":row[2],"monster_weight":row[4]}
         print(_json)
@@ -881,8 +957,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * FROM adventure_map_list where map_command_name = '" +map_command_name+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _json = {}
         _json={"map_id":row[0],"exp_min":row[1],"money_min":row[2],"map_name":row[3],"map_command_name":row[4]}
         print(_json)
@@ -897,8 +975,10 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql = "SELECT * FROM adventure_map_list where adventure_map_id = '" +str(map_id)+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
+        
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         _json = {}
         _json={"map_id":row[0],"exp_min":row[1],"money_min":row[2],"map_name":row[3],"map_command_name":row[4]}
         print(_json)
@@ -916,6 +996,7 @@ class DataBase():
         row = self.cursor.fetchone()
         # 事物提交
         self.conn.commit()
+        self.conn.close()
         if row is not None:
             return True
         else:
@@ -933,6 +1014,7 @@ class DataBase():
         row = self.cursor.fetchone()
         # 事物提交
         self.conn.commit()
+        self.conn.close()
         if row is not None:
             return True
         else:
@@ -949,6 +1031,7 @@ class DataBase():
         self.cursor.execute(sql)
         # 事物提交
         self.conn.commit()
+        self.conn.close()
         print("清空戰鬥:"+user_line_id)
     
     def getMonsterInfo(self,monster_id):
@@ -960,8 +1043,9 @@ class DataBase():
             self.cursor = self.conn.cursor()
         sql ="SELECT * FROM monsters where monster_id = '"+str(monster_id)+"'"
         self.cursor.execute(sql)
-        self.conn.commit()
         row = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         print("怪物基礎資料:")
         print(row)
         # 事物提交
@@ -980,6 +1064,7 @@ class DataBase():
         params = {'user_line_id':user_line_id, 'target_monster_id':monster_id,'now_turn':now_turn,'monster_hp':monster_hp,}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
         print("進入對戰列表:"+user_line_id)
     
     def setUserAdventureStatus(self,user_line_id,map_id):
@@ -996,6 +1081,7 @@ class DataBase():
         params = {'user_line_id':user_line_id, 'adventure_map_id':map_id,'pet_id':_user_pet,'start_time':str_todatabase,}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
         print("進入探險隊列表:"+user_line_id)
     
     def getUserAdventureStatus(self,user_line_id):
@@ -1010,6 +1096,7 @@ class DataBase():
         row = self.cursor.fetchone()
         # 事物提交
         self.conn.commit()
+        self.conn.close()
         print(row)
         _json ={"user_line_id":row[0],"map_id":row[1],"pet_id":row[2],"start_time":row[3]}
         return _json
@@ -1025,6 +1112,7 @@ class DataBase():
         self.cursor.execute(sql)
         # 事物提交
         self.conn.commit()
+        self.conn.close()
         print("清空探險隊:"+user_line_id)
     
     def UpdateUserBattleStatus(self,user_line_id,monster_id,now_turn,monster_hp):
@@ -1038,6 +1126,7 @@ class DataBase():
         params = {'line_id':user_line_id, 'target_monster_id':monster_id,'monster_hp':monster_hp,}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
         print("更新對戰列表:"+user_line_id)
     
     def getUserRoundInfo(self,user_line_id):
@@ -1052,6 +1141,7 @@ class DataBase():
         row = self.cursor.fetchone()
         # 事物提交
         self.conn.commit()
+        self.conn.close()
         print(row)
         _json ={"user_line_id":row[0],"target_monster_id":row[1],"now_turn":row[2],"monster_hp":row[3],"use_run_chance":row[4]}
         return _json
@@ -1067,6 +1157,7 @@ class DataBase():
         params = {'line_id':user_line_id, 'use_run_chance':bool}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
         print("更新對戰逃跑列表:"+user_line_id)
     
     def clearDailyRequest(self):
@@ -1079,6 +1170,7 @@ class DataBase():
         sql ="""UPDATE users SET daily_request_done = false"""
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
         print("0.00 DAILY CLEAR REQUEST DONE")
     
     def checkUserPackMaxLoc(self,user_line_id,item_type,item_id):###有修改###
@@ -1093,6 +1185,7 @@ class DataBase():
         self.cursor.execute(sql,params)
         self.conn.commit()
         row = self.cursor.fetchone()
+        self.conn.close()
         num = row[0]
         print("目前玩家背包序列index到達:"+str(num))
         if item_type == 'weapon':
@@ -1107,6 +1200,7 @@ class DataBase():
             self.cursor.execute(sql)
             self.conn.commit()
             row = self.cursor.fetchone()[0]
+            self.conn.close()
             if row == None:
                 if num == None:
                     return False,0
@@ -1139,6 +1233,7 @@ class DataBase():
             sql = """UPDATE user_backpack SET quantity={quantity} WHERE user_line_id = '{user_line_id}' and item_type = '{item_type}' and item_id = {item_id}""".format(quantity=quantity+row_quantity,user_line_id=user_line_id,item_type=item_type,item_id=item_id)
             self.cursor.execute(sql)
             self.conn.commit()
+        self.conn.close()
     
     #會移除玩家背包某個位置的東西 如果是武器會再幫她清除user_Weapon
     def removeUserBackPack(self,user_line_id,backpack_loc,quantity = 1):
@@ -1152,6 +1247,7 @@ class DataBase():
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         if _result is None:
             print("玩家此格背包沒有東西")
             return
@@ -1177,6 +1273,7 @@ class DataBase():
         sql ="""DELETE FROM user_backpack where user_line_id = %s and backpack_loc = %s """
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         self.conn.commit()
+        self.conn.close()
     
     #確定某格欄位有多少個物品
     def checkItemNumFromLoc(self,user_line_id,backpack_loc):
@@ -1193,6 +1290,7 @@ class DataBase():
         except:
             num = -999
         self.conn.commit()
+        self.conn.close()
         return num
     
     #消耗品會在同一格 所以要修改他的quantity
@@ -1209,6 +1307,7 @@ class DataBase():
             sql = """DELETE from user_backpack WHERE user_line_id = %s and backpack_loc = %s"""
             self.cursor.execute(sql,(user_line_id,backpack_loc,))
             self.conn.commit()
+        self.conn.close()
 
     
     def getItemFromUserBackPack(self,user_line_id,backpack_loc):
@@ -1222,6 +1321,7 @@ class DataBase():
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         _result = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         if _result == None or len(_result) ==0:
             return None
         else:
@@ -1245,6 +1345,7 @@ class DataBase():
         params = {'user_line_id':user_line_id,'weapon_id':weapon_id,'backpack_loc':backpack_loc,'str_add':str_add,'int_add':int_add,'dex_add':dex_add,'atk_add':atk_add}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
     
     def addToUserWeaponWithEnhanced(self,user_line_id,weapon_id,backpack_loc,str_add,int_add,dex_add,atk_add,uses_reel,available_reeltime,description,success_time):
         try:
@@ -1261,6 +1362,7 @@ class DataBase():
         'uses_reel':uses_reel,'available_reeltime':available_reeltime,'description':description,'success_time':success_time}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
     
     def getValueFromUserWeapon(self,user_line_id,backpack_loc):
         try:
@@ -1274,6 +1376,7 @@ class DataBase():
         self.cursor.execute(sql,(user_line_id,backpack_loc,))
         _result = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         print("武器加乘東西在這")
         print(_result)
         if _result[10] == ['None']:
@@ -1293,6 +1396,7 @@ class DataBase():
         sql ="""DELETE FROM user_weapon where user_line_id = %s and backpack_loc = %s """
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         self.conn.commit()
+        self.conn.close()
 
     #gm 用
     def givePlayerItem(self,user_lind_id,item_type,item_id,quantity=1):
@@ -1415,6 +1519,7 @@ class DataBase():
         sql = """UPDATE users_job SET equipment_weapon = %s WHERE user_line_id = %s"""
         self.cursor.execute(sql,(backpack_loc,user_line_id,))
         self.conn.commit()
+        self.conn.close()
     
     def getUserEquipmentList(self,user_line_id):
         user_job = self.getUserJob(user_line_id)
@@ -1430,6 +1535,7 @@ class DataBase():
         self.cursor.execute(sql,(user_line_id,))
         _result = self.cursor.fetchall()
         self.conn.commit()
+        self.conn.close()
         _weaponlist = []
         _now_weapon = {}
         for i in _result:
@@ -1511,6 +1617,7 @@ class DataBase():
         self.cursor.execute(sql,(user_line_id,reel_id,))
         rows = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         if rows == None:
             return None
         else:
@@ -1527,6 +1634,7 @@ class DataBase():
         sql = """UPDATE user_backpack SET quantity={quantity} WHERE user_line_id = '{user_line_id}' and item_type = 'reel' and item_id = {reel_id}""".format(quantity=quantity,user_line_id=user_line_id,reel_id=reel_id)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
 
     
     def getUserUsingWeapon(self,user_line_id):
@@ -1540,6 +1648,7 @@ class DataBase():
         self.cursor.execute(sql)
         rows = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         if rows is not None:
             equipment_weapon = rows[0]
             #
@@ -1562,6 +1671,7 @@ class DataBase():
         sql = """UPDATE user_weapon SET success_time = success_time+1 WHERE user_line_id = %s and backpack_loc = %s"""
         self.cursor.execute(sql,(user_line_id,backpack_loc))
         self.conn.commit()
+        self.conn.close()
     
     def getUserUsingReel(self,reel_id):
         try:
@@ -1574,6 +1684,7 @@ class DataBase():
         self.cursor.execute(sql)
         rows = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         if rows is not None:
             reelData = {'reel_id':rows[0],'plus_str':rows[1],'plus_int':rows[2],'plus_dex':rows[3],
                         'plus_atk':rows[4],'description':rows[5],'probability':rows[6],'image_type':rows[7],'reel_name':rows[8]}
@@ -1593,6 +1704,7 @@ class DataBase():
         self.cursor.execute(sql,(user_line_id,))
         _result = self.cursor.fetchall()
         self.conn.commit()
+        self.conn.close()
         if _result is not None:
             print(_result)
             _result_json = []
@@ -1624,6 +1736,7 @@ class DataBase():
             enhancedData['uses_reel'],enhancedData['available_reeltime'],enhancedData['user_line_id'],enhancedData['equipment_weapon'])
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def getSkillInfo(self,skill_id,job):
         try:
@@ -1637,6 +1750,7 @@ class DataBase():
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         
         if _result is not None:
             return {"skill_id":_result[0],"skill_name":_result[1],"skill_description":_result[2],"skill_effect_description":_result[3],"max_level":_result[4],"max_book_time":_result[5],"leveladd_one_book":_result[6],
@@ -1658,6 +1772,7 @@ class DataBase():
         params = {'user_line_id':user_line_id, 'skill_id':skill_id,'skill_job':skill_job,'skill_level':skill_level,'used_book_time':used_book_time}
         self.cursor.execute(sql,params)
         self.conn.commit()
+        self.conn.close()
 
     def getLevelSkillList(self,level,job):
         try:
@@ -1671,6 +1786,7 @@ class DataBase():
         self.cursor.execute(sql)
         _result = self.cursor.fetchall()
         self.conn.commit()
+        self.conn.close()
         list = []
         if _result is not None:
             for id in _result:
@@ -1690,6 +1806,8 @@ class DataBase():
         sql = "SELECT skill_id,skill_job FROM user_skill where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
         self.cursor.execute(sql)
         _result = self.cursor.fetchall()
+        self.conn.commit()
+        self.conn.close()
         _skills = {}
         _userskill_list = []
         for _id in _result:
@@ -1713,6 +1831,8 @@ class DataBase():
         sql = "SELECT skill_id FROM user_skill where user_line_id = '{user_line_id}' and skill_id = {skill_id} and skill_job = '{skill_job}'".format(user_line_id = user_line_id,skill_id = skill_id,skill_job=skill_job)
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
+        self.conn.commit()
+        self.conn.close()
         if _result is not None:
             return True
         else:
@@ -1728,6 +1848,8 @@ class DataBase():
         sql = "SELECT skill_id,skill_job FROM user_skill where user_line_id = '{user_line_id}'".format(user_line_id = user_line_id)
         self.cursor.execute(sql)
         _result = self.cursor.fetchall()
+        self.conn.commit()
+        self.conn.close()
         _skills = {}
         _userskill_list = []
         for _id in _result:
@@ -1760,6 +1882,7 @@ class DataBase():
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         if _result == None:
             return None
         _skillfromUser =  {"skill_id":_result[0],"skill_level":_result[1],"used_book_time":_result[2]}
@@ -1833,6 +1956,7 @@ class DataBase():
         sql = "UPDATE user_skill SET skill_level = skill_level+1 where skill_id = {skill_id} and skill_job ='{skill_job}' and user_line_id = '{user_line_id}'".format(skill_id=skill_id,skill_job=skill_job,user_line_id=user_line_id)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     def decUserSkillPoint(self,user_line_id):
         try:
@@ -1844,6 +1968,7 @@ class DataBase():
         sql = "UPDATE users_job SET skill_point = skill_point-1 where user_line_id = '{user_line_id}'".format(user_line_id=user_line_id)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
     
     #轉蛋
     def getGashaponPrizeList(self,gashapon_num):
@@ -1860,6 +1985,7 @@ class DataBase():
         sql = "SELECT * FROM gashapon_list_{gashapon_tableName}".format(gashapon_tableName=gashapon_tableName)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
         prizeList=[]
         prizeList = self.cursor.fetchall()
         return prizeList
@@ -1879,6 +2005,7 @@ class DataBase():
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()[0]
         self.conn.commit()
+        self.conn.close()
         print(int(_result))
         return int(_result)
     
@@ -1911,6 +2038,7 @@ class DataBase():
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()[0]
         self.conn.commit()
+        self.conn.close()
         print(int(_result))
         return int(_result)
 
@@ -1950,6 +2078,7 @@ class DataBase():
             )
             self.cursor.execute(sql)
             self.conn.commit()
+            self.conn.close()
     
     def getAuction(self,auction_id):
         try:
@@ -1962,6 +2091,7 @@ class DataBase():
         self.cursor.execute(sql)
         _auction = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         owner_name = self.getUser(_auction[1])["user_line_name"]
         _auction_json = {"auction_id":_auction[0],"auction_line_id":_auction[1],"auction_owner":owner_name,"item_id":_auction[2],"list_price":_auction[3],
         "auction_start_time":_auction[4],"str_add":_auction[5],"int_add":_auction[6],"dex_add":_auction[7],"atk_add":_auction[8],"available_reeltime":_auction[9],
@@ -1983,6 +2113,7 @@ class DataBase():
         sql = "DELETE FROM auction_list where auction_id = '{auction_id}' AND user_line_id = '{user_line_id}'".format(auction_id = auction_id,user_line_id = user_line_id)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
         print("remove auction:"+str(auction_id)+"done")
     
     def getAuctionList(self,item_type):
@@ -1998,6 +2129,7 @@ class DataBase():
         if result is None or len(result) ==0:
             return None
         self.conn.commit()
+        self.conn.close()
         auctions = []
         for _auction in result:
             #print(_auction)
@@ -2031,6 +2163,7 @@ class DataBase():
         sql = "INSERT INTO word_boss_status(boss_id,start_time,hp) VALUES({boss_id},'{start_time}',{hp})".format(boss_id = boss_id,start_time = str_database,hp = bossinfo["boss_hp"])
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
 
     def getWordBossStatus(self):
         try:
@@ -2046,6 +2179,7 @@ class DataBase():
             print("目前沒有世界boss喔")
             return None
         self.conn.commit()
+        self.conn.close()
         _json ={"boss_id":result[0],"start_time":result[1],"hp":result[2],"word1_damage":result[3],"word2_damage":result[4],"word3_damage":result[5],"last_word_army":result[6],"word1_last_damage":result[7],"word2_last_damage":result[8],"word3_last_damage":result[9]}
         return _json
     
@@ -2060,6 +2194,7 @@ class DataBase():
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         if result is None:
             return None
         _json = {"boss_id":result[0],"boss_name":result[1],"boss_hp":result[2],"boss_drop_weapon":result[3],"boss_image_url":result[4],
@@ -2078,6 +2213,7 @@ class DataBase():
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         if result is None:
             return None
         _json = {"user_line_id":result[0],"total_damage":result[1],"word_guide":result[2],"last_atack_time":result[3]}
@@ -2101,6 +2237,7 @@ class DataBase():
         sql = "INSERT INTO user_word_boss_status(user_line_id,total_damage,word_guide) VALUES('{user_line_id}',{total_damage},{word_guide})".format(user_line_id = user_line_id,total_damage = 0,word_guide =user_word)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
         print("玩家加入世界王")
     
     def addUserWordBossDamage(self,user_line_id,damage):
@@ -2117,6 +2254,7 @@ class DataBase():
         sql = "UPDATE user_word_boss_status SET total_damage = total_damage+{damage}, last_atack_time = '{current}' where user_line_id ='{user_line_id}' ".format(user_line_id = user_line_id,damage = damage,current = current)
         self.cursor.execute(sql)
         self.conn.commit()
+        self.conn.close()
         print("玩家攻擊世界王")
 
 
@@ -2131,6 +2269,7 @@ class DataBase():
         self.cursor.execute(sql)
         result = self.cursor.fetchall()
         self.conn.commit()
+        self.conn.close()
         players=[]
         for player in result:
             _username = self.getUser(player[0])["user_line_name"]
@@ -2148,6 +2287,7 @@ class DataBase():
         self.cursor.execute(sql)
         result = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         result = int(result[0])
         return result
     
@@ -2219,6 +2359,7 @@ class DataBase():
             sql = "UPDATE word_boss_status SET hp = {hp}".format(hp = now_boss_status["hp"])
             self.cursor.execute(sql)
             self.conn.commit()
+            self.conn.close()
         else:
             print("世界boss已陣亡")
             now_boss_status = self.getWordBossStatus()
@@ -2259,6 +2400,7 @@ class DataBase():
             sql = "delete from user_word_boss_status"
             self.cursor.execute(sql)
             self.conn.commit()
+            self.conn.close()
     
     def getWordlevelList(self,level):
         try:
@@ -2271,6 +2413,7 @@ class DataBase():
         self.cursor.execute(sql)
         _result = self.cursor.fetchone()
         self.conn.commit()
+        self.conn.close()
         if _result is not None:
             json = {"level":_result[0],"next_level_exp":int(_result[1]),"next_level_money":int(_result[2]),"abibilty_add":_result[3],"exp_add":_result[4]
             ,"build_num":_result[5],"daily_cost_money":_result[6],"army_num":_result[7]}
@@ -2290,6 +2433,7 @@ class DataBase():
         self.cursor.execute(sql)
         self.conn.commit()
         row = self.cursor.fetchall()
+        self.conn.close()
         for user in row:
             id = user[0]
             job = user[1]
