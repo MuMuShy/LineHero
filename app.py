@@ -892,7 +892,9 @@ def handle_message(event):
             return
         _jobjson = database.getUserJob(event.source.user_id)
         profile = line_bot_api.get_profile(event.source.user_id)
-        user_line_img = profile.picture_url
+        user_line_img = str(profile.picture_url)
+        if user_line_img.startswith("https") is False:
+            user_line_img = 'https://mumu.tw/images/game_ui/job_bkg.jpg'
         _rank = database.getUserRpgRank(event.source.user_id)
         _weapon = database.getUserEquipmentWeapon(event.source.user_id)
         _packagejson = lineMessagePackerRpg.getJobInfo(user_line_img,_jobjson,_rank,_weapon)

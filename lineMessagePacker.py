@@ -5,6 +5,8 @@ import json
 
 
 def getInfoFlexJson(user_name,user_type,user_img_link,user_money,locked_money,user_id,ranking):
+    if str(user_img_link).startswith('http') is False:
+        user_img_link = 'https://mumu.tw/images/game_ui/job_bkg.jpg'
     color = "#ff0000"
     if user_type != "GM":
         color = "#6666ff"

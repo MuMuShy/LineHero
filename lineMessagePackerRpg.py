@@ -5,6 +5,8 @@ from Games import rpgDictionary, rpgGame
 
 def getJobInfo(user_img_link,user_job_info,_rank,equipment_weapon_info):
     print(user_job_info)
+    if user_img_link == "" or len(user_img_link)<=0:
+        user_img_link = 'https://mumu.tw/images/game_ui/job_bkg.jpg'
     from Games import rpgGame 
     #userjobinfo = {"job","exp","hp","str","int","dex","level"}
     jobrul=""
