@@ -526,6 +526,7 @@ def handle_message(event):
                 ])
         return
     elif user_send =="@attackWordBoss":
+        
         #check word boss status
         _wordboss_status = database.getWordBossStatus()
         # line_bot_api.reply_message(
@@ -628,11 +629,18 @@ def handle_message(event):
         try:
             _skilljob = user_send.split(" ")[1]
             _skillid = user_send.split(" ")[2]
+            _test = int(_skillid)
         except:
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="指令好像有問題ㄛ 請盡量用按鈕謝謝"))
             return
+        if _skilljob != 'rog' and _skilljob !='warrior' and _skilljob !='majic':
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="指令好像有問題ㄛ 請盡量用按鈕謝謝"))
+            return
+
         try:
             _userjobinfo = database.getUserJob(event.source.user_id)
         except:
