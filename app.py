@@ -938,8 +938,6 @@ def handle_message(event):
         else:
             _flex_equipment = lineMessagePackerRpg.getEquipmentList(_weapon_json_list,_first)
             _sendlist.append(FlexSendMessage("裝備列表",contents=_flex_equipment))
-        print("裝備列表:")
-        print(_sendlist)
         line_bot_api.reply_message(
             event.reply_token,_sendlist)
         return
