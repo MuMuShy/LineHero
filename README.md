@@ -1,4 +1,4 @@
-# LINE-Hero
+# LINE-Hero 此Repo為舊版已棄用
 
 **LINE-Hero 無盡冒險 是一款透過文字對化進行的線上RPG遊戲**
 官網: https://linehero.tw
